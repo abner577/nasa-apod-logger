@@ -1,11 +1,10 @@
 import requests
 import os
 from dotenv import load_dotenv
-import datetime
 
-from storage import *
-from browser_utils import *
-from test_data import TEST_DATA
+from storage.data_storage import *
+from utils.browser_utils import *
+from utils.data_utils import *
 
 load_dotenv()
 
@@ -129,15 +128,3 @@ def get_apod_for_specific_day():
                 print(e)
     return None
 
-
-def format_apod_data(apod_data):
-    cur_time = datetime.datetime.now()
-    cur_time = cur_time.strftime("Day: %m-%d-%Y | Time: %H:%M:%S")
-
-    explanation = apod_data["explanation"].split(".") # makes a list of all the diff sentences, then we just want to return the first 2 sentences
-    explanation = explanation[0].strip(" ") + "." + explanation[1] + "." # First we strip off all white space from before the first sentence, then we manually add periods right after each sentence.
-
-    dict_to_return = {'date': apod_data['date'], 'title': apod_data['title'], 'url': apod_data['url'],
-                      'explanation': explanation, 'logged_at': cur_time}
-
-    return dict_to_return

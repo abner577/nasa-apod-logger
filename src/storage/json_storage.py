@@ -25,16 +25,20 @@ def create_json_output_file():
 # Wrong right now, this isnt executing not sure why
 def check_for_duplicate_json_entries(formatted_apod_data):
     try:
-        with open(file=json_file_path, mode='r', encoding='utf-8') as json_file:
-            content = json.load(json_file)
-            print(content)
-            print("CHECK IS HAPPENING")
-            for entry in content:
-                if formatted_apod_data['title'] == entry['title']:
+        with open(file=json_file_path, mode='r') as json_file:
+            for line in json_file:
+                if line is None or len(line) == 0:
+                    continue
+
+                content = json.loads(line)
+                print(f"Cur Line: {line}")
+                if content['date'] == formatted_apod_data['date']:
                     return True
 
     except PermissionError:
         print(f"Dont have permission to read from {json_file_path}.")
+    except json.decoder.JSONDecodeError:
+        print(f"Could not decode JSON from the file '{json_file}'. Check the file format.")
     except Exception as e:
         print(e)
 
@@ -45,13 +49,15 @@ def log_data_to_json(formatted_apod_data):
         print(f"json file {json_file_path} does not exist ❌. Create it before proceeding.")
         return
 
-    if check_for_duplicate_json_entries(formatted_apod_data):
+    flag = check_for_duplicate_json_entries(formatted_apod_data)
+    print(f"Flag value: {flag}")
+    if flag:
         print("This entry has already been logged. Not logging again.")
         return
 
     try:
         with open(file=json_file_path, mode='a', encoding='utf-8') as json_file:
-            json.dump(formatted_apod_data, json_file, ensure_ascii=False, indent=0)
+            json_file.write(json.dumps(formatted_apod_data, ensure_ascii=False) + "\n")
 
     except PermissionError:
         print(f"Dont have permission to write to {json_file_path}.")
@@ -65,5 +71,6 @@ def clear_json_output_file():
 
 def delete_json_output_file():
     pass
+
 
 log_data_to_json(FORMATTED_TEST_DATA)

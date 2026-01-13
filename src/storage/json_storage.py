@@ -34,6 +34,9 @@ def log_data_to_json(formatted_apod_data):
 
 
 def clear_json_output_file():
+    if not check_if_json_output_exists():
+        return
+
     try:
         with open(file=json_file_path, mode='w') as json_file:
             print(f"Successfully cleared file: '{json_file_name}' ✅")
@@ -82,16 +85,6 @@ def show_first_n_json_log_entries(entries_amount):
         print(e)
 
 
-def format_raw_jsonl_entry(formatted_jsonl_entry, count):
-    print(f"=====================================")
-    print(f"Entry #{count + 1} ({formatted_jsonl_entry['title']}):")
-    print(f"Date: {formatted_jsonl_entry['date']}\n"
-          f"Title: {formatted_jsonl_entry['title']}\n"
-          f"Url: {formatted_jsonl_entry['url']}\n"
-          f"Explanation: {formatted_jsonl_entry['explanation']}\n"
-          f"Logged_At: {formatted_jsonl_entry['logged_at']}")
-
-
 def show_last_n_json_log_entries(entries_amount):
     entries_list = []
 
@@ -122,6 +115,7 @@ def show_last_n_json_log_entries(entries_amount):
                     entries_list.remove(entries_list[removed_counter])
                     removed_counter += 1
 
+            print(entries_list)
 
     except PermissionError:
         print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
@@ -147,3 +141,4 @@ def fetch_oldest_json_apod():
 def show_all_json_entries():
     pass
 
+show_last_n_json_log_entries(3)

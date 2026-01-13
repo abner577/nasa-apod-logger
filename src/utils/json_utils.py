@@ -51,3 +51,14 @@ def check_if_json_output_exists():
 
     print(f"File: '{json_file_name}' at path: '{json_file_path}' not found ❌.")
     return False
+
+def format_raw_jsonl_entry(formatted_jsonl_entry, count):
+    print(f"=====================================")
+    print(f"Entry #{count + 1} ({formatted_jsonl_entry['title']}):")
+    print(f"Date: {formatted_jsonl_entry['date']}\n"
+          f"Title: {formatted_jsonl_entry['title']}\n"
+          f"Url: {formatted_jsonl_entry['url']}\n"
+          f"Explanation: {formatted_jsonl_entry['explanation']}\n"
+          f"Logged_At: {formatted_jsonl_entry['logged_at']}")
+
+

@@ -101,7 +101,7 @@ def write_header_to_csv():
 
 def show_first_n_csv_log_entries(entries_amount):
     if entries_amount < 1:
-        print("Amount of entries cannot be less than 1.")
+        print("Amount of entries cannot be less than 1 ❌")
         return
 
     count = 0
@@ -113,6 +113,9 @@ def show_first_n_csv_log_entries(entries_amount):
         with open(file=csv_file_path, mode='r', encoding='utf-8') as csv_file:
             content = csv.reader(csv_file)
             for row in content:
+                if not row or row[0] == 'date':
+                    continue
+
                 count += 1
 
     except PermissionError:
@@ -147,14 +150,14 @@ def show_first_n_csv_log_entries(entries_amount):
 
 def format_raw_csv_entry(formatted_csv_entry, count):
     print(f"=====================================")
-    print(f"Entry #{count} ({formatted_csv_entry[1]}):")
+    print(f"Entry #{count + 1} ({formatted_csv_entry[1]}):")
     print(f"Date: {formatted_csv_entry[0]}\n"
           f"Title: {formatted_csv_entry[1]}\n"
           f"Url: {formatted_csv_entry[2]}\n"
           f"Explanation: {formatted_csv_entry[3]}\n"
           f"Logged_At: {formatted_csv_entry[4]}")
 
-show_first_n_csv_log_entries(5)
+show_first_n_csv_log_entries(1)
 
 def fetch_most_recent_csv_apod():
     pass

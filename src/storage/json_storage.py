@@ -130,15 +130,13 @@ def show_first_n_json_log_entries(entries_amount):
 
 def format_raw_jsonl_entry(formatted_jsonl_entry, count):
     print(f"=====================================")
-    print(f"Entry #{count} ({formatted_jsonl_entry['title']}):")
+    print(f"Entry #{count + 1} ({formatted_jsonl_entry['title']}):")
     print(f"Date: {formatted_jsonl_entry['date']}\n"
           f"Title: {formatted_jsonl_entry['title']}\n"
           f"Url: {formatted_jsonl_entry['url']}\n"
           f"Explanation: {formatted_jsonl_entry['explanation']}\n"
           f"Logged_At: {formatted_jsonl_entry['logged_at']}")
 
-
-show_first_n_json_log_entries(4)
 
 def fetch_most_recent_json_apod():
     pass
@@ -151,7 +149,63 @@ def fetch_oldest_json_apod():
 def show_all_json_entries():
     pass
 
+def get_line_count(count):
+    try:
+        with open(file=json_file_path, mode='r') as json_file:
+            for line in json_file:
+                count += 1
+
+    except PermissionError:
+        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+    except json.decoder.JSONDecodeError:
+        print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
+    except Exception as e:
+        print(e)
+
+    return count
 
 
+def show_last_n_json_log_entries(entries_amount):
+    entries_list = []
+
+    if entries_amount < 1:
+        print("Amount of entries cannot be less than 1.")
+        return
+
+    if not check_if_json_output_exists():
+        return
+
+    line_count = get_line_count(0)
+
+    if entries_amount > line_count:
+        print(f"We only have {line_count} entries in total. Displaying all the entries that we have...")
+        entries_amount = line_count
+
+    count = 0
+    removed_counter = 0
+
+    try:
+        with open(file=json_file_path, mode='r') as json_file:
+            for line in json_file:
+                content = json.loads(line)
+                entries_list.append(content)
+                count += 1
+
+                if count > entries_amount:
+                    entries_list.remove(entries_list[removed_counter])
+                    removed_counter += 1
+
+
+    except PermissionError:
+        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+    except json.decoder.JSONDecodeError:
+        print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
+    except Exception as e:
+        print(e)
+
+    count = 0
+    for entry in entries_list:
+        format_raw_jsonl_entry(entry, count)
+        count += 1
 
 

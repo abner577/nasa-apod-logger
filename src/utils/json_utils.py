@@ -46,7 +46,6 @@ def check_for_duplicate_json_entries(formatted_apod_data):
 
 def check_if_json_output_exists():
     if Path(json_file_path).exists() and Path(json_file_path).is_file():
-        print(f"File: '{json_file_name}' at path: '{json_file_path}' found ✅.")
         return True
 
     print(f"File: '{json_file_name}' at path: '{json_file_path}' not found ❌.")

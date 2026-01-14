@@ -1,3 +1,5 @@
+from itertools import count
+
 from src.storage.data_storage import DIR_PATH
 from src.utils.json_utils import *
 from src.utils.data_utils import *
@@ -55,6 +57,9 @@ def delete_json_output_file():
 def show_first_n_json_log_entries(entries_amount):
     if entries_amount < 1:
         print("Amount of entries cannot be less than 1.")
+        return
+
+    if not check_if_json_output_exists():
         return
 
     line_count = get_line_count(0)
@@ -139,6 +144,28 @@ def fetch_oldest_json_apod():
 
 
 def show_all_json_entries():
+    if not check_if_json_output_exists():
+        return
+
+    count = 0
+    try:
+        with open(file=json_file_path, mode='r') as json_file:
+            for line in json_file:
+                if line is None or len(line) == 0:
+                    continue
+
+                content = json.loads(line)
+                format_raw_jsonl_entry(content, count)
+                count += 1
+
+    except PermissionError:
+        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+    except json.decoder.JSONDecodeError:
+        print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
+    except Exception as e:
+        print(e)
+
+def delete_one_json_entry():
     pass
 
-show_last_n_json_log_entries(2)
+

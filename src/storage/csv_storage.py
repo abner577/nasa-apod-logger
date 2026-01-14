@@ -158,5 +158,27 @@ def fetch_oldest_csv_apod():
 
 
 def show_all_csv_entries():
-    pass
+    if not check_if_csv_output_exists():
+        return
 
+    count = 0
+    try:
+        with open(file=csv_file_path, mode='r', encoding='utf-8') as csv_file:
+            content = csv.reader(csv_file)
+
+            for row in content:
+                if not row or row[0] == 'date':
+                    continue
+
+                format_raw_csv_entry(row, count)
+                count += 1
+
+
+    except PermissionError:
+        print(f"Dont have permission to read file: '{csv_file_name}' at path: '{csv_file_path}'.")
+    except Exception as e:
+        print(e)
+
+
+def delete_one_csv_entry():
+    pass

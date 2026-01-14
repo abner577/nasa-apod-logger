@@ -19,11 +19,11 @@ def get_todays_apod():
     print("Getting today's apod...")
 
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
-    print(full_url)
+    print(f"Full_url: {full_url}")
     response = requests.get(full_url)
 
     if response.status_code == 200:
-        print("Today's apod was successfully retrieved! 🚀")
+        print("Today's apod was successfully retrieved! 🚀\n")
         apod_data = response.json()
         apod_data = format_apod_data(apod_data)
 
@@ -33,10 +33,13 @@ def get_todays_apod():
             create_data_directory()
 
         print("Writing data to csv... 🗄️")
+        log_data_to_csv(apod_data)
 
         print("Writing to json... 🗃️")
+        log_data_to_json(apod_data)
 
-        print("Redirecting user...")
+        print(f"Redirecting user based on url: {apod_data['url']}")
+
 
         return apod_data
 
@@ -70,47 +73,42 @@ def get_apod_for_specific_day():
 
                     if date_object < NASA_APOD_START_DATE:
                         print("⚠️ Please enter a date after June 16, 1995")
-                        print(flag)
                     elif date_object > date_today:
                         print(f"⚠️ Please enter a date before {date_today}")
                     else:
                         full_url = f"{BASE_URL}?api_key={NASA_API_KEY}&date={date_object}"
-                        print(full_url)
-                        print(date_object)
                         print(f"Retrieving {date_object}'s APOD...")
                         response = requests.get(full_url)
-                        print(response)
 
                         if response.status_code == 200:
-                            print("Today's apod was successfully retrieved! 🚀")
+                            print("APOD was successfully retrieved! 🚀\n")
                             apod_data = response.json()
                             apod_data = format_apod_data(apod_data)
 
                             if check_if_data_exists():
-                                print("Data directory already exists ✅")
 
                                 print("Writing data to csv... 🗄️")
-                                log_data_to_csv()
+                                log_data_to_csv(apod_data)
 
                                 print("Writing to json... 🗃️")
-                                log_data_to_json()
+                                log_data_to_json(apod_data)
 
-                                flag = False
-                                return apod_data
+                                print(f"Taking user to url: {apod_data['url']}")
+                                take_user_to_browser()
+
 
                             else:
                                 print("Data directory doesnt exist ❌. Creating Data Directory... ")
                                 create_data_directory()
 
                                 print("Writing data to csv... 🗄️")
-                                log_data_to_csv()
+                                log_data_to_csv(apod_data)
 
                                 print("Writing to json... 🗃️")
-                                log_data_to_json()
+                                log_data_to_json(apod_data)
 
-                                flag = False
-                                return apod_data
-
+                                print(f"Taking user to url: {apod_data['url']}")
+                                take_user_to_browser()
 
                         elif response.status_code == 404 or response.status_code == 403:
                             print("🚫 This is a user error. Check your API key and try again.")
@@ -126,3 +124,4 @@ def get_apod_for_specific_day():
                 print(e)
     return None
 
+get_apod_for_specific_day()

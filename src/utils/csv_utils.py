@@ -29,7 +29,6 @@ def check_for_duplicate_csv_entries(formatted_apod_data):
 
 def check_if_csv_output_exists():
     if Path(csv_file_path).exists() and Path(csv_file_path).is_file():
-        print(f"File: '{csv_file_name}' at path: '{csv_file_path}' found ✅")
         return True
 
     print(f"File: '{csv_file_name}' at path: '{csv_file_path}' does not exist ❌. Create it before proceeding...")

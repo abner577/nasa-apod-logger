@@ -4,6 +4,7 @@ from src.utils.csv_utils import *
 from src.utils.data_utils import *
 
 DIR_PATH = "C://Users/joser/PycharmProjects/NASA-APOD-Logger"
+NASA_APOD_START_DATE = datetime.date(1995, 6, 16)
 
 HEADERS = {
     "date": "",
@@ -181,4 +182,57 @@ def show_all_csv_entries():
 
 
 def delete_one_csv_entry():
-    pass
+    entries_to_keep = []
+
+    if not check_if_csv_output_exists():
+        print("CSV file does not exist ❌.")
+        return
+
+    year = int(input("Enter a year (YYYY): "))
+    month = int(input("Enter a month (MM): "))
+    day = int(input("Enter a day (DD): "))
+
+    date_object = datetime.date(year, month, day)
+    date_today = datetime.date.today()
+
+    if date_object < NASA_APOD_START_DATE:
+        print("⚠️ Please enter a date after June 16, 1995")
+        return
+
+    if date_object > date_today:
+        print(f"⚠️ Please enter a date before {date_today}")
+        return
+
+    target_date = date_object.isoformat()
+    found = False
+
+    try:
+        # READ PHASE
+        with open(csv_file_path, mode="r", encoding="utf-8", newline="") as csv_file:
+            reader = csv.DictReader(csv_file)
+
+            for row in reader:
+                if row["date"] == target_date:
+                    found = True
+                    continue
+                entries_to_keep.append(row)
+
+        if not found:
+            print("This entry was not found ❌.")
+            return
+
+        print("Removing entry...")
+
+        # WRITE PHASE (overwrite file)
+        with open(csv_file_path, mode="w", encoding="utf-8", newline="") as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=reader.fieldnames)
+
+            writer.writeheader()
+            writer.writerows(entries_to_keep)
+
+        print("Entry removed ✅.")
+
+    except PermissionError:
+        print(f"Dont have permission to read/write '{csv_file_name}' at path: '{csv_file_path}'.")
+    except Exception as e:
+        print(e)

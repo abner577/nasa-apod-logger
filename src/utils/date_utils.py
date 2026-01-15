@@ -1,8 +1,4 @@
-import datetime
-
-
-NASA_APOD_START_DATE = datetime.date(1995, 6, 16)
-DATE_TODAY = datetime.date.today()
+from src.config import NASA_APOD_START_DATE, DATE_TODAY
 
 def check_valid_nasa_date(date_object):
     if date_object < NASA_APOD_START_DATE:

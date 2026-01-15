@@ -1,3 +1,10 @@
+"""
+nasa_client.py
+
+Handles all interactions with NASA's APOD public API.
+Responsible for fetching APOD data and coordinating persistence actions.
+"""
+
 import requests
 import os
 from dotenv import load_dotenv
@@ -15,6 +22,17 @@ BASE_URL = os.getenv('BASE_URL')
 
 
 def get_todays_apod():
+    """
+       Fetch today's Astronomy Picture of the Day (APOD) from NASA's API.
+
+       Retrieves the APOD for the current date, formats the response data,
+       ensures the data directory exists, and logs the snapshot to both
+       CSV and JSONL storage.
+
+       Returns:
+            None:
+       """
+
     print("Getting today's apod...")
 
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
@@ -39,20 +57,26 @@ def get_todays_apod():
 
         print(f"Redirecting user based on url: {apod_data['url']}")
 
-
-        return apod_data
-
     elif response.status_code == 404 or response.status_code == 403:
         print("This is a user error. Check your API key and try again.")
-        return None
+        return
     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
         print("This is a server error. Try again later.")
-        return None
-
-    return None
+        return
 
 
 def get_apod_for_specific_day():
+    """
+       Fetch the Astronomy Picture of the Day (APOD) for a user-specified date.
+
+       Prompts the user for a year, month, and day, validates the date against
+       NASA APOD constraints, retrieves the APOD for that date, and logs the
+       snapshot to CSV and JSONL storage.
+
+       Returns:
+         None:
+       """
+
     flag = True
     while flag:
         try:
@@ -114,5 +138,14 @@ def get_apod_for_specific_day():
 
 
 def get_random_n_apods():
-    pass
+    """
+    Fetch a user-defined number of random Astronomy Picture of the Day (APOD) entries.
 
+    Intended to prompt the user for a count, retrieve that many random APOD
+    entries from NASA's API, and log each snapshot to persistent storage.
+
+    Returns:
+        None:
+    """
+
+    pass

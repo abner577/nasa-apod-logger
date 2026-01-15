@@ -1,5 +1,11 @@
-import csv
+"""
+csv_storage.py
 
+CSV persistence layer for APOD snapshots.
+Responsible for creating, writing, reading, and rewriting the CSV log.
+"""
+
+import csv
 from src.utils.csv_utils import *
 from src.utils.data_utils import *
 from src.config import DIR_PATH, csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY
@@ -16,6 +22,13 @@ HEADERS = {
 
 
 def create_csv_output_file():
+    """
+     Create the CSV output file if it does not already exist.
+
+     Returns:
+         None:
+     """
+
     if check_if_csv_output_exists():
         return
 
@@ -25,6 +38,16 @@ def create_csv_output_file():
 
 
 def log_data_to_csv(formatted_apod_data):
+    """
+       Append a formatted APOD snapshot to the CSV log.
+
+       Args:
+    formatted_apod_data: A dict containing the snapshot fields to write.
+
+       Returns:
+        None:
+       """
+
     if not check_if_csv_output_exists():
         return
 
@@ -33,6 +56,8 @@ def log_data_to_csv(formatted_apod_data):
 
     try:
         with open(file=csv_file_path, mode='a', encoding='utf-8', newline="") as csv_file:
+            # newline="" prevents extra blank lines on Windows when writing CSV.
+            # DictWriter writes dict values in the exact order of fieldnames.
             writer = csv.DictWriter(csv_file, fieldnames=formatted_apod_data.keys())
             writer.writerow(formatted_apod_data)
             print(f"Successfully logged data to '{csv_file_name}' ✅")
@@ -42,7 +67,15 @@ def log_data_to_csv(formatted_apod_data):
     except Exception as e:
         print(e)
 
+
 def clear_csv_output_file():
+    """
+       Clear (truncate) the CSV output file contents.
+
+       Returns:
+           None:
+       """
+
     try:
         with open(file=csv_file_path, mode='w', encoding='utf-8') as csv_file:
             print(f"Successfully cleared file: '{csv_file_name}' ✅")
@@ -54,11 +87,25 @@ def clear_csv_output_file():
 
 
 def delete_csv_output_file():
+    """
+       Delete the CSV output file from disk.
+
+       Returns:
+           None:
+       """
+
     Path(f"{csv_file_path}").unlink()
     print(f"File: '{csv_file_name}' at path: '{csv_file_path}' deleted ✅.")
 
 
 def write_header_to_csv():
+    """
+    Write the CSV header row to the output file.
+
+    Returns:
+        None:
+    """
+
     try:
         with open(file=csv_file_path, mode='a', encoding='utf-8') as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=HEADERS.keys())
@@ -69,7 +116,18 @@ def write_header_to_csv():
     except Exception as e:
         print(e)
 
+
 def show_first_n_csv_log_entries(entries_amount):
+    """
+     Display the first N logged CSV entries.
+
+     Args:
+    entries_amount: Number of entries to display.
+
+     Returns:
+        None:
+     """
+
     if entries_amount < 1:
         print("Amount of entries cannot be less than 1 ❌")
         return
@@ -105,6 +163,16 @@ def show_first_n_csv_log_entries(entries_amount):
 
 
 def show_last_n_csv_log_entries(entries_amount):
+    """
+        Display the last N logged CSV entries.
+
+        Args:
+        entries_amount: Number of entries to display.
+
+        Returns:
+            None:
+        """
+
     entries_list = []
 
     if entries_amount < 1:
@@ -136,7 +204,6 @@ def show_last_n_csv_log_entries(entries_amount):
                     entries_list.remove(entries_list[0])
                     count -= 1
 
-
     except PermissionError:
         print(f"Dont have permission to read file: '{csv_file_name}' at path: '{csv_file_path}'.")
     except Exception as e:
@@ -149,6 +216,13 @@ def show_last_n_csv_log_entries(entries_amount):
 
 
 def show_all_csv_entries():
+    """
+      Display all logged CSV entries.
+
+      Returns:
+          None:
+      """
+
     if not check_if_csv_output_exists():
         return
 
@@ -172,6 +246,16 @@ def show_all_csv_entries():
 
 
 def delete_one_csv_entry():
+    """
+        Delete a single CSV entry by its APOD date.
+
+        Prompts the user for a date, removes the matching row, and rewrites the
+        CSV file with the remaining entries.
+
+        Returns:
+            None:
+        """
+
     entries_to_keep = []
 
     if not check_if_csv_output_exists():
@@ -226,10 +310,26 @@ def delete_one_csv_entry():
 
 
 def fetch_most_recent_csv_apod():
+    """
+      Fetch the most recent APOD (by date) from the CSV log.
+      Doesn't matter in which order it was logged.
+      Ex: Todays APOD will always be the most recent.
+
+      Returns:
+          None:
+      """
+
     pass
 
 
 def fetch_oldest_csv_apod():
-    pass
+    """
+          Fetch the oldest APOD (by date) from the CSV log.
+          Doesn't matter in which order it was logged.
+          Ex: First APOD ever uploaded will always be the oldest.
 
-delete_one_csv_entry()
+          Returns:
+              None:
+          """
+
+    pass

@@ -4,6 +4,7 @@ json_storage.py
 JSONL persistence layer for APOD snapshots.
 Responsible for creating, writing, reading, and rewriting the JSONL log.
 """
+from itertools import count
 
 from src.utils.json_utils import *
 from src.utils.data_utils import *
@@ -299,7 +300,37 @@ def fetch_most_recent_json_apod():
          Returns:
              None:
     """
-    pass
+    if not check_if_json_output_exists():
+        return
+
+    most_recent_date = NASA_APOD_START_DATE.isoformat()
+    most_recent_apod = None
+
+    try:
+        with open(file=json_file_path, mode='r') as json_file:
+            for line in json_file:
+                if line is None or len(line) == 0:
+                    continue
+
+                content = json.loads(line)
+
+                if content['date'] >= most_recent_date:
+                    most_recent_date = content['date']
+                    most_recent_apod = content
+
+            if most_recent_apod is None:
+                print(f"{json_file_name} is empty ❌.")
+                return
+
+            most_recent_apod = format_apod_data(most_recent_apod)
+            format_raw_jsonl_entry(most_recent_apod, 0)
+
+    except PermissionError:
+        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+    except json.decoder.JSONDecodeError:
+        print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
+    except Exception as e:
+        print(e)
 
 
 def fetch_oldest_json_apod():
@@ -312,7 +343,37 @@ def fetch_oldest_json_apod():
             None:
     """
 
-    pass
+    if not check_if_json_output_exists():
+        return
+
+    oldest_date = DATE_TODAY.isoformat()
+    oldest_apod = None
+
+    try:
+        with open(file=json_file_path, mode='r') as json_file:
+            for line in json_file:
+                if line is None or len(line) == 0:
+                    continue
+
+                content = json.loads(line)
+
+                if content['date'] <= oldest_date:
+                    oldest_date = content['date']
+                    oldest_apod = content
+
+            if oldest_apod is None:
+                print(f"{json_file_name} is empty ❌.")
+                return
+
+            most_recent_apod = format_apod_data(oldest_apod)
+            format_raw_jsonl_entry(oldest_apod, 0)
+
+    except PermissionError:
+        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+    except json.decoder.JSONDecodeError:
+        print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
+    except Exception as e:
+        print(e)
 
 
 def log_multiple_json_entries():

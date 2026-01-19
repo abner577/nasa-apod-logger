@@ -60,7 +60,6 @@ def log_data_to_csv(formatted_apod_data):
             # DictWriter writes dict values in the exact order of fieldnames.
             writer = csv.DictWriter(csv_file, fieldnames=formatted_apod_data.keys())
             writer.writerow(formatted_apod_data)
-            print(f"Successfully logged data to '{csv_file_name}' ✅")
 
     except PermissionError:
         print(f"Dont have permission to write to file: '{csv_file_name}' at path: '{csv_file_path}' ❌")
@@ -389,12 +388,12 @@ def fetch_oldest_csv_apod():
         print(e)
 
 
-def log_multiple_csv_entries():
+def log_multiple_csv_entries(list_formatted_apod_data):
     """
        Log multiple APOD entries to csv.
 
        Returns:
            None:
     """
-
-    pass
+    for entry in list_formatted_apod_data:
+        log_data_to_csv(entry)

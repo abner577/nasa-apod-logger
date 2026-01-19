@@ -33,7 +33,7 @@ def get_todays_apod():
             None:
     """
 
-    print("Getting today's apod...")
+    print("Getting today's APOD...")
 
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
     print(f"Full_url: {full_url}")
@@ -51,9 +51,11 @@ def get_todays_apod():
 
         print("Writing data to csv... 🗄️")
         log_data_to_csv(apod_data)
+        print(f"Successfully logged data to '{csv_file_name}' ✅")
 
         print("Writing to json... 🗃️")
         log_data_to_json(apod_data)
+        print(f"Successfully logged data to '{json_file_name}' ✅")
 
         print(f"Redirecting user based on url: {apod_data['url']}")
 
@@ -115,9 +117,11 @@ def get_apod_for_specific_day():
 
                             print("Writing data to csv... 🗄️")
                             log_data_to_csv(apod_data)
+                            print(f"Successfully logged data to '{csv_file_name}' ✅")
 
                             print("Writing to json... 🗃️")
                             log_data_to_json(apod_data)
+                            print(f"Successfully logged data to '{json_file_name}' ✅")
 
                             print(f"Taking user to url: {apod_data['url']}")
                             take_user_to_browser()
@@ -146,4 +150,55 @@ def get_random_n_apods():
     Returns:
         None:
     """
-    pass
+    try:
+        n = int(input('Enter how many random APOD entries to fetch (1-20):\n'))
+        print(f"Getting {n} random APODS...")
+
+        # Max of 20, because we don't want to open like 100 tabs in the users browser and cause a crash.
+        if not (0 < n <= 20):
+            print("Number of APOD entries must be between 1 and 20.")
+            return
+
+        full_url = f"{BASE_URL}?api_key={NASA_API_KEY}&count={n}"
+        print(f"Full_url: {full_url}")
+        response = requests.get(full_url)
+
+        list_of_formatted_apod_entries = []
+        list_of_unformatted_apod_entries = []
+
+        if response.status_code == 200:
+            print("APOD entries successfully retrieved! 🚀\n")
+            list_of_unformatted_apod_entries = response.json()
+            for apod in list_of_unformatted_apod_entries:
+                apod = format_apod_data(apod)
+                list_of_formatted_apod_entries.append(apod)
+
+            if not check_if_data_exists():
+                print("Data directory doesnt exist ❌ Creating Data Directory...\n")
+                create_data_directory()
+
+            print("Writing data to csv... 🗄️")
+            log_multiple_json_entries(list_of_formatted_apod_entries)
+            print(f"Successfully logged data to '{csv_file_name}' ✅")
+
+            print("Writing to json... 🗃️")
+            log_multiple_csv_entries(list_of_formatted_apod_entries)
+            print(f"Successfully logged data to '{json_file_name}' ✅")
+
+            # This will get replaced by opening all apods in the users browser
+            # If the user presses yes to be taken to browser
+            for apod in list_of_formatted_apod_entries:
+                print(f"Taking user to url: {apod['url']}")
+
+        elif response.status_code == 404 or response.status_code == 403:
+            print("This is a user error. Check your API key and try again.")
+            return
+        elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
+            print("This is a server error. Try again later.")
+            return
+
+    except ValueError as e:
+        print("Please enter a number")
+    except Exception as e:
+        print('Something went wrong. Try again.')
+        print(e)

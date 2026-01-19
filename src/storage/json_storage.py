@@ -50,7 +50,6 @@ def log_data_to_json(formatted_apod_data):
             # One JSON object per line so we can safely append.
             # Need to use .dumps to write JSON as a string
             json_file.write(json.dumps(formatted_apod_data, ensure_ascii=False) + "\n")
-            print(f"Successfully logged data to '{json_file_name}' ✅")
 
     except PermissionError:
         print(f"Dont have permission to write to file: '{json_file_name}' at path: '{json_file_path}'.")
@@ -376,13 +375,13 @@ def fetch_oldest_json_apod():
         print(e)
 
 
-def log_multiple_json_entries():
+def log_multiple_json_entries(list_formatted_apod_data):
     """
        Log multiple APOD entries to jsonl.
 
        Returns:
            None:
     """
-
-    pass
+    for entry in list_formatted_apod_data:
+        log_data_to_json(entry)
 

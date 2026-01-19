@@ -55,7 +55,8 @@ def get_todays_apod():
         print("Writing to json... 🗃️")
         log_data_to_json(apod_data)
 
-        print(f"Redirecting user based on url: {apod_data['url']}")
+        redirect_url = apod_data['url']
+        take_user_to_browser(redirect_url)
 
     elif response.status_code == 404 or response.status_code == 403:
         print("This is a user error. Check your API key and try again.")
@@ -137,8 +138,8 @@ def get_apod_for_specific_day():
                     print("Writing to json... 🗃️")
                     log_data_to_json(apod_data)
 
-                    print(f"Taking user to url: {apod_data['url']}")
-                    take_user_to_browser()
+                    redirect_url = apod_data['url']
+                    take_user_to_browser(redirect_url)
 
                 elif response.status_code == 404 or response.status_code == 403:
                     print("🚫 This is a user error. Check your API key and try again.")
@@ -210,7 +211,8 @@ def get_random_n_apods():
                         # This will get replaced by opening all apods in the users browser
                         # If the user presses yes to be taken to browser
                         for apod in list_of_formatted_apod_entries:
-                            print(f"Taking user to url: {apod['url']}")
+                            redirect_url = apod['url']
+                            take_user_to_browser(redirect_url)
 
                     elif response.status_code == 404 or response.status_code == 403:
                         print("This is a user error. Check your API key and try again.")

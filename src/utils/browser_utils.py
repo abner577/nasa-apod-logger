@@ -15,8 +15,8 @@ def take_user_to_browser(url):
     """  # For Windows
 
     try:
-        print(f"Taking user to url: {url}")
+        print(f"Opening in browser 🌐: {url}")
         webbrowser.open_new_tab(url)
 
     except webbrowser.Error:
-        print("Something went wrong. Try again.")
+        print("Browser error: Unable to open the link in a new tab.")

@@ -34,10 +34,10 @@ def log_data_to_json(formatted_apod_data):
             # One JSON object per line so we can safely append.
             # Need to use .dumps to write JSON as a string
             json_file.write(json.dumps(formatted_apod_data, ensure_ascii=False) + "\n")
-            print(f"Successfully logged APOD from: '{formatted_apod_data['date']}' to {json_file_name} ✅")
+            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {csv_file_name} ✅")
 
     except PermissionError:
-        print(f"Dont have permission to write to file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -66,7 +66,7 @@ def show_first_n_json_log_entries():
         return
 
     if entries_amount < 1:
-        print("Amount of entries cannot be less than 1.")
+        print("Invalid input: Number of entries must be at least 1. ❌")
         return
 
     if not check_if_json_output_exists():
@@ -74,8 +74,12 @@ def show_first_n_json_log_entries():
 
     line_count = get_line_count(0)
 
+    if line_count == 0:
+        print("No log entries found.")
+        return
+
     if entries_amount > line_count:
-        print(f"We only have {line_count} entries in total. Displaying all the entries that we have...")
+        print(f"Only {line_count} entries exist. Displaying all entries instead.")
         entries_amount = line_count
 
     count = 0
@@ -95,7 +99,7 @@ def show_first_n_json_log_entries():
                     break
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except json.decoder.JSONDecodeError:
         print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
     except Exception as e:
@@ -117,7 +121,7 @@ def show_last_n_json_log_entries():
         entries_amount = int(input("Enter the number of log entries you would like to fetch:\n"))
 
     except ValueError:
-        print("Please enter a valid number.")
+        print("Invalid input: Enter a valid number.")
         return
     except Exception as e:
         print(e)
@@ -126,13 +130,17 @@ def show_last_n_json_log_entries():
     entries_list = []
 
     if entries_amount < 1:
-        print("Amount of entries cannot be less than 1.")
+        print("Invalid input: Number of entries must be at least 1. ❌")
         return
 
     if not check_if_json_output_exists():
         return
 
     line_count = get_line_count(count=0)
+
+    if line_count == 0:
+        print("No log entries found.")
+        return
 
     if entries_amount > line_count:
         print(f"We only have {line_count} entries in total. Displaying all the entries that we have...")
@@ -155,7 +163,7 @@ def show_last_n_json_log_entries():
                     count -= 1
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except json.decoder.JSONDecodeError:
         print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
     except Exception as e:
@@ -190,11 +198,15 @@ def show_all_json_entries():
                 count += 1
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except json.decoder.JSONDecodeError:
         print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
     except Exception as e:
         print(e)
+
+    if count == 0:
+        print("No log entries found.")
+        return
 
 
 def delete_one_json_entry():
@@ -265,7 +277,7 @@ def delete_one_json_entry():
                     file.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except json.decoder.JSONDecodeError:
         print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
     except Exception as e:
@@ -307,7 +319,7 @@ def fetch_most_recent_json_apod():
             format_raw_jsonl_entry(most_recent_apod, 0)
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except json.decoder.JSONDecodeError:
         print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
     except Exception as e:
@@ -350,7 +362,7 @@ def fetch_oldest_json_apod():
             format_raw_jsonl_entry(oldest_apod, 0)
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except json.decoder.JSONDecodeError:
         print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
     except Exception as e:

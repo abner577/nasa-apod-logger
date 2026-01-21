@@ -8,12 +8,26 @@ Responsible for the main menu loop and user interaction flow.
 """
 
 print('Welcome to the APOD Logger.')
+print('Startup Banner & Startup Art Here')
 # startup_banner()
 # startup_art()
 
 flag = True
 while flag:
-    print('======================= Main Menu =======================\n')
+    print('\n======================= Main Menu ☄️ =======================')
+
+    if not check_if_data_exists():
+        create_data_directory()
+
+    if not check_if_user_settings_exist():
+        create_user_settings()
+
+    if not check_if_json_output_exists():
+        create_json_output_file()
+
+    if not check_if_csv_output_exists():
+        create_csv_output_file()
+
 
     try:
         print('Pick an option (1-4):')
@@ -33,17 +47,10 @@ while flag:
                 user_settings_menu()
 
             case 4:
-                print("Exiting...")
+                print("Exiting Main Menu...")
                 flag = False
 
     except ValueError:
-        print("Please enter a number (1-3).")
+        print("Please enter a number (1-4).")
     except Exception as e:
         print(e)
-
-
-
-
-
-
-

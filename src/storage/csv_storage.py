@@ -5,20 +5,10 @@ CSV persistence layer for APOD snapshots.
 Responsible for creating, writing, reading, and rewriting the CSV log.
 """
 
-import csv
 from src.utils.csv_utils import *
 from src.utils.data_utils import *
 from src.config import DIR_PATH, csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY
 from src.utils.date_utils import check_valid_nasa_date
-
-
-HEADERS = {
-    "date": "",
-    "title": "",
-    "url": "",
-    "explanation": "",
-    "logged_at": "",
-}
 
 
 def log_data_to_csv(formatted_apod_data):
@@ -44,10 +34,10 @@ def log_data_to_csv(formatted_apod_data):
             # DictWriter writes dict values in the exact order of fieldnames.
             writer = csv.DictWriter(csv_file, fieldnames=formatted_apod_data.keys())
             writer.writerow(formatted_apod_data)
-            print(f"Successfully logged APOD from: '{formatted_apod_data['date']}' to {csv_file_name} ✅")
+            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {csv_file_name} ✅")
 
     except PermissionError:
-        print(f"Dont have permission to write to file: '{csv_file_name}' at path: '{csv_file_path}' ❌")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -64,7 +54,7 @@ def show_first_n_csv_log_entries(entries_amount):
     """
 
     if entries_amount < 1:
-        print("Amount of entries cannot be less than 1 ❌")
+        print("Invalid input: Number of entries must be at least 1. ❌")
         return
 
     if not check_if_csv_output_exists():
@@ -72,8 +62,12 @@ def show_first_n_csv_log_entries(entries_amount):
 
     line_count = get_line_count(count=0)
 
+    if line_count == 0:
+        print("No log entries found.")
+        return
+
     if entries_amount > line_count:
-        print(f"We only have {line_count} entries in total. Displaying all the entries that we have...")
+        print(f"Only {line_count} entries exist. Displaying all entries instead.")
         entries_amount = line_count
     count = 0
 
@@ -92,7 +86,7 @@ def show_first_n_csv_log_entries(entries_amount):
 
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -111,7 +105,7 @@ def show_last_n_csv_log_entries(entries_amount):
     entries_list = []
 
     if entries_amount < 1:
-        print("Amount of entries cannot be less than 1 ❌")
+        print("Invalid input: Number of entries must be at least 1.")
         return
 
     if not check_if_csv_output_exists():
@@ -119,8 +113,12 @@ def show_last_n_csv_log_entries(entries_amount):
 
     line_count = get_line_count(count=0)
 
+    if line_count == 0:
+        print("No log entries found.")
+        return
+
     if entries_amount > line_count:
-        print(f"We only have {line_count} entries in total. Displaying all the entries that we have...")
+        print(f"Only {line_count} entries exist. Displaying all entries instead.")
         entries_amount = line_count
     count = 0
 
@@ -140,7 +138,7 @@ def show_last_n_csv_log_entries(entries_amount):
                     count -= 1
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -175,9 +173,13 @@ def show_all_csv_entries():
 
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
+
+    if count == 0:
+        print("No log entries found.")
+        return
 
 
 def delete_one_csv_entry():
@@ -194,7 +196,6 @@ def delete_one_csv_entry():
     entries_to_keep = []
 
     if not check_if_csv_output_exists():
-        print("CSV file does not exist ❌.")
         return
 
     year = int(input("Enter a year (YYYY): "))

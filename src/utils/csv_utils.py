@@ -10,6 +10,14 @@ import csv
 from pathlib import Path
 from src.config import DIR_PATH, csv_file_path, csv_file_name
 
+HEADERS = {
+    "date": "",
+    "title": "",
+    "url": "",
+    "explanation": "",
+    "logged_at": "",
+}
+
 
 def create_csv_output_file():
     """
@@ -24,7 +32,7 @@ def create_csv_output_file():
 
     Path(csv_file_path).touch()
     write_header_to_csv()
-    print(f"File: '{csv_file_name}' at path: '{csv_file_path}' created ✅")
+    print(f"Created: '{csv_file_name}' at '{csv_file_path}'. ✅")
 
 
 def clear_csv_output_file():
@@ -37,10 +45,10 @@ def clear_csv_output_file():
 
     try:
         with open(file=csv_file_path, mode='w', encoding='utf-8') as csv_file:
-            print(f"Successfully cleared file: '{csv_file_name}' ✅")
+            print(f"Cleared: '{csv_file_name}'.")
 
     except PermissionError:
-        print(f"Dont have permission to write to file: '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -54,7 +62,7 @@ def delete_csv_output_file():
     """
 
     Path(f"{csv_file_path}").unlink()
-    print(f"File: '{csv_file_name}' at path: '{csv_file_path}' deleted ✅.")
+    print(f"Deleted: '{csv_file_name}' at '{csv_file_path}'.")
 
 
 def write_header_to_csv():
@@ -71,7 +79,7 @@ def write_header_to_csv():
             writer.writeheader()
 
     except PermissionError:
-        print(f"Dont have permission to write to file: '{csv_file_name}' at path: '{csv_file_path}' ❌")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -100,7 +108,7 @@ def check_for_duplicate_csv_entries(formatted_apod_data):
                    return True
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -118,7 +126,7 @@ def check_if_csv_output_exists():
     if Path(csv_file_path).exists() and Path(csv_file_path).is_file():
         return True
 
-    print(f"File: '{csv_file_name}' at path: '{csv_file_path}' does not exist ❌. Create it before proceeding...")
+    print(f"Missing file: '{csv_file_name}' at '{csv_file_path}'. Create it before proceeding.")
     return False
 
 

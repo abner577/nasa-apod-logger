@@ -34,26 +34,26 @@ def get_todays_apod():
             None:
     """
 
-    print("Getting today's APOD...")
+    print("Fetching today's APOD...")
 
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
-    print(f"Full_url: {full_url}")
+    print(f"[DEBUG] Full_url: {full_url}")
     response = requests.get(full_url)
 
     if response.status_code == 200:
-        print("Today's apod was successfully retrieved! 🚀\n")
+        print("Success: Today's APOD was retrieved 🚀.\n")
         apod_data = response.json()
         apod_data = format_apod_data(apod_data)
 
 
         if not check_if_data_exists():
-            print("Data directory doesnt exist ❌ Creating Data Directory...\n")
+            print("Data directory not found. Creating it now...\n")
             create_data_directory()
 
-        print("Writing data to csv... 🗄️")
+        print("Saving to CSV log... 🗄️")
         log_data_to_csv(apod_data)
 
-        print("Writing to json... 🗃️")
+        print("Saving to JSONL log... 🗃️")
         log_data_to_json(apod_data)
 
         redirect_url = apod_data['url']
@@ -61,13 +61,13 @@ def get_todays_apod():
         if get_user_settings():
             take_user_to_browser(redirect_url)
         else:
-            print(f"You can access this APOD at: {redirect_url}\n")
+            print(f"APOD link: {redirect_url}\n")
 
     elif response.status_code == 404 or response.status_code == 403:
-        print("This is a user error. Check your API key and try again.")
+        print("Request failed: Check your API key and try again.")
         return
     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
-        print("This is a server error. Try again later.")
+        print("NASA API error: Please try again later.")
         return
 
 
@@ -87,15 +87,15 @@ def get_apod_for_specific_day():
 
         # Catch non-numeric input here (e.g., "abc")
         try:
-            user_choice = int(input("Enter (1-2) for one of the options below:\n"
-                                    "1. Enter a Date\n"
-                                    "2. Exit GET APOD Menu\n"))
+            user_choice = int(input("Pick an option (1-2):\n"
+                                    "1. Enter a date\n"
+                                    "2. Back\n"))
         except ValueError:
-            print("Please enter a valid number.")
+            print("Invalid input: Please enter a number (1-2).")
             continue
 
         if user_choice != 1 and user_choice != 2:
-            print("Invalid option entered. Please enter 1 or 2.")
+            print("Invalid input: Please enter a number (1-2).")
             continue
 
         match user_choice:
@@ -106,7 +106,7 @@ def get_apod_for_specific_day():
                     month = int(input("Enter a month (MM): "))
                     day = int(input("Enter a day (DD): "))
                 except ValueError:
-                    print("Please enter a valid number.")
+                    print("Invalid input: Year, month, and day must be numbers.")
                     continue
 
                 try:
@@ -123,23 +123,23 @@ def get_apod_for_specific_day():
                     continue
 
                 if not check_if_data_exists():
-                    print('Data directory not found. Creating Data Directory...')
+                    print('Data directory not found. Creating it now...')
                     create_data_directory()
 
                 # Valid date at this point
                 full_url = f"{BASE_URL}?api_key={NASA_API_KEY}&date={date_object}"
-                print(f"Retrieving {date_object}'s APOD...")
+                print(f"Fetching APOD for {date_object}...")
                 response = requests.get(full_url)
 
                 if response.status_code == 200:
-                    print("APOD was successfully retrieved! 🚀\n")
+                    print("Success: APOD was retrieved 🚀\n")
                     apod_data = response.json()
                     apod_data = format_apod_data(apod_data)
 
-                    print("Writing data to csv... 🗄️")
+                    print("Saving to CSV log... 🗄️")
                     log_data_to_csv(apod_data)
 
-                    print("Writing to json... 🗃️")
+                    print("Saving to JSONL log... 🗃️")
                     log_data_to_json(apod_data)
 
                     redirect_url = apod_data['url']
@@ -147,15 +147,15 @@ def get_apod_for_specific_day():
                     if get_user_settings():
                         take_user_to_browser(redirect_url)
                     else:
-                        print(f"You can access this APOD at: {redirect_url}\n")
+                        print(f"APOD link: {redirect_url}\n")
 
                 elif response.status_code == 404 or response.status_code == 403:
-                    print("🚫 This is a user error. Check your API key and try again.")
+                    print("Request failed: Check your API key and try again.")
                 elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
-                    print("⚠️ This is a server error. Try again later.")
+                    print("NASA API error: Please try again later.")
 
             case 2:
-                print("Exiting...")
+                print("Returning...")
                 flag = False
 
 
@@ -172,48 +172,48 @@ def get_random_n_apods():
     flag = True
     while flag:
         try:
-            user_choice = int(input("\nEnter (1-2) for one of the options below:\n"
-                                    "1. Make a request for random APODS\n"
-                                    "2. Exit GET random APODS Menu\n"))
+            user_choice = int(input("\nPick an option (1-2):\n"
+                                    "1. Request Random APODs\n"
+                                    "2. Back\n"))
 
             if user_choice != 1 and user_choice != 2:
-                print("Invalid option entered. Please enter 1 or 2.")
+                print("Invalid option: Please enter 1 or 2.")
                 continue
 
             match user_choice:
                 case 1:
-                    n = int(input('Enter how many random APOD entries to fetch (1-20):\n'))
+                    n = int(input('How many random APODs should we fetch? (1-20): \n'))
 
                     # Max of 20, because we don't want to open like 100 tabs in the users browser and cause a crash.
                     if not (0 < n <= 20):
-                        print("Number of APOD entries must be between 1 and 20.")
+                        print("Invalid input: Number of APODs must be between 1 and 20.")
                         continue
 
-                    print(f"Getting {n} random APODS...")
+                    print(f"Fetching {n} random APODs...")
 
                     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}&count={n}"
-                    print(f"Full_url: {full_url}")
+                    print(f"[DEBUG] Request URL: {full_url}")
                     response = requests.get(full_url)
 
                     list_of_formatted_apod_entries = []
                     list_of_unformatted_apod_entries = []
 
                     if response.status_code == 200:
-                        print("APOD entries successfully retrieved! 🚀\n")
+                        print("Success: Random APOD entries were retrieved 🚀\n")
                         list_of_unformatted_apod_entries = response.json()
                         for apod in list_of_unformatted_apod_entries:
                             apod = format_apod_data(apod)
                             list_of_formatted_apod_entries.append(apod)
 
                         if not check_if_data_exists():
-                            print("Data directory doesnt exist ❌ Creating Data Directory...\n")
+                            print("Data directory not found. Creating it now...\n")
                             create_data_directory()
 
-                        print("Writing data to csv... 🗄️")
-                        log_multiple_json_entries(list_of_formatted_apod_entries)
-
-                        print("Writing to json... 🗃️")
+                        print("Saving to CSV log.. 🗄️")
                         log_multiple_csv_entries(list_of_formatted_apod_entries)
+
+                        print("Saving to JSONL log.. 🗃️")
+                        log_multiple_json_entries(list_of_formatted_apod_entries)
 
 
                         if get_user_settings():
@@ -225,21 +225,21 @@ def get_random_n_apods():
                             print()
                             for apod in list_of_formatted_apod_entries:
                                 redirect_url = apod['url']
-                                print(f"You can access this APOD at: {redirect_url}")
+                                print(f"APOD link: {redirect_url}")
 
                     elif response.status_code == 404 or response.status_code == 403:
-                        print("This is a user error. Check your API key and try again.")
+                        print("Request failed: Check your API key and try again.")
                         continue
                     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
-                        print("This is a server error. Try again later.")
+                        print("NASA API error: Please try again later.")
                         continue
 
                 case 2:
-                    print("Exiting...")
+                    print("Returning...")
                     flag = False
 
         except ValueError:
-            print("Please enter a number.")
+            print("Invalid input: Please enter a number.")
         except Exception as e:
-            print('Something went wrong. Try again.')
+            print('Unexpected error: Something went wrong. Please try again.')
             print(e)

@@ -48,18 +48,23 @@ def startup_art():
 ....................................................................................................""")
 
 
+
 def nasa_apods_menu():
     flag = True
     while flag:
-        print('======================= Interacting with NASA Menu =======================\n'
-              'Pick an option (1-4):')
+        print(
+            "\n======================= NASA APOD Requests 🌌 =======================\n"
+            "Fetch Astronomy Picture of the Day (APOD) entries from NASA.\n"
+            "Pick an option (1-4):"
+        )
+
         try:
-
-            user_choice = int(input("1. Get todays APOD\n"
-                                    "2. Get APOD for a specific date\n"
-                                    "3. Get a random N amount of APODS\n"
-                                    "4. Quit\n"))
-
+            user_choice = int(input(
+                "1. Fetch today’s APOD\n"
+                "2. Fetch APOD by date\n"
+                "3. Fetch random APODs\n"
+                "4. Back to Main Menu\n"
+            ))
         except ValueError:
             print("Please enter a number (1-4).")
             return
@@ -70,34 +75,38 @@ def nasa_apods_menu():
         match user_choice:
             case 1:
                 get_todays_apod()
-
             case 2:
                 get_apod_for_specific_day()
-
             case 3:
                 get_random_n_apods()
-
             case 4:
-                print("Exiting Interacting with NASA Menu...")
+                print("Returning to Main Menu...")
                 flag = False
 
 
 def output_files_menu():
     flag = True
     while flag:
-        print('======================= Output Files Menu =======================\n'
-              'Pick an option (1-4):')
-        try:
-            user_choice = int(input("1. Show first n log entries\n"
-                                    "2. Show last n log entries\n"
-                                    "3. Show all entries\n"
-                                    "4. Delete one entry\n"
-                                    "5. Fetch most recent entry (by date not logged by)\n"
-                                    "6. Fetch oldest entry (by date not logged by)\n"
-                                    "7. Exit Output Files Menu\n"))
+        print(
+            "\n======================= Log & File Tools 🗃️ =======================\n"
+            "View, manage, and maintain your saved APOD logs.\n"
+            "Pick an option (1-9):"
+        )
 
+        try:
+            user_choice = int(input(
+                "1. View first N entries\n"
+                "2. View last N entries\n"
+                "3. View all entries\n"
+                "4. Delete an entry by date\n"
+                "5. Show most recent APOD (by date)\n"
+                "6. Show oldest APOD (by date)\n"
+                "7. Clear logs (CSV + JSONL)\n"
+                "8. Count logged entries\n"
+                "9. Back to Main Menu\n"
+            ))
         except ValueError:
-            print("Please enter a number (1-4).")
+            print("Please enter a number (1-9).")
             return
         except Exception as e:
             print(e)
@@ -106,37 +115,42 @@ def output_files_menu():
         match user_choice:
             case 1:
                 show_first_n_json_log_entries()
-
             case 2:
                 show_last_n_json_log_entries()
-
             case 3:
                 show_all_json_entries()
-
             case 4:
                 delete_one_json_entry()
-
             case 5:
                 fetch_most_recent_json_apod()
-
             case 6:
                 fetch_oldest_json_apod()
-
             case 7:
-                print("Exiting Output Files Menu...")
+                clear_csv_output_file()
+                clear_json_output_file()
+            case 8:
+                line_count = get_line_count(0)
+                print(f"You have {line_count} logged entries.\n")
+            case 9:
+                print("Returning to Main Menu...")
                 flag = False
+
 
 def user_settings_menu():
     flag = True
     while flag:
-        print('======================= User Settings Menu ========================\n'
-              'Pick an option (1-3):')
+        print(
+            "\n======================= Preferences 📃 =======================\n"
+            "Manage how the app behaves after fetching APOD entries.\n"
+            "Pick an option (1-3):"
+        )
 
         try:
-            user_choice = int(input("1. Check user setting\n"
-                                    "2. Update user setting\n"
-                                    "3. Exit User Settings Menu\n"))
-
+            user_choice = int(input(
+                "1. View redirect setting\n"
+                "2. Change redirect setting\n"
+                "3. Back to Main Menu\n"
+            ))
         except ValueError:
             print("Please enter a number (1-3).")
             return
@@ -147,13 +161,11 @@ def user_settings_menu():
         match user_choice:
             case 1:
                 if get_user_settings():
-                    print("You will be automatically directed to url's ✅.")
+                    print("Auto-open in browser: ON ✅")
                 else:
-                    print("You wont be automatically directed to url's ❌.")
-
+                    print("Auto-open in browser: OFF ❌")
             case 2:
                 update_user_settings()
-
             case 3:
-                print("Exiting User Settings Menu...")
+                print("Returning to Main Menu...")
                 flag = False

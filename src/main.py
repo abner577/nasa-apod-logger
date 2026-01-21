@@ -13,13 +13,14 @@ print('Welcome to the APOD Logger.')
 
 flag = True
 while flag:
-    print('======================= Welcome to the Main Menu =======================\n')
+    print('======================= Main Menu =======================\n')
 
     try:
         print('Pick an option (1-3):')
         user_choice = int(input("1. Interacting with Nasa APODS menu\n"
                                 "2. Interacting with output files menu\n"
-                                "3. Quit\n"))
+                                "3. Change Setting\n"
+                                "4. Quit Main Menu\n"))
 
         match user_choice:
             case 1:
@@ -29,6 +30,9 @@ while flag:
                 output_files_menu()
 
             case 3:
+                user_settings_menu()
+
+            case 4:
                 print("Exiting...")
                 flag = False
 

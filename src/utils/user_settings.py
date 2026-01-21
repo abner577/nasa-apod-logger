@@ -34,16 +34,27 @@ def create_user_settings():
 
 # Write to file with something like:
 # automatically_redirect: yes/no
-def update_user_settings(updated_setting):
+def update_user_settings():
     if not check_if_user_settings_exist():
         print(f"File '{user_settings_name}' does not exist. Create it before proceeding.")
         return
 
-    updated_setting = {'automatically_redirect': updated_setting}
+    try:
+        updated_setting = input(("Enter 'yes' to enable automatic redirect OR "
+                                 "Enter 'no' to disable automatic redirect\n"))
+
+    except ValueError:
+        print("Please enter 'yes' or 'no'")
+        return
+    except Exception as e:
+        print(e)
+        return
+
+    updated_settings = {'automatically_redirect': updated_setting}
 
     try:
         with open(file=user_settings_path, mode="w", encoding='utf-8') as file:
-            file.write(json.dumps(updated_setting, ensure_ascii=False) + "\n")
+            file.write(json.dumps(updated_settings, ensure_ascii=False) + "\n")
 
     except PermissionError:
         print(f"Dont have permission to write to file: '{user_settings_name}' at path: '{user_settings_path}'.")

@@ -1,4 +1,5 @@
 from src.nasa_client import *
+from src.utils.user_settings import *
 
 
 def startup_banner():
@@ -51,7 +52,7 @@ def startup_art():
 def nasa_apods_menu():
     flag = True
     while flag:
-        print('======================= Welcome to the Interacting with NASA Menu =======================\n'
+        print('======================= Interacting with NASA Menu =======================\n'
               'Pick an option (1-4):')
         try:
 
@@ -62,8 +63,10 @@ def nasa_apods_menu():
 
         except ValueError:
             print("Please enter a number (1-4).")
+            return
         except Exception as e:
             print(e)
+            return
 
         match user_choice:
             case 1:
@@ -83,7 +86,7 @@ def nasa_apods_menu():
 def output_files_menu():
     flag = True
     while flag:
-        print('======================= Welcome to the Output Files Menu =======================\n'
+        print('======================= Output Files Menu =======================\n'
               'Pick an option (1-4):')
         try:
             user_choice = int(input("1. Show first n log entries\n"
@@ -124,3 +127,30 @@ def output_files_menu():
                 print("Exiting Output Files Menu...")
                 flag = False
 
+def user_settings_menu():
+    flag = True
+    while flag:
+        print('======================= User Settings Menu ========================\n')
+
+        try:
+            user_choice = int(input("1. Check user setting\n"
+                                    "2. Update user setting\n"
+                                    "3. Exit User Settings Menu\n"))
+
+        except ValueError:
+            print("Please enter a number (1-3).")
+            return
+        except Exception as e:
+            print(e)
+            return
+
+        match user_choice:
+            case 1:
+                get_user_settings()
+
+            case 2:
+                update_user_settings()
+
+            case 3:
+                print("Exiting User Settings Menu...")
+                flag = False

@@ -28,11 +28,11 @@ def create_csv_output_file():
     """
 
     if check_if_csv_output_exists():
-        return
+        print(f"File Error: Cannot create file '{csv_file_name}' because it already exists.")
 
     Path(csv_file_path).touch()
     write_header_to_csv()
-    print(f"Created: '{csv_file_name}' at '{csv_file_path}'. ✅")
+    print(f"Created: '{csv_file_name}' ✅")
 
 
 def clear_csv_output_file():
@@ -62,7 +62,7 @@ def delete_csv_output_file():
     """
 
     Path(f"{csv_file_path}").unlink()
-    print(f"Deleted: '{csv_file_name}' at '{csv_file_path}'.")
+    print(f"Deleted: '{csv_file_name}'.")
 
 
 def write_header_to_csv():
@@ -126,7 +126,7 @@ def check_if_csv_output_exists():
     if Path(csv_file_path).exists() and Path(csv_file_path).is_file():
         return True
 
-    print(f"Missing file: '{csv_file_name}' at '{csv_file_path}'. Create it before proceeding.")
+    print(f"File Error: File: '{csv_file_name}' at path: '{csv_file_path}' not found ❌.")
     return False
 
 

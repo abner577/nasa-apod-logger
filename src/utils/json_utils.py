@@ -8,7 +8,7 @@ Includes file checks, duplicate detection, and display formatting.
 import json
 
 from pathlib import Path
-from src.config import DIR_PATH, json_file_path, json_file_name
+from src.config import json_file_path, json_file_name
 
 
 def create_json_output_file():
@@ -20,11 +20,11 @@ def create_json_output_file():
     """
 
     if check_if_json_output_exists():
-        print(f"Cannot create file at '{json_file_path}' because it already exists ❌")
+        print(f"File Error: Cannot create file at '{json_file_path}' because it already exists.")
         return
 
     Path(json_file_path).touch()
-    print(f"output.jsonl file created at '{json_file_path}' ✅")
+    print(f"Created: '{json_file_name}' ✅")
 
 
 def clear_json_output_file():
@@ -40,10 +40,10 @@ def clear_json_output_file():
 
     try:
         with open(file=json_file_path, mode='w') as json_file:
-            print(f"Successfully cleared file: '{json_file_name}' ✅")
+            print(f"Cleared: '{json_file_name}'.")
 
     except PermissionError:
-        print(f"Dont have permission to write to file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to write '{json_file_name}' at '{json_file_path}' ❌.")
     except Exception as e:
         print(e)
 
@@ -57,7 +57,7 @@ def delete_json_output_file():
     """
 
     Path(f"{json_file_path}").unlink()
-    print(f"File: {json_file_name} at path: '{json_file_path}' deleted ✅.")
+    print(f"Deleted: '{json_file_name}'.")
 
 
 def get_line_count(count):
@@ -77,9 +77,9 @@ def get_line_count(count):
                 count += 1
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌.")
     except json.decoder.JSONDecodeError:
-        print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
+        print(f"JSON Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:
         print(e)
 
@@ -109,9 +109,9 @@ def check_for_duplicate_json_entries(formatted_apod_data):
                     return True
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{json_file_name}' at path: '{json_file_path}'.")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌.")
     except json.decoder.JSONDecodeError:
-        print(f"Could not decode JSON from file '{json_file}'. Check the file format.")
+        print(f"JSON Error: Could not decode JSON from file '{json_file}'. Check the file format.")
     except Exception as e:
         print(e)
 

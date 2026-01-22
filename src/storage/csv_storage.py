@@ -7,7 +7,7 @@ Responsible for creating, writing, reading, and rewriting the CSV log.
 
 from src.utils.csv_utils import *
 from src.utils.data_utils import *
-from src.config import DIR_PATH, csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY
+from src.config import csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY
 from src.utils.date_utils import check_valid_nasa_date
 
 
@@ -42,7 +42,7 @@ def log_data_to_csv(formatted_apod_data):
         print(e)
 
 
-def show_first_n_csv_log_entries(entries_amount):
+def show_first_n_csv_log_entries():
     """
      Display the first N logged CSV entries.
 
@@ -52,6 +52,16 @@ def show_first_n_csv_log_entries(entries_amount):
      Returns:
         None:
     """
+    try:
+        entries_amount = int(input("Enter the number of log entries you would like to fetch:\n"))
+
+    except ValueError:
+        print("Please enter a valid number.")
+        return
+    except Exception as e:
+        print(e)
+        return
+
 
     if entries_amount < 1:
         print("Invalid input: Number of entries must be at least 1. ❌")
@@ -91,7 +101,7 @@ def show_first_n_csv_log_entries(entries_amount):
         print(e)
 
 
-def show_last_n_csv_log_entries(entries_amount):
+def show_last_n_csv_log_entries():
     """
         Display the last N logged CSV entries.
 
@@ -101,6 +111,16 @@ def show_last_n_csv_log_entries(entries_amount):
         Returns:
             None:
     """
+
+    try:
+        entries_amount = int(input("Enter the number of log entries you would like to fetch:\n"))
+
+    except ValueError:
+        print("Invalid input: Enter a valid number.")
+        return
+    except Exception as e:
+        print(e)
+        return
 
     entries_list = []
 
@@ -198,9 +218,17 @@ def delete_one_csv_entry():
     if not check_if_csv_output_exists():
         return
 
-    year = int(input("Enter a year (YYYY): "))
-    month = int(input("Enter a month (MM): "))
-    day = int(input("Enter a day (DD): "))
+    try:
+        year = int(input("Enter a year (YYYY): "))
+        month = int(input("Enter a month (MM): "))
+        day = int(input("Enter a day (DD): "))
+
+    except ValueError:
+        print("Please enter a valid number.")
+        return
+    except Exception as e:
+        print(e)
+        return
 
     date_object = datetime.date(year, month, day)
     check_result = check_valid_nasa_date(date_object)
@@ -228,8 +256,6 @@ def delete_one_csv_entry():
             print("This entry was not found ❌.")
             return
 
-        print("Removing entry...")
-
         # Write phase
         with open(csv_file_path, mode="w", encoding="utf-8", newline="") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=reader.fieldnames)
@@ -237,10 +263,10 @@ def delete_one_csv_entry():
             writer.writeheader()
             writer.writerows(entries_to_keep)
 
-        print("Entry removed ✅.")
+        print(f"Removed entry: {target_date} ✅")
 
     except PermissionError:
-        print(f"Dont have permission to read/write '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to read/write '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -273,14 +299,14 @@ def fetch_most_recent_csv_apod():
                     most_recent_apod = row
 
             if most_recent_apod is None:
-                print(f"{csv_file_name} is empty ❌.")
+                print(f"{csv_file_name} is empty.")
                 return
 
 
             format_raw_csv_entry(most_recent_apod, 0)
 
     except PermissionError:
-        print(f"Dont have permission to read '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 
@@ -320,7 +346,7 @@ def fetch_oldest_csv_apod():
             format_raw_csv_entry(oldest_apod, 0)
 
     except PermissionError:
-        print(f"Dont have permission to read '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' ❌")
     except Exception as e:
         print(e)
 

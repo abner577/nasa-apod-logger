@@ -31,8 +31,8 @@ while flag:
 
     try:
         print('Pick an option (1-4):')
-        user_choice = int(input("1. Interacting with Nasa APODS menu\n"
-                                "2. Interacting with output files menu\n"
+        user_choice = int(input("1. Make a NASA APOD Request\n"
+                                "2. Interact with Log & File Tools\n"
                                 "3. Change Setting\n"
                                 "4. Quit Main Menu\n"))
 

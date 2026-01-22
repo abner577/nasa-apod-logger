@@ -199,7 +199,7 @@ def get_random_n_apods():
                     list_of_unformatted_apod_entries = []
 
                     if response.status_code == 200:
-                        print("Success: Random APOD entries were retrieved 🚀\n")
+                        print(f"Success: {n} Random APOD entries were retrieved 🚀\n")
                         list_of_unformatted_apod_entries = response.json()
                         for apod in list_of_unformatted_apod_entries:
                             apod = format_apod_data(apod)

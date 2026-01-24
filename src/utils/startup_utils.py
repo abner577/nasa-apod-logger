@@ -130,7 +130,7 @@ def output_files_menu():
                 line_count = get_line_count(0)
                 print(f"\nTotal logged entries: {line_count}\n")
             case 9:
-                print("Returning to Main Menu...")
+                print("\nReturning to Main Menu...")
                 flag = False
 
 
@@ -158,11 +158,11 @@ def user_settings_menu():
         match user_choice:
             case 1:
                 if get_user_settings():
-                    print("Auto-open in browser: ON ✅\n")
+                    print("\nAuto-open in browser: ON ✅")
                 else:
-                    print("Auto-open in browser: OFF ❌\n")
+                    print("\nAuto-open in browser: OFF ❌")
             case 2:
                 update_user_settings()
             case 3:
-                print("\nReturning to Main Menu...\n")
+                print("\nReturning to Main Menu...")
                 flag = False

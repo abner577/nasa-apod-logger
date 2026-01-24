@@ -8,7 +8,7 @@ Includes duplicate detection, file checks, and display formatting.
 import csv
 
 from pathlib import Path
-from src.config import DIR_PATH, csv_file_path, csv_file_name
+from src.config import csv_file_path, csv_file_name
 
 HEADERS = {
     "date": "",

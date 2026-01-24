@@ -35,7 +35,7 @@ def update_user_settings():
         return
 
     try:
-        updated_setting = input('Auto-open APOD links in your browser? Type "yes" or "no": ').strip().lower()
+        updated_setting = input('\nAuto-open APOD links in your browser? Type "yes" or "no": ').strip().lower()
 
         if updated_setting != "yes" and updated_setting != "no":
             print('Invalid input. Please enter "yes" or "no".\n')
@@ -56,7 +56,7 @@ def update_user_settings():
     except Exception as e:
         print(e)
 
-    print(f"Updated settings: '{user_settings_name}' ✅\n")
+    print(f"Updated settings: '{user_settings_name}' ✅")
 
 
 def get_user_settings():

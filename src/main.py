@@ -9,8 +9,8 @@ Responsible for the main menu loop and user interaction flow.
 
 print('Welcome to the APOD Logger.')
 print('Startup Banner & Startup Art Here')
-# startup_banner()
-# startup_art()
+startup_banner()
+startup_art()
 
 if not check_if_data_exists():
     create_data_directory()
@@ -32,10 +32,10 @@ while flag:
 
     try:
         print('Select an option (1-4):')
-        user_choice = int(input("1. Make a NASA APOD Request\n"
-                                "2. View/Manage saved logs\n"
-                                "3. Change Setting\n"
-                                "4. Goodbye 👋\n"))
+        user_choice = int(input("[1] Make a NASA APOD Request\n"
+                                "[2] View/Manage saved logs\n"
+                                "[3] Change Setting\n"
+                                "[4] Goodbye 👋\n"))
 
         match user_choice:
             case 1:

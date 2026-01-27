@@ -25,7 +25,6 @@ def take_user_to_browser(url: str) -> None:
     Returns:
         None
     """
-    print(f"Opening in browser 🌐: {url}")
 
     try:
         # If running in WSL, use Windows to open the URL
@@ -38,6 +37,7 @@ def take_user_to_browser(url: str) -> None:
             subprocess.run(["cmd.exe", "/c", "start", "", url], check=False)
             return
 
+        print(f"Opening in browser 🌐: {url}")
         webbrowser.open_new_tab(url)
 
     except Exception as e:

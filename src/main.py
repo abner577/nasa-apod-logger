@@ -8,7 +8,7 @@ Responsible for the main menu loop and user interaction flow.
 """
 
 startup_banner()
-spaceship_startup_art3()
+test1()
 print("-----------------------------------------------------------------------------\n")
 
 # Startup checks (create if missing)

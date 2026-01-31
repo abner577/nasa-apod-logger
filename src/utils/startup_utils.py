@@ -1,6 +1,5 @@
 from src.nasa_client import *
 from src.utils.user_settings import *
-from src.utils.startup_art import *
 
 
 def nasa_apods_menu():

@@ -1,5 +1,6 @@
 from src.utils.startup_utils import *
 from src.startup_art import *
+from src.config import *
 
 """
 main.py
@@ -8,8 +9,9 @@ Program entry point.
 Responsible for the main menu loop and user interaction flow.
 """
 
-startup_banner()
-space_startup_art1()
+startup_banner2()
+print(MAYBE_STARTUP_ART2)
+print("\n")
 print("-----------------------------------------------------------------------------\n")
 
 # Startup checks (create if missing)

@@ -24,6 +24,10 @@ DEEP_SPACE_THEME = Theme({
     "rule": "dim color(27)",
     "menu.key": "bold color(39)",
     "menu.text": "color(252)",
+
+    # Startup arts
+    "earth.land": "color(34)",       # dark green
+    "earth.water": "on color(25)",   # muted blue ocean
 })
 
 console = Console(theme=DEEP_SPACE_THEME)

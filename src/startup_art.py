@@ -1,7 +1,6 @@
 from rich.text import Text
 from src.utils.console import console
 from src.config import *
-import random
 
 
 def startup_banner1():
@@ -64,15 +63,76 @@ def render_space_startup_art_1() -> None:
     console.print(text)
 
 
-CORE_ONLY = set("ITLH")
-RING_ONLY = set("'`")
-OVERLAP = set(".,:;+=i)")
+def render_spaceship_startup_art_1() -> None:
+    char_style_map = {
+        # Flame
+        "^": "ship.flame.inner",
+        "(": "ship.flame.outer",
+        ")": "ship.flame.outer",
+        ":": "ship.flame.inner",
+        ".": "ship.flame.inner",
+        "|": "ship.trim",
 
-SATURN_VARIANTS = [
-    "color(172)",   # bronze
-    "color(173)",   # darker bronze
-    "color(179)",   # warm tan
-    "color(99)",    # purple
-    "color(99)",    # purple (extra weight)
-    "color(98)",    # deeper purple
-]
+        # Body
+        "/": "ship.trim",
+        "\\": "ship.trim",
+        "_": "ship.trim",
+        "=": "ship.trim",
+        "!": "ship.flame.inner",
+        "#": "ship.trim",
+
+        # Text
+        "U": "ship.usa",
+        "S": "ship.usa",
+        "A": "ship.usa",
+    }
+
+    text = Text()
+
+    for line_index, line in enumerate(SPACESHIP_STARTUP_ART1.splitlines()):
+        if line_index > 0:
+            text.append("\n")
+
+        for ch in line:
+            style = char_style_map.get(ch)
+            if style:
+                text.append(ch, style=style)
+            else:
+                text.append(ch)
+
+    console.print(text)
+
+
+def render_spaceship_startup_art_2() -> None:
+    char_style_map = {
+        # Structure (white)
+        "/": "ship.body",
+        "\\": "ship.body",
+        "|": "ship.body",
+        "-": "ship.body",
+
+        # Accents
+        ".": "ship.dots",
+        "(": "ship.paren",
+        ")": "ship.paren",
+
+        # NASA letters
+        "N": "ship.nasa.red",
+        "S": "ship.nasa.red",
+        "A": "ship.nasa.blue",
+    }
+
+    text = Text()
+
+    for line_index, line in enumerate(SPACESHIP_STARTUP_ART2.splitlines()):
+        if line_index > 0:
+            text.append("\n")
+
+        for ch in line:
+            style = char_style_map.get(ch)
+            if style:
+                text.append(ch, style=style)
+            else:
+                text.append(ch)
+
+    console.print(text)

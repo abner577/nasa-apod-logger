@@ -110,6 +110,8 @@ def render_spaceship_startup_art_2() -> None:
         "\\": "ship.body",
         "|": "ship.body",
         "-": "ship.body",
+        "_": "ship.nasa.blue",
+        "!": "ship.nasa.red",
 
         # Accents
         ".": "ship.dots",

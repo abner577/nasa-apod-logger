@@ -29,7 +29,7 @@ DEEP_SPACE_THEME = Theme({
     "earth.land": "color(34)",       # dark green
     "earth.water": "on color(25)",   # muted blue ocean
 
-    # SPACESHIP_STARTUP_ART1
+    # SPACESHIP STARTUP ARTS
    "ship.body": "color(252)",
    "ship.trim": "color(250)",
    "ship.window": "color(39)",

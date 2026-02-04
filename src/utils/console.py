@@ -68,6 +68,38 @@ DEEP_SPACE_THEME = Theme({
    "astro.metal": "color(245)",
    "astro.highlight": "color(252)",
 
+    # Alien: Minimal Body, Loud FX
+   "alien.symbol.caret": "bold color(63)",
+   "alien.symbol.plus": "bold color(98)",
+   "alien.eyes": "bold color(40)",
+
+    # Astronaut (mostly white/gray)
+    "astro.suit": "color(252)",
+    "astro.suit.dim": "dim color(250)",
+    "astro.detail": "dim color(245)",
+    "astro.joint": "color(246)",
+    "astro.visor": "bold color(39)",
+
+    # Gun (green accent)
+    "gun.body": "bold color(82)",
+    "gun.detail": "color(70)",
+
+    # Fire (red -> orange -> yellow + sparks)
+    "fire.red": "bold color(160)",
+    "fire.orange": "bold color(208)",
+    "fire.yellow": "bold color(220)",
+    "fire.smoke": "dim color(245)",
+    "fire.spark": "bold color(226)",
+
+    # Alien (sickly)
+    "alien.body": "bold color(118)",
+    "alien.detail": "color(76)",
+    "alien.slime": "dim color(70)",
+
+    # Ground
+    "ground.line": "dim color(245)",
+    "ground.rock": "dim color(242)",
+    "ground.ember": "dim color(208)",
 })
 
 console = Console(theme=DEEP_SPACE_THEME)

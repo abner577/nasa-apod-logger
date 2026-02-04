@@ -331,3 +331,104 @@ def render_astronaut_startup_art_2() -> None:
             i += 1
 
     console.print(text)
+
+def render_alien_startup_art_1() -> None:
+    char_style_map = {
+        # Shell / structure
+        "/": "alien.symbol.caret",
+        "\\": "alien.symbol.plus",
+        "|": "alien.symbol.caret",
+        "(": "alien.symbol.plus",
+        ")": "alien.symbol.caret",
+        "-": "alien.symbol.plus",
+        "_": "alien.symbol.caret",
+
+        # Face / inner
+        "!": "alien.symbol.caret",
+        "\"": "alien.symbol.plus",
+        "'": "alien.symbol.plus",
+        "#": "alien.eyes",
+
+        # Texture (choose deliberately: this is your “dial”)
+        ":": "alien.symbol.caret",
+        ".": "alien.symbol.plus",
+
+        # FX
+        "^": "alien.symbol.caret",
+        "+": "alien.symbol.plus",
+    }
+
+    text = Text()
+    for line_index, line in enumerate(ALIEN_STARTUP_ART1.splitlines()):
+        if line_index > 0:
+            text.append("\n")
+
+        for ch in line:
+            if ch == "A":
+                text.append(ch, style="usa.blue")
+            elif ch in {"N", "S"}:
+                text.append(ch, style="usa.red")
+            else:
+                style = char_style_map.get(ch)
+                text.append(ch, style=style) if style else text.append(ch)
+
+    console.print(text)
+
+
+def render_alien_startup_art_2() -> None:
+    FORCE_ASTRO_BODY_CHARS = {"\\", "/", ")"}
+
+    char_style_map = {
+        # --- Fire chars ---
+        "@": "fire.red",        # primary flame mass
+        "~": "fire.spark",     # heat trail
+        "*": "fire.spark",      # spark
+        ".": "fire.spark",      # smoke / particles
+        "(": "fire.orange",     # embers / flame curls (baseline)
+        ")": "fire.orange",
+
+        # --- Alien chars (baseline) ---
+        "M": "alien.body",
+        "O": "alien.body",
+        "!": "alien.detail",
+        "/": "alien.body",
+        "\\": "alien.body",
+        "-": "alien.body",
+        "_": "astro.body",
+        "0": "astro.body",
+
+        # --- Astronaut chars (baseline) ---
+        "|": "astro.body",
+        "<": "astro.metal",
+        ">": "astro.metal",
+        "+": "astro.metal",
+        "=": "astro.suit",
+        "o": "astro.body",
+    }
+
+    lines = ALIEN_STARTUP_ART2.splitlines()
+    text = Text()
+
+    for r, line in enumerate(lines):
+        if r > 0:
+            text.append("\n")
+
+        # Boundary: everything left of the first '@' is "astronaut side"
+        at_idx = line.find("@")
+        astro_side_end = at_idx if at_idx != -1 else len(line)
+
+        for c, ch in enumerate(line):
+            # Positional override (very simple, very intentional)
+            if c < astro_side_end and ch in FORCE_ASTRO_BODY_CHARS:
+                text.append(ch, style="astro.body")
+                continue
+
+            # ... your existing character->style mapping logic goes here ...
+            # Example:
+            style = char_style_map.get(ch)
+            if style:
+                text.append(ch, style=style)
+            else:
+                text.append(ch)
+
+    console.print(text)

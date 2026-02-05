@@ -68,7 +68,7 @@ DEEP_SPACE_THEME = Theme({
    "astro.metal": "color(245)",
    "astro.highlight": "color(252)",
 
-    # Alien: Minimal Body, Loud FX
+    # ALIENT STARTUP ARTS
    "alien.symbol.caret": "bold color(63)",
    "alien.symbol.plus": "bold color(98)",
    "alien.eyes": "bold color(40)",
@@ -92,6 +92,11 @@ DEEP_SPACE_THEME = Theme({
 
     # Alien (sickly)
     "alien.body": "color(118)",
+
+    # MAYBE STARTUP ARTS
+    "sat.metal": "bold color(230)",   # warm cream
+    "sat.light": "bold color(220)",  # warm gold
+    "sat.dark": "dim color(94)",      # bronze/brown shadow
 })
 
 console = Console(theme=DEEP_SPACE_THEME)

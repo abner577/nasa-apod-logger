@@ -89,7 +89,7 @@ def render_spaceship_startup_art_1() -> None:
 
     text = Text()
 
-    for line_index, line in enumerate(SPACESHIP_STARTUP_ART1.splitlines()):
+    for line_index, line in enumerate(SPACESHIP_STARTUP_ART_1.splitlines()):
         if line_index > 0:
             text.append("\n")
 
@@ -126,7 +126,7 @@ def render_spaceship_startup_art_2() -> None:
 
     text = Text()
 
-    for line_index, line in enumerate(SPACESHIP_STARTUP_ART2.splitlines()):
+    for line_index, line in enumerate(SPACESHIP_STARTUP_ART_2.splitlines()):
         if line_index > 0:
             text.append("\n")
 
@@ -169,7 +169,7 @@ def render_moon_startup_art_1() -> None:
         "A": "nasa.red",
     }
 
-    lines = MOON_STARTUP_ART1.splitlines()
+    lines = MOON_STARTUP_ART_1.splitlines()
     height = len(lines)
 
     text = Text()
@@ -207,7 +207,7 @@ def render_moon_startup_art_1() -> None:
 def render_astronaut_startup_art_1() -> None:
     ground_chars = set("^~'\"")
 
-    lines = ASTRONAUT_STARTUP_ART1.splitlines()
+    lines = ASTRONAUT_STARTUP_ART_1.splitlines()
     total_lines = len(lines)
 
     # Identify the finial line: the one that contains "<>" (or "< >") near the top
@@ -302,7 +302,7 @@ def render_astronaut_startup_art_1() -> None:
 def render_astronaut_startup_art_2() -> None:
     highlight_chars = {"=", "*"}
 
-    lines = ASTRONAUT_STARTUP_ART2.splitlines()
+    lines = ASTRONAUT_STARTUP_ART_2.splitlines()
     text = Text()
 
     for row, line in enumerate(lines):
@@ -359,7 +359,7 @@ def render_alien_startup_art_1() -> None:
     }
 
     text = Text()
-    for line_index, line in enumerate(ALIEN_STARTUP_ART1.splitlines()):
+    for line_index, line in enumerate(ALIEN_STARTUP_ART_1.splitlines()):
         if line_index > 0:
             text.append("\n")
 
@@ -404,7 +404,7 @@ def render_alien_startup_art_2() -> None:
         "o": "alien.body",
     }
 
-    lines = ALIEN_STARTUP_ART2.splitlines()
+    lines = ALIEN_STARTUP_ART_2.splitlines()
     text = Text()
 
     for r, line in enumerate(lines):
@@ -423,6 +423,50 @@ def render_alien_startup_art_2() -> None:
 
             # ... your existing character->style mapping logic goes here ...
             # Example:
+            style = char_style_map.get(ch)
+            if style:
+                text.append(ch, style=style)
+            else:
+                text.append(ch)
+
+    console.print(text)
+      # structure strokes
+# Everything else falls through (including spaces)
+
+def render_satellite_startup_art1() -> None:
+    char_style_map = {
+        # Main structure
+        "|": "sat.metal",
+        "\\": "sat.metal",
+        "/": "sat.metal",
+        "_": "sat.metal",
+        "-": "sat.metal",
+        ":": "sat.metal",
+        ";": "sat.metal",
+        "L": "sat.metal",
+
+        # Shine / curvature / small details
+        '"': "sat.light",
+        "'": "sat.light",
+        "`": "sat.light",
+        ".": "sat.light",
+        ",": "sat.light",
+
+        # Optional: make the chevron/bracket pop as “shadow weight”
+        "<": "sat.metal",
+
+        # NASA wordmark (pure character mapping)
+        "N": "nasa.red",
+        "S": "nasa.red",
+        "A": "nasa.blue",
+    }
+
+    text = Text()
+    for line_idx, line in enumerate(SATELLITE_STARTUP_ART_1.splitlines()):
+        if line_idx > 0:
+            text.append("\n")
+
+        for ch in line:
             style = char_style_map.get(ch)
             if style:
                 text.append(ch, style=style)

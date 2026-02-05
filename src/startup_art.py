@@ -376,7 +376,7 @@ def render_alien_startup_art_1() -> None:
 
 
 def render_alien_startup_art_2() -> None:
-    FORCE_ASTRO_BODY_CHARS = {"\\", "/", ")"}
+    force_astro_body_chars = {"\\", "/"}
 
     char_style_map = {
         # --- Fire chars ---
@@ -390,20 +390,18 @@ def render_alien_startup_art_2() -> None:
         # --- Alien chars (baseline) ---
         "M": "alien.body",
         "O": "alien.body",
-        "!": "alien.detail",
+        "!": "alien.body",
         "/": "alien.body",
         "\\": "alien.body",
         "-": "alien.body",
         "_": "astro.body",
         "0": "astro.body",
+        "%": "alien.body",
 
         # --- Astronaut chars (baseline) ---
         "|": "astro.body",
-        "<": "astro.metal",
-        ">": "astro.metal",
-        "+": "astro.metal",
-        "=": "astro.suit",
-        "o": "astro.body",
+        "=": "fire.spark",
+        "o": "alien.body",
     }
 
     lines = ALIEN_STARTUP_ART2.splitlines()
@@ -419,7 +417,7 @@ def render_alien_startup_art_2() -> None:
 
         for c, ch in enumerate(line):
             # Positional override (very simple, very intentional)
-            if c < astro_side_end and ch in FORCE_ASTRO_BODY_CHARS:
+            if c < astro_side_end and ch in force_astro_body_chars:
                 text.append(ch, style="astro.body")
                 continue
 

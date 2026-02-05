@@ -85,21 +85,13 @@ DEEP_SPACE_THEME = Theme({
     "gun.detail": "color(70)",
 
     # Fire (red -> orange -> yellow + sparks)
-    "fire.red": "bold color(160)",
-    "fire.orange": "bold color(208)",
-    "fire.yellow": "bold color(220)",
-    "fire.smoke": "dim color(245)",
-    "fire.spark": "bold color(226)",
+    "fire.red": "color(160)",
+    "fire.orange": "color(208)",
+    "fire.yellow": "color(220)",
+    "fire.spark": "color(226)",
 
     # Alien (sickly)
-    "alien.body": "bold color(118)",
-    "alien.detail": "color(76)",
-    "alien.slime": "dim color(70)",
-
-    # Ground
-    "ground.line": "dim color(245)",
-    "ground.rock": "dim color(242)",
-    "ground.ember": "dim color(208)",
+    "alien.body": "color(118)",
 })
 
 console = Console(theme=DEEP_SPACE_THEME)

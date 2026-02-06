@@ -40,13 +40,6 @@ def startup_banner2():
 
 
 def render_space_startup_art_1() -> None:
-    """
-    Space Startup Art 1 (Earth)
-
-    - Every visible character = land
-    - Only land is colored
-    """
-
     text = Text()
 
     for line_index, line in enumerate(SPACE_STARTUP_ART_1.splitlines()):
@@ -55,7 +48,7 @@ def render_space_startup_art_1() -> None:
 
         for ch in line:
             if ch.isspace():
-                # Water → implicit → no styling
+                # Water
                 text.append(ch)
             else:
                 # Land
@@ -66,7 +59,6 @@ def render_space_startup_art_1() -> None:
 
 def render_spaceship_startup_art_1() -> None:
     char_style_map = {
-        # Flame
         "^": "ship.flame.inner",
         "(": "ship.flame.outer",
         ")": "ship.flame.outer",
@@ -74,7 +66,6 @@ def render_spaceship_startup_art_1() -> None:
         ".": "ship.flame.inner",
         "|": "ship.trim",
 
-        # Body
         "/": "ship.trim",
         "\\": "ship.trim",
         "_": "ship.trim",
@@ -82,7 +73,6 @@ def render_spaceship_startup_art_1() -> None:
         "!": "ship.flame.inner",
         "#": "ship.trim",
 
-        # Text
         "U": "ship.usa",
         "S": "ship.usa",
         "A": "ship.usa",
@@ -106,7 +96,6 @@ def render_spaceship_startup_art_1() -> None:
 
 def render_spaceship_startup_art_2() -> None:
     char_style_map = {
-        # Structure (white)
         "/": "ship.body",
         "\\": "ship.body",
         "|": "ship.body",
@@ -114,12 +103,10 @@ def render_spaceship_startup_art_2() -> None:
         "_": "ship.nasa.blue",
         "!": "ship.nasa.red",
 
-        # Accents
         ".": "ship.dots",
         "(": "ship.paren",
         ")": "ship.paren",
 
-        # NASA letters
         "N": "ship.nasa.red",
         "S": "ship.nasa.red",
         "A": "ship.nasa.blue",
@@ -140,19 +127,17 @@ def render_spaceship_startup_art_2() -> None:
 
     console.print(text)
 
+
 def render_moon_startup_art_1() -> None:
     char_style_map = {
-        # Suns
         "O": "sun.primary",
         "|": "sun.primary",
         "-": "sun.primary",
 
-        # Stars
         "*": "star.purple",
         "o": "star.blue",
         ".": "star.muted",
 
-        # Moon
         "_": "moon.body",
         "~": "moon.body",
         "`": "moon.body",
@@ -164,7 +149,6 @@ def render_moon_startup_art_1() -> None:
         ")": "moon.body",
         "@": "moon.body",
 
-        # USA letters
         "U": "nasa.red",
         "S": "nasa.blue",
         "A": "nasa.red",
@@ -205,6 +189,7 @@ def render_moon_startup_art_1() -> None:
 
     console.print(text)
 
+
 def render_astronaut_startup_art_1() -> None:
     ground_chars = set("^~'\"")
 
@@ -237,9 +222,8 @@ def render_astronaut_startup_art_1() -> None:
         is_finial_row = (finial_row is not None and row == finial_row)
 
         for col, ch in enumerate(line):
-            # --- Positional overrides first ---
 
-            # (1) Ground chars should only be "ground" on the ground row;
+            # Ground chars should only be "ground" on the ground row;
             # otherwise treat them like astronaut body.
             if ch in ("~", "'", "\""):
                 if is_ground_row:
@@ -248,15 +232,13 @@ def render_astronaut_startup_art_1() -> None:
                     text.append(ch, style="astronaut.body")
                 continue
 
-            # (2) < and > are pole-top only on the finial row; otherwise astronaut body
+            # < and > are pole-top only on the finial row; otherwise astronaut body
             if ch in ("<", ">"):
                 if is_finial_row:
                     text.append(ch, style="pole.top")
                 else:
                     text.append(ch, style="astronaut.body")
                 continue
-
-            # --- Existing logic (mostly unchanged) ---
 
             # Ground remaining chars (like ^) on ground row
             if ch in ground_chars:
@@ -268,17 +250,14 @@ def render_astronaut_startup_art_1() -> None:
                 text.append(ch, style="pole.body")
                 continue
 
-            # Flag canton
             if ch == ":" and has_flag_cloth and pole_start != -1 and col > pole_start + 1:
                 text.append(ch, style="flag.canton")
                 continue
 
-            # Flag stripes
             if ch == "=" and stripe_style and pole_start != -1 and col > pole_start + 1:
                 text.append(ch, style=stripe_style)
                 continue
 
-            # USA letters
             if ch == "U":
                 text.append(ch, style="usa.red")
                 continue
@@ -299,6 +278,7 @@ def render_astronaut_startup_art_1() -> None:
                 text.append(ch, style="astronaut.body")
 
     console.print(text)
+
 
 def render_astronaut_startup_art_2() -> None:
     highlight_chars = {"=", "*"}
@@ -333,9 +313,9 @@ def render_astronaut_startup_art_2() -> None:
 
     console.print(text)
 
+
 def render_alien_startup_art_1() -> None:
     char_style_map = {
-        # Shell / structure
         "/": "alien.symbol.caret",
         "\\": "alien.symbol.plus",
         "|": "alien.symbol.caret",
@@ -344,17 +324,14 @@ def render_alien_startup_art_1() -> None:
         "-": "alien.symbol.plus",
         "_": "alien.symbol.caret",
 
-        # Face / inner
         "!": "alien.symbol.caret",
         "\"": "alien.symbol.plus",
         "'": "alien.symbol.plus",
         "#": "alien.eyes",
 
-        # Texture (choose deliberately: this is your “dial”)
         ":": "alien.symbol.caret",
         ".": "alien.symbol.plus",
 
-        # FX
         "^": "alien.symbol.caret",
         "+": "alien.symbol.plus",
     }
@@ -380,15 +357,13 @@ def render_alien_startup_art_2() -> None:
     force_astro_body_chars = {"\\", "/"}
 
     char_style_map = {
-        # --- Fire chars ---
-        "@": "fire.red",        # primary flame mass
-        "~": "fire.spark",     # heat trail
-        "*": "fire.spark",      # spark
-        ".": "fire.spark",      # smoke / particles
-        "(": "fire.orange",     # embers / flame curls (baseline)
+        "@": "fire.red",
+        "~": "fire.spark",
+        "*": "fire.spark",
+        ".": "fire.spark",
+        "(": "fire.orange",
         ")": "fire.orange",
 
-        # --- Alien chars (baseline) ---
         "M": "alien.body",
         "O": "alien.body",
         "!": "alien.body",
@@ -399,7 +374,6 @@ def render_alien_startup_art_2() -> None:
         "0": "astro.body",
         "%": "alien.body",
 
-        # --- Astronaut chars (baseline) ---
         "|": "astro.body",
         "=": "fire.spark",
         "o": "alien.body",
@@ -412,18 +386,15 @@ def render_alien_startup_art_2() -> None:
         if r > 0:
             text.append("\n")
 
-        # Boundary: everything left of the first '@' is "astronaut side"
+        # Boundary: everything left of the first '@' is "astronaut"
         at_idx = line.find("@")
         astro_side_end = at_idx if at_idx != -1 else len(line)
 
         for c, ch in enumerate(line):
-            # Positional override (very simple, very intentional)
             if c < astro_side_end and ch in force_astro_body_chars:
                 text.append(ch, style="astro.body")
                 continue
 
-            # ... your existing character->style mapping logic goes here ...
-            # Example:
             style = char_style_map.get(ch)
             if style:
                 text.append(ch, style=style)
@@ -431,12 +402,10 @@ def render_alien_startup_art_2() -> None:
                 text.append(ch)
 
     console.print(text)
-      # structure strokes
-# Everything else falls through (including spaces)
+
 
 def render_satellite_startup_art1() -> None:
     char_style_map = {
-        # Main structure
         "|": "sat.metal",
         "\\": "sat.metal",
         "/": "sat.metal",
@@ -446,17 +415,14 @@ def render_satellite_startup_art1() -> None:
         ";": "sat.metal",
         "L": "sat.metal",
 
-        # Shine / curvature / small details
         '"': "sat.light",
         "'": "sat.light",
         "`": "sat.light",
         ".": "sat.light",
         ",": "sat.light",
 
-        # Optional: make the chevron/bracket pop as “shadow weight”
         "<": "sat.metal",
 
-        # NASA wordmark (pure character mapping)
         "N": "nasa.red",
         "S": "nasa.red",
         "A": "nasa.blue",
@@ -476,22 +442,19 @@ def render_satellite_startup_art1() -> None:
 
     console.print(text)
 
+
 def render_space_startup_art_2() -> None:
     char_style_map = {
-        # --- Border ---
         "{": "border.frame",
         "}": "border.frame",
 
-        # --- Suns (given) ---
         "O": "sun.primary",
         "-": "sun.primary",
         "|": "sun.primary",
 
-        # --- Stars (given / allowed) ---
         "*": "star.purple",
         "D": "star.blue",
 
-        # --- Planet ---
         "_": "planet.glow",
         "/": "planet.glow",
         "\\": "planet.glow",
@@ -504,8 +467,7 @@ def render_space_startup_art_2() -> None:
         ".": "planet.glow",
     }
 
-    # Characters you said can be purple or blue
-    twinkle_chars = {"@", "+", "o", ".", "=", ")", ">", "<"}
+    randomized_chars = {"@", "+", "o", ".", "=", ")", ">", "<"}
 
     text = Text()
     for line_idx, line in enumerate(SPACE_STARTUP_ART_2.splitlines()):
@@ -513,8 +475,8 @@ def render_space_startup_art_2() -> None:
             text.append("\n")
 
         for ch in line:
-            if ch in twinkle_chars:
-                # randomized twinkle, no positional checks
+            if ch in randomized_chars:
+                # randomized colors for the following chars
                 text.append(ch, style=random.choice(["star.purple", "star.blue"]))
                 continue
 

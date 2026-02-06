@@ -4,104 +4,112 @@ from rich.console import Console
 from rich.theme import Theme
 
 STARTUP_ARTS_THEME = Theme({
+
+    # =========================
     # Identity
-    "app.title": "bold color(39)",      # light blue
-    "app.banner": "bold color(27)",     # deep blue
-    "accent": "color(93)",              # purple
+    # =========================
+    "app.title": "bold color(39)",  # light blue / cyan-blue
+    "app.banner": "bold color(27)",  # deep blue / navy
+    "accent": "color(93)",  # purple / violet
 
+    # =========================
     # Text hierarchy
-    "body": "color(252)",               # light gray
-    "muted": "dim color(250)",
-    "label": "bold color(39)",
-    "value": "color(252)",
+    # =========================
+    "body": "color(252)",  # light gray / near-white
+    "muted": "dim color(250)",  # muted light gray
+    "label": "bold color(39)",  # bold light blue
+    "value": "color(252)",  # light gray / near-white
 
+    # =========================
     # Status
-    "ok": "bold color(37)",              # teal
-    "warn": "bold yellow",
-    "err": "bold red",
+    # =========================
+    "ok": "bold color(37)",  # teal / cyan-green
+    "warn": "bold yellow",  # bright yellow
+    "err": "bold red",  # bright red
 
+    # =========================
     # UI
-    "rule": "dim color(27)",
-    "menu.key": "bold color(39)",
-    "menu.text": "color(252)",
+    # =========================
+    "rule": "dim color(27)",  # dim deep blue
+    "menu.key": "bold color(39)",  # light blue
+    "menu.text": "color(252)",  # light gray
 
+    # ----------------------- STARTUP ARTS -----------------------
+
+    # ==================================================
     # SPACE STARTUP ARTS
-    "earth.land": "color(34)",       # dark green
-    "earth.water": "on color(25)",   # muted blue ocean
+    # ==================================================
+    "earth.land": "color(34)",  # dark green
 
-    "border.frame": "dim color(97)"  ,    # navy-black  # deep space blue,  # soft graphite
-    "planet.core": "bold color(252)",     # light gray body
-    "planet.ridge": "color(250)",         # slightly darker contour
-    "planet.glow": "dim color(39)",       # cool cyan glow
+    "border.frame": "dim color(97)",  # navy-black / deep space blue
+    "planet.glow": "dim color(39)",  # cool cyan glow
 
+    # =========================
     # SPACESHIP STARTUP ARTS
-   "ship.body": "color(252)",
-   "ship.trim": "color(250)",
-   "ship.window": "color(39)",
-   "ship.panel": "color(27)",
-   "ship.usa": "bold color(160)",
-   "ship.flame.outer": "bold color(160)",
-   "ship.flame.inner": "color(214)",
+    # =========================
+    "ship.body": "color(252)",  # light gray hull
+    "ship.trim": "color(250)",  # slightly darker trim
+    "ship.usa": "bold color(160)",  # bright red
+    "ship.flame.outer": "bold color(160)",  # bright red flame edge
+    "ship.flame.inner": "color(214)",  # orange-yellow flame core
 
-   "ship.dots": "color(37)",
-   "ship.paren": "bold color(93)",
-   "ship.nasa.red": "bold color(160)",
-   "ship.nasa.blue": "bold color(39)",
+    "ship.dots": "color(37)",  # teal / cyan dots
+    "ship.paren": "bold color(93)",  # bold purple accents
+    "ship.nasa.red": "bold color(160)",  # NASA red
+    "ship.nasa.blue": "bold color(39)",  # NASA blue
 
+    # =========================
     # MOON STARTUP ART
-   "sun.primary": "bold color(220)",
-   "star.purple": "color(93)",
-   "star.blue": "color(39)",
-   "star.muted": "dim color(250)",
-   "moon.body": "color(252)",
-   "nasa.red": "bold color(160)",
-   "nasa.blue": "bold color(27)",
+    # =========================
+    "sun.primary": "bold color(220)",  # warm yellow / sun glow
+    "star.purple": "color(93)",  # purple star
+    "star.blue": "color(39)",  # blue star
+    "star.muted": "dim color(250)",  # faint gray star
+    "moon.body": "color(252)",  # light gray moon surface
+    "nasa.red": "bold color(160)",  # NASA red
+    "nasa.blue": "bold color(27)",  # NASA deep blue
 
+    # =========================
     # ASTRONAUTS STARTUP ARTS
-   "flag.canton": "bold color(33)",
-   "flag.stripe.red": "bold color(160)",
-   "flag.stripe.white": "color(252)",
-   "pole.body": "color(245)",
-   "pole.top": "bold color(220)",
-   "astronaut.body": "color(152)",
-   "astronaut.detail": "dim color(109)",
-   "ground": "color(97)",
-   "usa.red": "bold color(160)",
-   "usa.blue": "bold color(39)",
+    # =========================
+    "flag.canton": "bold color(33)",  # deep blue flag canton
+    "flag.stripe.red": "bold color(160)",  # red stripes
+    "flag.stripe.white": "color(252)",  # white stripes
+    "pole.body": "color(245)",  # muted gray pole
+    "pole.top": "bold color(220)",  # gold/yellow finial
+    "astronaut.body": "color(152)",  # pale blue suit body
+    "astronaut.detail": "dim color(109)",  # muted teal details
+    "ground": "color(97)",  # dark navy ground
+    "usa.red": "bold color(160)",  # USA red
+    "usa.blue": "bold color(39)",  # USA blue
 
-   "astro.body": "color(153)",
-   "astro.metal": "color(245)",
-   "astro.highlight": "color(252)",
+    "astro.body": "color(153)",  # soft light blue
+    "astro.metal": "color(245)",  # dull metallic gray
 
+    # =========================
     # ALIEN STARTUP ARTS
-   "alien.symbol.caret": "bold color(63)",
-   "alien.symbol.plus": "bold color(98)",
-   "alien.eyes": "bold color(40)",
+    # =========================
+    "alien.symbol.caret": "bold color(63)",  # neon cyan-green
+    "alien.symbol.plus": "bold color(98)",  # electric purple
+    "alien.eyes": "bold color(40)",  # bright green
 
-    # Astronaut
-    "astro.suit": "color(252)",
-    "astro.suit.dim": "dim color(250)",
-    "astro.detail": "dim color(245)",
-    "astro.joint": "color(246)",
-    "astro.visor": "bold color(39)",
-
-    # Gun
-    "gun.body": "bold color(82)",
-    "gun.detail": "color(70)",
-
+    # =========================
     # Fire (red -> orange -> yellow + sparks)
-    "fire.red": "color(160)",
-    "fire.orange": "color(208)",
-    "fire.yellow": "color(220)",
-    "fire.spark": "color(226)",
+    # =========================
+    "fire.red": "color(160)",  # bright red flame
+    "fire.orange": "color(208)",  # orange flame
+    "fire.spark": "color(226)",  # bright spark yellow
 
+    # =========================
     # Alien (sickly)
-    "alien.body": "color(118)",
+    # =========================
+    "alien.body": "color(118)",  # sickly green
 
+    # =========================
     # SATELLITE STARTUP ART
-    "sat.metal": "bold color(230)",   # warm cream
-    "sat.light": "bold color(220)",  # warm gold
-    "sat.dark": "dim color(94)",      # bronze/brown shadow
+    # =========================
+    "sat.metal": "bold color(230)",  # warm cream satellite body
+    "sat.light": "bold color(220)",  # warm gold ground/platform
 })
 
 console = Console(theme=STARTUP_ARTS_THEME)

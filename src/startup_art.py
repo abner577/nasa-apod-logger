@@ -1,6 +1,7 @@
 from rich.text import Text
 from src.utils.console import console
 from src.config import *
+import random
 
 
 def startup_banner1():
@@ -467,6 +468,56 @@ def render_satellite_startup_art1() -> None:
             text.append("\n")
 
         for ch in line:
+            style = char_style_map.get(ch)
+            if style:
+                text.append(ch, style=style)
+            else:
+                text.append(ch)
+
+    console.print(text)
+
+def render_space_startup_art_2() -> None:
+    char_style_map = {
+        # --- Border ---
+        "{": "border.frame",
+        "}": "border.frame",
+
+        # --- Suns (given) ---
+        "O": "sun.primary",
+        "-": "sun.primary",
+        "|": "sun.primary",
+
+        # --- Stars (given / allowed) ---
+        "*": "star.purple",
+        "D": "star.blue",
+
+        # --- Planet ---
+        "_": "planet.glow",
+        "/": "planet.glow",
+        "\\": "planet.glow",
+
+        "~": "sun.primary",
+
+        "`": "planet.glow",
+        "'": "planet.glow",
+        ",": "planet.glow",
+        ".": "planet.glow",
+    }
+
+    # Characters you said can be purple or blue
+    twinkle_chars = {"@", "+", "o", ".", "=", ")", ">", "<"}
+
+    text = Text()
+    for line_idx, line in enumerate(SPACE_STARTUP_ART_2.splitlines()):
+        if line_idx > 0:
+            text.append("\n")
+
+        for ch in line:
+            if ch in twinkle_chars:
+                # randomized twinkle, no positional checks
+                text.append(ch, style=random.choice(["star.purple", "star.blue"]))
+                continue
+
             style = char_style_map.get(ch)
             if style:
                 text.append(ch, style=style)

@@ -3,7 +3,7 @@ from __future__ import annotations
 from rich.console import Console
 from rich.theme import Theme
 
-DEEP_SPACE_THEME = Theme({
+STARTUP_ARTS_THEME = Theme({
     # Identity
     "app.title": "bold color(39)",      # light blue
     "app.banner": "bold color(27)",     # deep blue
@@ -25,9 +25,14 @@ DEEP_SPACE_THEME = Theme({
     "menu.key": "bold color(39)",
     "menu.text": "color(252)",
 
-    # SPACE STARTUP ART
+    # SPACE STARTUP ARTS
     "earth.land": "color(34)",       # dark green
     "earth.water": "on color(25)",   # muted blue ocean
+
+    "border.frame": "dim color(97)"  ,    # navy-black  # deep space blue,  # soft graphite
+    "planet.core": "bold color(252)",     # light gray body
+    "planet.ridge": "color(250)",         # slightly darker contour
+    "planet.glow": "dim color(39)",       # cool cyan glow
 
     # SPACESHIP STARTUP ARTS
    "ship.body": "color(252)",
@@ -68,19 +73,19 @@ DEEP_SPACE_THEME = Theme({
    "astro.metal": "color(245)",
    "astro.highlight": "color(252)",
 
-    # ALIENT STARTUP ARTS
+    # ALIEN STARTUP ARTS
    "alien.symbol.caret": "bold color(63)",
    "alien.symbol.plus": "bold color(98)",
    "alien.eyes": "bold color(40)",
 
-    # Astronaut (mostly white/gray)
+    # Astronaut
     "astro.suit": "color(252)",
     "astro.suit.dim": "dim color(250)",
     "astro.detail": "dim color(245)",
     "astro.joint": "color(246)",
     "astro.visor": "bold color(39)",
 
-    # Gun (green accent)
+    # Gun
     "gun.body": "bold color(82)",
     "gun.detail": "color(70)",
 
@@ -93,10 +98,10 @@ DEEP_SPACE_THEME = Theme({
     # Alien (sickly)
     "alien.body": "color(118)",
 
-    # MAYBE STARTUP ARTS
+    # SATELLITE STARTUP ART
     "sat.metal": "bold color(230)",   # warm cream
     "sat.light": "bold color(220)",  # warm gold
     "sat.dark": "dim color(94)",      # bronze/brown shadow
 })
 
-console = Console(theme=DEEP_SPACE_THEME)
+console = Console(theme=STARTUP_ARTS_THEME)

@@ -10,7 +10,8 @@ Responsible for the main menu loop and user interaction flow.
 """
 
 startup_banner2()
-render_satellite_startup_art1()
+# render func
+
 print("\n")
 print("-----------------------------------------------------------------------------\n")
 

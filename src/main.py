@@ -82,9 +82,6 @@ flag = True
 while flag:
     print("\n======================= Main Menu ☄️ =======================\n")
     increment_launch_count(int(get_launch_count()['launch_count']))
-
-    print("Commands: /help  /readme  /quit\n")
-
     raw = input(
         "[1] Make a NASA APOD Request\n"
         "[2] View/Manage saved logs\n"

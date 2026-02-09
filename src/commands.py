@@ -40,7 +40,6 @@ def print_help() -> None:
         "/help      Show this help screen\n"
         "/readme    Open the GitHub README in your browser\n"
         "/quit      Exit the application\n\n"
-        "Tip: You can always use the numbered menu options as usual.\n"
     )
 
 

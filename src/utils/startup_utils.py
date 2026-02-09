@@ -93,13 +93,14 @@ def user_settings_menu():
 
         try:
             user_choice = int(input(
-                "[1] View auto-open setting\n"
-                "[2] Change auto-open setting\n"
-                "[3] Return to Main Menu\n\n"
+                "[1] View settings\n"
+                "[2] Change auto-redirect setting\n"
+                "[3] Change auto-set-wallpaper setting\n"
+                "[4] Return to Main Menu\n\n"
                 "Option: "
             ))
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 3.")
+            print("Invalid input: Please enter a number from 1 to 4.")
             return
         except Exception as e:
             print(e)
@@ -107,26 +108,19 @@ def user_settings_menu():
 
         match user_choice:
             case 1:
-                automatically_redirect = get_user_settings()
-                flag = automatically_redirect['automatically_redirect']
-
-                if flag == 'yes':
-                    print("\nAuto-open in browser: ON ✅")
-                else:
-                    print("\nAuto-open in browser: OFF ❌")
+                settings_dict = get_all_user_settings()
+                format_all_user_settings(settings_dict)
             case 2:
-                update_user_settings()
+                update_automatically_redirect_setting()
             case 3:
+                update_automatically_set_wallpaper()
+            case 4:
                 print("\nReturning to Main Menu...")
                 flag = False
 
 def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
     """
     Prints a clean Unicode box around a titled section.
-
-    title: Box title text (e.g., "Startup Checks")
-    lines: Lines to display inside the box (already formatted)
-    padding_x: Left/right padding spaces inside the box
     """
     # Compute inner width: longest line + padding on both sides
     max_line_len = max((len(line) for line in lines), default=0)

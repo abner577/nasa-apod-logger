@@ -1,6 +1,7 @@
 from src.utils.startup_utils import *
 from src.startup_art import *
 from src.config import *
+from src.cli_commands import handle_global_command
 
 """
 main.py
@@ -62,25 +63,33 @@ print("\n-----------------------------------------------------------------------
 # Entry Prompt
 entry_flag = True
 while entry_flag:
-    entry_choice = input(
+    print('Tip: type --help for the help menu\n')
+
+    raw = input(
         "[1] Get started\n"
         "[Q] Quit\n\n"
         "Option: "
     ).strip()
 
-    if entry_choice == "1":
-        entry_flag = False
-    elif entry_choice.lower() == "q":
+    try:
+        if handle_global_command(raw):
+            continue
+    except SystemExit:
         print("\nGoodbye 👋")
-        exit()
+        raise
+
+    if raw == "1":
+        entry_flag = False
     else:
-        print("Invalid input: Please enter 1 or Q.")
+        print('Invalid input: Please enter 1 or Q (or type --help).\n')
+
 
 # Main Menu
 flag = True
 while flag:
     print("\n======================= Main Menu ☄️ =======================\n")
-    increment_launch_count(int(get_launch_count()['launch_count']))
+    increment_launch_count(int(get_launch_count()["launch_count"]))
+
     raw = input(
         "[1] Make a NASA APOD Request\n"
         "[2] View/Manage saved logs\n"
@@ -90,9 +99,16 @@ while flag:
     ).strip()
 
     try:
+        if handle_global_command(raw):
+            continue
+    except SystemExit:
+        print("\nGoodbye 👋")
+        raise
+
+    try:
         user_choice = int(raw)
     except ValueError:
-        print("Invalid input: Please enter a number from 1 to 4 (or type /help).\n")
+        print("Invalid input: Please enter a number from 1 to 4.\n")
         continue
     except Exception as e:
         print(e)
@@ -109,4 +125,4 @@ while flag:
             print("\nGoodbye 👋")
             flag = False
         case _:
-            print("Invalid input: Please enter a number from 1 to 4 (or type /help).\n")
+            print("Invalid input: Please enter a number from 1 to 4 (or type --help).\n")

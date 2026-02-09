@@ -150,9 +150,12 @@ def _show_help_modal() -> None:
 
 
 def print_help() -> None:
-    print("Commands:")
-    print("--help                     Show this help menu")
-    print("--readme                   Open the project README in your browser")
-    print("--quit                     Exit the application")
-    print("--auto-redirect            Change auto-redirect setting")
-    print("--auto-wallpaper           Change auto-wallpaper setting")
+    print("\n============================= HELP MENU ============================\n")
+    print("COMMANDS:")
+    print("  --help, /help                        Show this help menu")
+    print("  --readme, /readme                    Open README in browser")
+    print("  --quit, /quit, q                     Exit the application")
+    print("  --auto-redirect, /auto-redirect      Change auto-redirect setting")
+    print("  --auto-wallpaper, /auto-wallpaper    Change auto-wallpaper setting")
+
+    print("\n====================================================================")

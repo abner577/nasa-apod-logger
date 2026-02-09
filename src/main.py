@@ -1,7 +1,6 @@
 from src.utils.startup_utils import *
 from src.startup_art import *
 from src.config import *
-from src.commands import handle_main_menu_command
 
 """
 main.py
@@ -90,18 +89,6 @@ while flag:
         "Option: "
     ).strip()
 
-    # Phase 1: handle global commands only at Main Menu
-    cmd_result = handle_main_menu_command(raw)
-
-    # IMPORTANT: /help will clear the screen, print the help, and wait for Enter
-    # When it returns here, we should just re-render the Main Menu cleanly.
-    if cmd_result.handled:
-        if cmd_result.should_exit:
-            print("\nGoodbye 👋")
-            flag = False
-        continue
-
-    # Not a command
     try:
         user_choice = int(raw)
     except ValueError:

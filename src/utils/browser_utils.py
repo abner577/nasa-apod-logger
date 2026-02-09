@@ -20,12 +20,10 @@ def _is_wsl() -> bool:
 def take_user_to_browser(url: str) -> None:
     """
     Open the APOD URL in the user's default web browser.
-    Works on Windows/macOS/Linux and WSL.
 
     Returns:
         None
     """
-
     try:
         # If running in WSL, use Windows to open the URL
         if _is_wsl():

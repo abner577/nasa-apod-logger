@@ -80,8 +80,7 @@ def format_all_user_settings(settings_dict):
    print(f"Amount of times logged in: {settings_dict['launch_count']}")
 
 
-# when we update, we need to write back the second setting as well
-# so we would call the get_launch_count method
+# when we update, we need to write back all the other settings as well
 def update_automatically_redirect_setting():
     if not check_if_user_settings_exist():
         print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
@@ -121,6 +120,9 @@ def update_automatically_redirect_setting():
 
 
 def get_automatically_redirect_setting():
+    """
+    Returns line 1 dict: {"automatically_redirect": "..."}
+    """
     if not check_if_user_settings_exist():
         print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
         return None
@@ -144,8 +146,11 @@ def get_automatically_redirect_setting():
     return None
 
 
-# when we update this we need to write back automatically_redirect as well which is why we call the get_user_settings method
 def increment_launch_count(current_launch_count):
+    """
+     Updates launch_count (line 2) and writes back automatically_redirect (line 1)
+     AND automatically_set_wallpaper (line 3).
+     """
     current_launch_count += 1
 
     current_automatically_redirect_dict = get_automatically_redirect_setting() # returns user settings
@@ -168,6 +173,9 @@ def increment_launch_count(current_launch_count):
 
 
 def get_launch_count():
+    """
+    Returns line 2 dict: {"launch_count": "..."}
+    """
     count = 0
 
     try:
@@ -184,6 +192,9 @@ def get_launch_count():
         print(e)
 
 def get_automatically_set_wallpaper():
+    """
+       Returns line 3 dict: {"automatically_set_wallpaper": "..."}
+    """
     if not check_if_user_settings_exist():
         print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
         return None

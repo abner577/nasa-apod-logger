@@ -1,6 +1,9 @@
+from unittest import case
+
 from src.nasa_client import *
 from src.utils.user_settings import *
 from src.cli_commands import handle_global_command
+from src.startup_art import *
 
 
 def nasa_apods_menu():
@@ -150,44 +153,40 @@ def user_settings_menu():
 
 def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
     """
-    Prints a clean Unicode box around a titled section.
+    Prints a clean Unicode box around a section.
     """
-    # Compute inner width: longest line + padding on both sides
+    # Compute inner width
     max_line_len = max((len(line) for line in lines), default=0)
     inner_width = max_line_len + (padding_x * 2)
 
     # Build top border with title
     title_str = f" {title} "
-    # Make sure the title fits; if title is longer, expand inner width
     if len(title_str) > inner_width:
         inner_width = len(title_str)
 
-    # Top: ┌─── Title ───┐
+    # Top
     left_top = "┌"
     right_top = "┐"
     horiz = "─"
 
-    # Place title after a run of horizontals
-    # Example: ┌──── Startup Checks ────┐
     remaining = inner_width - len(title_str)
     left_run = remaining // 2
     right_run = remaining - left_run
     top = f"{left_top}{horiz * left_run}{title_str}{horiz * right_run}{right_top}"
 
-    # Middle lines: │  ...  │
+    # Sides of box
     side = "│"
     mid_lines = []
     for line in lines:
         space = inner_width - len(line)
         left_pad = " " * padding_x
         right_pad = " " * (space - padding_x) if space >= padding_x else ""
-        # If for some reason line is longer than inner_width, don't break; just print it.
         if len(line) > inner_width:
             mid_lines.append(f"{side}{left_pad}{line}{side}")
         else:
             mid_lines.append(f"{side}{left_pad}{line}{right_pad}{side}")
 
-    # Bottom: └────────┘
+    # Bottom
     left_bot = "└"
     right_bot = "┘"
     bottom = f"{left_bot}{horiz * inner_width}{right_bot}"
@@ -196,3 +195,71 @@ def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
     for m in mid_lines:
         print(m)
     print(bottom)
+
+def print_startup():
+    startup_banner2()
+
+    random_choice = random.randint(1, 10)
+    match random_choice:
+        case 1:
+            render_space_startup_art_1()
+        case 2:
+            render_space_startup_art_2()
+        case 3:
+            render_spaceship_startup_art_1()
+        case 4:
+            render_spaceship_startup_art_2()
+        case 5:
+            render_moon_startup_art_1()
+        case 6:
+            render_astronaut_startup_art_1()
+        case 7:
+            render_astronaut_startup_art_2()
+        case 8:
+            render_alien_startup_art_1()
+        case 9:
+            render_alien_startup_art_2()
+        case 10:
+            render_satellite_startup_art1()
+
+    print("\n")
+    print("-----------------------------------------------------------------------------\n")
+
+    # Startup checks (create if missing)
+    data_dir_status = "Found"
+    settings_status = "Found"
+    json_status = "Found"
+    csv_status = "Found"
+
+    if not check_if_data_exists():
+        create_data_directory()
+        data_dir_status = "Created"
+
+    if not check_if_user_settings_exist():
+        create_user_settings()
+        settings_status = "Created"
+
+    if not check_if_json_output_exists():
+        create_json_output_file()
+        json_status = "Created"
+
+    if not check_if_csv_output_exists():
+        create_csv_output_file()
+        csv_status = "Created"
+
+    checks_lines = [
+        f"Data directory     [✓] {data_dir_status}",
+        f"JSONL log          [✓] {json_status}",
+        f"CSV log            [✓] {csv_status}",
+        f"User settings      [✓] {settings_status}",
+    ]
+
+    print_box("Startup Checks:", checks_lines)
+    print("\nVersion: 1.0.0\n")
+
+    print("Tips for getting started:")
+    print("> Review the README for usage details.")
+    print("> Fetch todays APOD to begin!")
+    print("> /help for more information.")
+
+    print("\n-------------------------------------------------------------------------------\n")

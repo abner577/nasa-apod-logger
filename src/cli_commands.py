@@ -145,7 +145,7 @@ def _open_readme() -> None:
 def _show_help_modal() -> None:
     clear_screen()
     print_help()
-    input("\nPress Enter to return...")
+    input("\nPress Enter to return... ")
     clear_screen()
 
 
@@ -157,5 +157,10 @@ def print_help() -> None:
     print("  --quit, /quit, q                     Exit the application")
     print("  --auto-redirect, /auto-redirect      Change auto-redirect setting")
     print("  --auto-wallpaper, /auto-wallpaper    Change auto-wallpaper setting")
+
+    print("\nNOTES:")
+    print("  New here? I recommend opening the README before getting started.\n"
+          "  It explains how this tool fetches, stores, and manages NASA APOD entries.\n"
+          "  Dont forget to check out the Configuration section to learn how to customize behavior!")
 
     print("\n====================================================================")

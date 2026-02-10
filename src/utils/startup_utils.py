@@ -1,5 +1,6 @@
 from src.nasa_client import *
 from src.utils.user_settings import *
+from src.cli_commands import handle_global_command
 
 
 def nasa_apods_menu():
@@ -9,14 +10,21 @@ def nasa_apods_menu():
             "\n======================= NASA APOD Requests 🌌 =======================\n"
             "     Fetch Astronomy Picture of the Day (APOD) entries from NASA.\n")
 
+        raw = input(
+            "[1] Today’s APOD           [3] Random APODs\n"
+            "[2] APOD by date           [4] Return to Main Menu\n\n"
+            "Option: "
+        ).strip()
+
         try:
-            user_choice = int(input(
-                "[1] Today’s APOD\n"
-                "[2] APOD by date\n"
-                "[3] Random APODs\n"
-                "[4] Return to Main Menu\n\n"
-                "Option: "
-            ))
+            if handle_global_command(raw):
+                continue
+        except SystemExit:
+            print("\nGoodbye 👋")
+            raise
+
+        try:
+            user_choice = int(raw)
         except ValueError:
             print("Invalid input: Please enter a number from 1 to 4.")
             continue
@@ -34,6 +42,8 @@ def nasa_apods_menu():
             case 4:
                 print("\nReturning to Main Menu...")
                 flag = False
+            case _:
+                print("Invalid input: Please enter a number from 1 to 4.")
 
 
 def output_files_menu():
@@ -43,19 +53,28 @@ def output_files_menu():
             "\n======================= Log & File Tools 🗃️ =======================\n"
             "         View, manage, and maintain your saved APOD logs\n")
 
-        try:
-            user_choice = int(input(
-                "[1] View first N entries           [6] Show oldest entry (by date)\n"
-                "[2] View last N entries            [7] Clear logs (CSV + JSONL)\n"
-                "[3] View all entries               [8] Count logged entries\n"
-                "[4] Delete entry by date           [9] Return to Main Menu\n"
-                "[5] Show most recent entry (by date)\n\n"
-                "Option: "
-            ))
 
+        raw = input(
+            "[1] View first N entries           [6] Show oldest entry (by date)\n"
+            "[2] View last N entries            [7] Clear logs (CSV + JSONL)\n"
+            "[3] View all entries               [8] Count logged entries\n"
+            "[4] Delete entry by date           [9] Return to Main Menu\n"
+            "[5] Show most recent entry (by date)\n\n"
+            "Option: "
+        ).strip()
+
+        try:
+            if handle_global_command(raw):
+                continue
+        except SystemExit:
+            print("\nGoodbye 👋")
+            raise
+
+        try:
+            user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 9.")
-            return
+            print("Invalid input: Please enter a number from 1 to 9 (or type /help).")
+            continue
         except Exception as e:
             print(e)
             return
@@ -82,6 +101,8 @@ def output_files_menu():
             case 9:
                 print("\nReturning to Main Menu...")
                 flag = False
+            case _:
+                print("Invalid input: Please enter a number from 1 to 9 (or type /help).")
 
 
 def user_settings_menu():
@@ -91,17 +112,24 @@ def user_settings_menu():
             "\n======================= Preferences 📃 =======================\n"
             "   Manage how the app behaves after fetching APOD entries.\n")
 
+        raw = input(
+            "[1] View settings                  [3] Change auto-set-wallpaper setting\n"
+            "[2] Change auto-redirect setting   [4] Return to Main Menu\n\n"
+            "Option: "
+        ).strip()
+
         try:
-            user_choice = int(input(
-                "[1] View settings\n"
-                "[2] Change auto-redirect setting\n"
-                "[3] Change auto-set-wallpaper setting\n"
-                "[4] Return to Main Menu\n\n"
-                "Option: "
-            ))
+            if handle_global_command(raw):
+                continue
+        except SystemExit:
+            print("\nGoodbye 👋")
+            raise
+
+        try:
+            user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 4.")
-            return
+            print("Invalid input: Please enter a number from 1 to 4 (or type /help).")
+            continue
         except Exception as e:
             print(e)
             return
@@ -117,6 +145,8 @@ def user_settings_menu():
             case 4:
                 print("\nReturning to Main Menu...")
                 flag = False
+            case _:
+                print("Invalid input: Please enter a number from 1 to 4 (or type /help).")
 
 def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
     """

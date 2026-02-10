@@ -54,7 +54,7 @@ def get_todays_apod():
         log_data_to_json(apod_data)
 
         redirect_url = apod_data['url']
-        automatically_redirect_setting = get_user_settings()
+        automatically_redirect_setting = get_automatically_redirect_setting()
 
         if automatically_redirect_setting['automatically_redirect'] == 'yes':
             take_user_to_browser(redirect_url)
@@ -140,7 +140,7 @@ def get_apod_for_specific_day():
                     log_data_to_json(apod_data)
 
                     redirect_url = apod_data['url']
-                    automatically_redirect_setting = get_user_settings()
+                    automatically_redirect_setting = get_automatically_redirect_setting()
 
                     if automatically_redirect_setting['automatically_redirect'] == 'yes':
                         take_user_to_browser(redirect_url)
@@ -212,7 +212,7 @@ def get_random_n_apods():
                         log_multiple_csv_entries(list_of_formatted_apod_entries)
                         log_multiple_json_entries(list_of_formatted_apod_entries)
 
-                        automatically_redirect_setting = get_user_settings()
+                        automatically_redirect_setting = get_automatically_redirect_setting()
 
                         if automatically_redirect_setting['automatically_redirect'] == 'yes':
                             print()

@@ -1,9 +1,7 @@
-from unittest import case
-
-from src.nasa_client import *
+from src.nasa.nasa_client import *
 from src.utils.user_settings import *
-from src.cli_commands import handle_global_command
-from src.startup_art import *
+from src.utils.cli_commands import handle_global_command
+from src.startup.startup_art import *
 
 
 def nasa_apods_menu():

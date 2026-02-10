@@ -1,6 +1,5 @@
-from src.utils.startup_utils import *
-from src.config import *
-from src.cli_commands import handle_global_command
+from src.startup.startup_utils import *
+from src.utils.cli_commands import handle_global_command
 
 """
 main.py

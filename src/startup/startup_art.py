@@ -1,5 +1,5 @@
 from rich.text import Text
-from src.utils.console import console
+from src.startup.console import console
 from src.config import *
 import random
 

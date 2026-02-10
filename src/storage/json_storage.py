@@ -4,11 +4,10 @@ json_storage.py
 JSONL persistence layer for APOD snapshots.
 Responsible for creating, writing, reading, and rewriting the JSONL log.
 """
-from itertools import count
 
 from src.utils.json_utils import *
 from src.utils.data_utils import *
-from src.utils.date_utils import check_valid_nasa_date
+from src.nasa.nasa_date import check_valid_nasa_date
 from src.config import json_file_path, json_file_name, NASA_APOD_START_DATE, DATE_TODAY
 
 

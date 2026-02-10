@@ -8,7 +8,7 @@ Responsible for creating, writing, reading, and rewriting the CSV log.
 from src.utils.csv_utils import *
 from src.utils.data_utils import *
 from src.config import csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY
-from src.utils.date_utils import check_valid_nasa_date
+from src.nasa.nasa_date import check_valid_nasa_date
 
 
 def log_data_to_csv(formatted_apod_data):

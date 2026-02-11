@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-from src.utils.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper,)
+from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, )
 
 from src.utils.browser_utils import take_user_to_browser
 from src.config import README_URL

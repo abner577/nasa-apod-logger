@@ -1,7 +1,17 @@
 from src.nasa.nasa_client import *
-from src.utils.user_settings import *
+from src.user_settings import *
 from src.utils.cli_commands import handle_global_command
 from src.startup.startup_art import *
+import random
+from rich.panel import Panel
+from rich.text import Text
+from rich.table import Table
+from rich.align import Align
+from rich.rule import Rule
+
+APP_NAME = "NASA APOD Logger"
+APP_TAGLINE = "Astronomy Picture of the Day — Snapshot CLI"
+APP_VERSION = "1.0.0"
 
 
 def nasa_apods_menu():
@@ -196,29 +206,9 @@ def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
 
 def print_startup():
     startup_banner2()
+    render_random_startup_art()
 
-    random_choice = random.randint(1, 10)
-    match random_choice:
-        case 1:
-            render_space_startup_art_1()
-        case 2:
-            render_space_startup_art_2()
-        case 3:
-            render_spaceship_startup_art_1()
-        case 4:
-            render_spaceship_startup_art_2()
-        case 5:
-            render_moon_startup_art_1()
-        case 6:
-            render_astronaut_startup_art_1()
-        case 7:
-            render_astronaut_startup_art_2()
-        case 8:
-            render_alien_startup_art_1()
-        case 9:
-            render_alien_startup_art_2()
-        case 10:
-            render_satellite_startup_art1()
+    run_startup_checks()
 
     print("\n")
     print("-----------------------------------------------------------------------------\n")
@@ -261,3 +251,60 @@ def print_startup():
     print("> /help for more information.")
 
     print("\n-------------------------------------------------------------------------------\n")
+
+def render_random_startup_art() -> None:
+    random_choice = random.randint(1, 10)
+    match random_choice:
+        case 1:
+            render_space_startup_art_1()
+        case 2:
+            render_space_startup_art_2()
+        case 3:
+            render_spaceship_startup_art_1()
+        case 4:
+            render_spaceship_startup_art_2()
+        case 5:
+            render_moon_startup_art_1()
+        case 6:
+            render_astronaut_startup_art_1()
+        case 7:
+            render_astronaut_startup_art_2()
+        case 8:
+            render_alien_startup_art_1()
+        case 9:
+            render_alien_startup_art_2()
+        case 10:
+            render_satellite_startup_art1()
+
+
+def run_startup_checks() -> list[tuple[str, str]]:
+    """
+    Returns a list of (label, status) pairs. Status is 'Found' or 'Created'.
+    """
+    data_dir_status = "Found"
+    settings_status = "Found"
+    json_status = "Found"
+    csv_status = "Found"
+
+    if not check_if_data_exists():
+        create_data_directory()
+        data_dir_status = "Created"
+
+    if not check_if_user_settings_exist():
+        create_user_settings()
+        settings_status = "Created"
+
+    if not check_if_json_output_exists():
+        create_json_output_file()
+        json_status = "Created"
+
+    if not check_if_csv_output_exists():
+        create_csv_output_file()
+        csv_status = "Created"
+
+    return [
+        ("Data directory", data_dir_status),
+        ("JSONL log", json_status),
+        ("CSV log", csv_status),
+        ("User settings", settings_status),
+    ]

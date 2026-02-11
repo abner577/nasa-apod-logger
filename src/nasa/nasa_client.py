@@ -6,7 +6,6 @@ Responsible for fetching APOD data and coordinating persistence actions.
 """
 
 import requests
-import os
 from dotenv import load_dotenv
 
 from src.storage.data_storage import *
@@ -14,7 +13,7 @@ from src.storage.csv_storage import *
 from src.storage.json_storage import *
 from src.utils.browser_utils import *
 from src.utils.data_utils import *
-from src.utils.user_settings import *
+from src.user_settings import *
 
 load_dotenv()
 

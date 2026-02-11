@@ -8,8 +8,6 @@ Program entry point.
 Responsible for the main menu loop and user interaction flow.
 """
 
-print_startup()
-
 entry_flag = True
 while entry_flag:
     print_startup()

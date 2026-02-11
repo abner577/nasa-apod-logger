@@ -36,7 +36,7 @@ def get_todays_apod():
     print("\nFetching today's APOD...")
 
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
-    print(f"[DEBUG] Full_url: {full_url}")
+    # print(f"[DEBUG] Full_url: {full_url}")
     response = requests.get(full_url)
 
     if response.status_code == 200:
@@ -127,7 +127,7 @@ def get_apod_for_specific_day():
 
                 # Valid date at this point
                 full_url = f"{BASE_URL}?api_key={NASA_API_KEY}&date={date_object}"
-                print(f"\nFetching APOD for {date_object}...")
+                # print(f"\nDEBUG: Fetching APOD for {date_object}...")
                 response = requests.get(full_url)
 
                 if response.status_code == 200:
@@ -188,10 +188,10 @@ def get_random_n_apods():
                         print("Invalid input: Number of APODs must be between 1 and 20.")
                         continue
 
-                    print(f"\nFetching {n} random APODs...")
+                    # print(f"\nFetching {n} random APODs...")
 
                     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}&count={n}"
-                    print(f"[DEBUG] Request URL: {full_url}")
+                    # print(f"[DEBUG] Request URL: {full_url}")
                     response = requests.get(full_url)
 
                     list_of_formatted_apod_entries = []

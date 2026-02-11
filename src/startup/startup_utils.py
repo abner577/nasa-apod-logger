@@ -18,7 +18,7 @@ def nasa_apods_menu():
     flag = True
     while flag:
         print(
-            "\n======================= NASA APOD Requests 🌌 =======================\n"
+            "\n─────────────────────── NASA APOD Requests 🌌 ───────────────────────\n"
             "     Fetch Astronomy Picture of the Day (APOD) entries from NASA.\n")
 
         raw = input(
@@ -61,7 +61,7 @@ def output_files_menu():
     flag = True
     while flag:
         print(
-            "\n======================= Log & File Tools 🗃️ =======================\n"
+            "\n─────────────────────── Log & File Tools 🗃️ ───────────────────────\n"
             "         View, manage, and maintain your saved APOD logs\n")
 
 
@@ -120,7 +120,7 @@ def user_settings_menu():
     flag = True
     while flag:
         print(
-            "\n======================= Preferences 📃 =======================\n"
+            "\n─────────────────────── Preferences 📃 ───────────────────────\n"
             "   Manage how the app behaves after fetching APOD entries.\n")
 
         raw = input(
@@ -205,52 +205,31 @@ def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
     print(bottom)
 
 def print_startup():
+    # Header
     startup_banner2()
+    print()  # breathing room
     render_random_startup_art()
+    print()
 
-    run_startup_checks()
+    # Separator
+    print("─" * 79) # ━
+    print()
 
-    print("\n")
-    print("-----------------------------------------------------------------------------\n")
-
-    # Startup checks (create if missing)
-    data_dir_status = "Found"
-    settings_status = "Found"
-    json_status = "Found"
-    csv_status = "Found"
-
-    if not check_if_data_exists():
-        create_data_directory()
-        data_dir_status = "Created"
-
-    if not check_if_user_settings_exist():
-        create_user_settings()
-        settings_status = "Created"
-
-    if not check_if_json_output_exists():
-        create_json_output_file()
-        json_status = "Created"
-
-    if not check_if_csv_output_exists():
-        create_csv_output_file()
-        csv_status = "Created"
-
-    checks_lines = [
-        f"Data directory     [✓] {data_dir_status}",
-        f"JSONL log          [✓] {json_status}",
-        f"CSV log            [✓] {csv_status}",
-        f"User settings      [✓] {settings_status}",
-    ]
-
+    # Checks
+    checks_lines = run_startup_checks()
     print_box("Startup Checks:", checks_lines)
-    print("\nVersion: 1.0.0\n")
+    print()
+
+    print("Version: 1.0.0\n")
 
     print("Tips for getting started:")
-    print("> Review the README for usage details.")
-    print("> Fetch todays APOD to begin!")
-    print("> /help for more information.")
+    for tip in startup_tips_lines():
+        print(f"> {tip}")
 
-    print("\n-------------------------------------------------------------------------------\n")
+    print()
+    print("─" * 79)
+    print()
+
 
 def render_random_startup_art() -> None:
     random_choice = random.randint(1, 10)
@@ -277,7 +256,14 @@ def render_random_startup_art() -> None:
             render_satellite_startup_art1()
 
 
-def run_startup_checks() -> list[tuple[str, str]]:
+def startup_tips_lines() -> list[str]:
+    return [
+        "Review the README for usage details.",
+        "Fetch today's APOD to begin!",
+        "Type /help for commands.",
+    ]
+
+def run_startup_checks() -> list[str]:
     """
     Returns a list of (label, status) pairs. Status is 'Found' or 'Created'.
     """
@@ -303,8 +289,8 @@ def run_startup_checks() -> list[tuple[str, str]]:
         csv_status = "Created"
 
     return [
-        ("Data directory", data_dir_status),
-        ("JSONL log", json_status),
-        ("CSV log", csv_status),
-        ("User settings", settings_status),
+        f"Data directory     [✓] {data_dir_status}",
+        f"JSONL log          [✓] {json_status}",
+        f"CSV log            [✓] {csv_status}",
+        f"User settings      [✓] {settings_status}",
     ]

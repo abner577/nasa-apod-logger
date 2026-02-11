@@ -10,7 +10,7 @@ Responsible for the main menu loop and user interaction flow.
 
 entry_flag = True
 while entry_flag:
-    print_startup()
+    print_startup_layout_1()
 
     raw = input(
         "[1] Get started\n"
@@ -34,7 +34,7 @@ while entry_flag:
 # Main Menu
 flag = True
 while flag:
-    print("\n======================= Main Menu ☄️ =======================\n")
+    print("\n────────────────────── Main Menu ☄️ ──────────────────────\n")
     increment_launch_count(int(get_launch_count()["launch_count"]))
 
     raw = input(

@@ -33,10 +33,10 @@ def log_data_to_json(formatted_apod_data):
             # One JSON object per line so we can safely append.
             # Need to use .dumps to write JSON as a string
             json_file.write(json.dumps(formatted_apod_data, ensure_ascii=False) + "\n")
-            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {json_file_name} ✅")
+            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {json_file_name} [✓]")
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to write '{json_file_name}' at '{json_file_path}' [X]")
     except Exception as e:
         print(e)
 
@@ -97,7 +97,7 @@ def show_first_n_json_log_entries():
                     break
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' [X]")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:
@@ -161,7 +161,7 @@ def show_last_n_json_log_entries():
                     count -= 1
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' [X]")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:
@@ -196,7 +196,7 @@ def show_all_json_entries():
                 count += 1
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' [X]")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:
@@ -262,18 +262,18 @@ def delete_one_json_entry():
                     entries_to_keep.append(content)
 
             if not found:
-                print(f"\nNo entry found for {target_date} ❌\n")
+                print(f"\nNo entry found for {target_date} [X]\n")
                 return
 
             else:
-                print(f"\nDeleted entry: {target_date} ✅\n")
+                print(f"\nDeleted entry: {target_date} [✓]\n")
             # Write phase
             with open(file=json_file_path, mode='w') as file:
                 for entry in entries_to_keep:
                     file.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Permission denied: Unable to read/write '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to read/write '{json_file_name}' at '{json_file_path}' [X]")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:
@@ -316,7 +316,7 @@ def fetch_most_recent_json_apod():
             format_raw_jsonl_entry(most_recent_apod, 0)
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' [X]")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:
@@ -360,7 +360,7 @@ def fetch_oldest_json_apod():
             format_raw_jsonl_entry(oldest_apod, 0)
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to write '{json_file_name}' at '{json_file_path}' [X]")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:

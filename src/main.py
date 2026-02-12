@@ -1,5 +1,5 @@
 from src.startup.startup_utils import *
-from src.utils.cli_commands import handle_global_command
+from src.utils.cli_commands import handle_global_command, clear_screen
 
 """
 main.py
@@ -12,23 +12,30 @@ entry_flag = True
 while entry_flag:
     print_startup()
 
-    raw = input(
-        "[1] Get started\n"
-        "[Q] Quit\n\n"
-        "Option: "
-    ).strip()
+    while True:
+        raw = input(
+            "[1] Get started\n"
+            "[Q] Quit\n\n"
+            "Option: "
+        ).strip()
 
-    try:
-        if handle_global_command(raw):
-            continue
-    except SystemExit:
-        print("\nGoodbye 👋")
-        raise
+        try:
+            if handle_global_command(raw):
+                print_startup()
+                continue
+        except SystemExit:
+            print("\nGoodbye 👋")
+            raise
 
-    if raw == "1":
-        entry_flag = False
-    else:
-        print('Invalid input: Please enter 1 or Q (or type --help).\n')
+        if raw == "1":
+            entry_flag = False
+            break
+
+        if raw.lower() == "q":
+            print("\nGoodbye 👋")
+            raise SystemExit
+
+        print("Invalid input: Please enter 1 or Q (or type --help).\n")
 
 
 # Main Menu

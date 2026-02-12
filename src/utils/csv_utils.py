@@ -33,7 +33,7 @@ def create_csv_output_file():
 
     Path(csv_file_path).touch()
     write_header_to_csv()
-    print(f"Created log file: '{csv_file_name}' ✅")
+    print(f"Created log file: '{csv_file_name}' [✓]")
 
 
 def clear_csv_output_file():
@@ -52,7 +52,7 @@ def clear_csv_output_file():
             return True
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' [X]")
     except Exception as e:
         print(e)
 
@@ -68,7 +68,7 @@ def delete_csv_output_file():
     """
 
     Path(f"{csv_file_path}").unlink()
-    print(f"Deleted: '{csv_file_name}' ✅")
+    print(f"Deleted: '{csv_file_name}' [✓]")
 
 
 def write_header_to_csv():
@@ -85,7 +85,7 @@ def write_header_to_csv():
             writer.writeheader()
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' ❌")
+        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' [X]")
     except Exception as e:
         print(e)
 
@@ -110,11 +110,11 @@ def check_for_duplicate_csv_entries(formatted_apod_data):
                   continue
 
               if row[0] == formatted_apod_data['date']:
-                   print(f"Skipped (duplicate): {formatted_apod_data['date']} already exists in {csv_file_name} ⛔")
+                   print(f"Skipped (duplicate): {formatted_apod_data['date']} already exists in {csv_file_name}.")
                    return True
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' ❌")
+        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' [X]")
     except Exception as e:
         print(e)
 

@@ -24,7 +24,7 @@ def create_json_output_file():
         return
 
     Path(json_file_path).touch()
-    print(f"Created log file: '{json_file_name}' ✅")
+    print(f"Created log file: '{json_file_name}' [✓]")
 
 
 def clear_json_output_file():
@@ -43,7 +43,7 @@ def clear_json_output_file():
             return True
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{json_file_name}' at '{json_file_path}' ❌")
+        print(f"Permission denied: Unable to write '{json_file_name}' at '{json_file_path}' [X]")
     except Exception as e:
         print(e)
 
@@ -58,7 +58,7 @@ def delete_json_output_file():
     """
 
     Path(f"{json_file_path}").unlink()
-    print(f"Deleted: '{json_file_name}' ✅")
+    print(f"Deleted: '{json_file_name}' [✓]")
 
 
 def get_line_count(count):
@@ -78,7 +78,7 @@ def get_line_count(count):
                 count += 1
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌.")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' [X].")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:
@@ -106,11 +106,11 @@ def check_for_duplicate_json_entries(formatted_apod_data):
 
                 content = json.loads(line)
                 if content['date'] == formatted_apod_data['date']:
-                    print(f"Skipped (duplicate): {content['date']} already exists in {json_file_name} ⛔")
+                    print(f"Skipped (duplicate): {content['date']} already exists in {json_file_name}.")
                     return True
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' ❌.")
+        print(f"Permission denied: Unable to read '{json_file_name}' at '{json_file_path}' [X].")
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
     except Exception as e:

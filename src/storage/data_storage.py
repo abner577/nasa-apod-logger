@@ -31,4 +31,4 @@ def create_data_directory():
         return
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    print("\nCreated data directory ✅")
+    print("\nCreated data directory v")

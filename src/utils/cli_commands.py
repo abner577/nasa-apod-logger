@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, )
+from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, get_all_user_settings, format_all_user_settings)
 
 from src.utils.browser_utils import take_user_to_browser
 from src.config import README_URL
@@ -30,6 +30,7 @@ CMD_README = "readme"
 CMD_QUIT = "quit"
 CMD_AUTO_REDIRECT = "auto_redirect"
 CMD_AUTO_WALLPAPER = "auto_wallpaper"
+CMD_VIEW_SETTINGS = "settings"
 
 
 def clear_screen() -> None:
@@ -57,6 +58,7 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
       - --quit, -quit, /quit, q
       - --auto-redirect, --automatically-redirect, /auto-redirect, /automatically-redirect
       - --auto-wallpaper, --automatically-set-wallpaper, /auto-wallpaper, /automatically-set-wallpaper
+      - --settings, /settings, -settings
     """
     s = _normalize(raw)
     if not s:
@@ -94,21 +96,13 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
     if token in ("auto-wallpaper", "automatically-set-wallpaper"):
         return CommandMatch(CMD_AUTO_WALLPAPER)
 
+    if token == "settings":
+        return CommandMatch(CMD_VIEW_SETTINGS)
+
     return None
 
 
 def handle_global_command(raw: str) -> bool:
-    """
-    Returns True if a command was recognized and handled.
-    Returns False if raw is not a command/
-
-    Command effects:
-    - --help: clears screen, shows help, waits, clears screen.
-    - --readme: opens README_URL in browser.
-    - --quit / q: raises SystemExit.
-    - --auto-redirect: prompts and updates the setting.
-    - --auto-wallpaper: prompts and updates the setting.
-    """
     match = parse_global_command(raw)
     if match is None:
         return False
@@ -118,15 +112,36 @@ def handle_global_command(raw: str) -> bool:
         return True
 
     if match.name == CMD_README:
-        _open_readme()
+        run_plain_modal(_open_readme)
         return True
 
     if match.name == CMD_AUTO_REDIRECT:
-        update_automatically_redirect_setting()
+        def change_auto_redirect():
+            update_automatically_redirect_setting()
+            print()
+
+            settings_dict = get_all_user_settings()
+            format_all_user_settings(settings_dict)
+
+        run_plain_modal(change_auto_redirect)
         return True
 
     if match.name == CMD_AUTO_WALLPAPER:
-        update_automatically_set_wallpaper()
+        def change_auto_wallpaper():
+            update_automatically_set_wallpaper()
+            print()
+
+            settings_dict = get_all_user_settings()
+            format_all_user_settings(settings_dict)
+
+        run_plain_modal(change_auto_wallpaper)
+        return True
+
+    if match.name == CMD_VIEW_SETTINGS:
+        def show_settings():
+            settings_dict = get_all_user_settings()
+            format_all_user_settings(settings_dict)
+        run_plain_modal(show_settings)
         return True
 
     if match.name == CMD_QUIT:
@@ -150,11 +165,12 @@ def _show_help_modal() -> None:
 
 
 def print_help() -> None:
-    print("\n============================= HELP MENU ============================\n")
+    print("\n───────────────────────────── HELP MENU ─────────────────────────────\n")
     print("COMMANDS:")
     print("  --help, /help                        Show this help menu")
     print("  --readme, /readme                    Open README in browser")
     print("  --quit, /quit, q                     Exit the application")
+    print("  --settings, /settings                View settings configuration")
     print("  --auto-redirect, /auto-redirect      Change auto-redirect setting")
     print("  --auto-wallpaper, /auto-wallpaper    Change auto-wallpaper setting")
 
@@ -163,4 +179,17 @@ def print_help() -> None:
           "  It explains how this tool fetches, stores, and manages NASA APOD entries.\n"
           "  Dont forget to check out the Configuration section to learn how to customize behavior!")
 
-    print("\n====================================================================")
+    print()
+    print("─" * 68)
+
+def run_plain_modal(fn) -> None:
+    """
+    Clear screen, run fn(), then wait for Enter and clear screen again.
+    Use this for commands that should not print into the startup screen scrollback.
+    """
+    clear_screen()
+    try:
+        fn()
+    finally:
+        input("\nPress Enter to return... ")
+        clear_screen()

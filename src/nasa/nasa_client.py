@@ -33,14 +33,12 @@ def get_todays_apod():
             None:
     """
 
-    print("\nFetching today's APOD...")
-
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
     # print(f"[DEBUG] Full_url: {full_url}")
     response = requests.get(full_url)
 
     if response.status_code == 200:
-        print("Success: Today's APOD was retrieved 🚀.\n")
+        print("Success: Today's APOD was retrieved [✓].\n")
         apod_data = response.json()
         apod_data = format_apod_data(apod_data)
 
@@ -131,7 +129,7 @@ def get_apod_for_specific_day():
                 response = requests.get(full_url)
 
                 if response.status_code == 200:
-                    print("Success: APOD was retrieved 🚀\n")
+                    print("\nSuccess: APOD was retrieved [✓]\n")
                     apod_data = response.json()
                     apod_data = format_apod_data(apod_data)
 
@@ -198,7 +196,7 @@ def get_random_n_apods():
                     list_of_unformatted_apod_entries = []
 
                     if response.status_code == 200:
-                        print(f"Success: {n} Random APODs were retrieved 🚀\n")
+                        print(f"\nSuccess: {n} Random APODs were retrieved [✓]\n")
                         list_of_unformatted_apod_entries = response.json()
                         for apod in list_of_unformatted_apod_entries:
                             apod = format_apod_data(apod)
@@ -209,6 +207,7 @@ def get_random_n_apods():
                             create_data_directory()
 
                         log_multiple_csv_entries(list_of_formatted_apod_entries)
+                        print()
                         log_multiple_json_entries(list_of_formatted_apod_entries)
 
                         automatically_redirect_setting = get_automatically_redirect_setting()

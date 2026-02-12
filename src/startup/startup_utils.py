@@ -9,10 +9,6 @@ from rich.table import Table
 from rich.align import Align
 from rich.rule import Rule
 
-APP_NAME = "NASA APOD Logger"
-APP_TAGLINE = "Astronomy Picture of the Day — Snapshot CLI"
-APP_VERSION = "1.0.0"
-
 
 def nasa_apods_menu():
     flag = True
@@ -159,6 +155,7 @@ def user_settings_menu():
             case _:
                 print("Invalid input: Please enter a number from 1 to 4 (or type /help).")
 
+
 def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
     """
     Prints a clean Unicode box around a section.
@@ -207,27 +204,37 @@ def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
 def print_startup():
     # Header
     startup_banner2()
-    print()  # breathing room
     render_random_startup_art()
     print()
 
     # Separator
-    print("─" * 79) # ━
+    print("─" * 90) # ━
     print()
 
     # Checks
     checks_lines = run_startup_checks()
-    print_box("Startup Checks:", checks_lines)
+    print_startup_info_two_column_boxed_right(
+        checks_title="STARTUP CHECKS:",
+        checks_lines=checks_lines,
+        right_title="QUICK INFO:",
+        version_str="Version: 1.0.0",
+        tips_lines=startup_tips_lines(),
+        gap=6,
+        padding_x=2,
+    )
+
+    # Alternate startup screen version
+    # print_box("Startup Checks:", checks_lines)
+    # print()
+    #
+    # print("Version: 1.0.0\n")
+    #
+    # print("Tips for getting started:")
+    # for tip in startup_tips_lines():
+    #     print(f"> {tip}")
+
     print()
-
-    print("Version: 1.0.0\n")
-
-    print("Tips for getting started:")
-    for tip in startup_tips_lines():
-        print(f"> {tip}")
-
-    print()
-    print("─" * 79)
+    print("─" * 90)
     print()
 
 
@@ -263,6 +270,7 @@ def startup_tips_lines() -> list[str]:
         "Type /help for commands.",
     ]
 
+
 def run_startup_checks() -> list[str]:
     """
     Returns a list of (label, status) pairs. Status is 'Found' or 'Created'.
@@ -288,9 +296,96 @@ def run_startup_checks() -> list[str]:
         create_csv_output_file()
         csv_status = "Created"
 
+    settings_dict = get_all_user_settings()
+    automatically_redirect_setting = settings_dict["automatically_redirect"]
+    automatically_set_wallpaper_setting = settings_dict["automatically_set_wallpaper"]
+
+    if automatically_redirect_setting == 'yes':
+        automatically_redirect_setting_message = f"Auto-open in browser  [✓] ON"
+    else:
+        automatically_redirect_setting_message = f"Auto-open in browser  [X] OFF"
+
+    if automatically_set_wallpaper_setting == 'yes':
+        automatically_set_wallpaper_setting_message = f"Auto-set-wallpaper    [✓] ON"
+    else:
+        automatically_set_wallpaper_setting_message = f"Auto-set-wallpaper    [X] OFF"
+
     return [
-        f"Data directory     [✓] {data_dir_status}",
-        f"JSONL log          [✓] {json_status}",
-        f"CSV log            [✓] {csv_status}",
-        f"User settings      [✓] {settings_status}",
+        f"Data directory        [✓] {data_dir_status}",
+        f"JSONL log             [✓] {json_status}",
+        f"CSV log               [✓] {csv_status}",
+        f"User settings         [✓] {settings_status}",
+        automatically_redirect_setting_message,
+        automatically_set_wallpaper_setting_message,
     ]
+
+
+def print_startup_info_two_column_boxed_right(
+    checks_title: str,
+    checks_lines: list[str],
+    right_title: str,
+    version_str: str,
+    tips_lines: list[str],
+    gap: int = 6,
+    padding_x: int = 2,
+) -> None:
+    """
+    Left: checks box.
+    Right: boxed panel containing Version + Tips.
+    """
+
+    def _build_box_lines(title: str, lines: list[str], padding_x_local: int) -> list[str]:
+        max_line_len = max((len(line) for line in lines), default=0)
+        inner_width = max_line_len + (padding_x_local * 2)
+
+        title_str = f" {title} "
+        if len(title_str) > inner_width:
+            inner_width = len(title_str)
+
+        left_top = "┌"
+        right_top = "┐"
+        horiz = "─"
+
+        remaining = inner_width - len(title_str)
+        left_run = remaining // 2
+        right_run = remaining - left_run
+        top = f"{left_top}{horiz * left_run}{title_str}{horiz * right_run}{right_top}"
+
+        side = "│"
+        mid_lines = []
+        for line in lines:
+            space = inner_width - len(line)
+            left_pad = " " * padding_x_local
+            right_pad = " " * (space - padding_x_local) if space >= padding_x_local else ""
+            if len(line) > inner_width:
+                mid_lines.append(f"{side}{left_pad}{line}{side}")
+            else:
+                mid_lines.append(f"{side}{left_pad}{line}{right_pad}{side}")
+
+        left_bot = "└"
+        right_bot = "┘"
+        bottom = f"{left_bot}{horiz * inner_width}{right_bot}"
+
+        return [top] + mid_lines + [bottom]
+
+    # --- Left box ---
+    left_box_lines = _build_box_lines(checks_title, checks_lines, padding_x)
+
+    # --- Right box ---
+    right_content: list[str] = [version_str, "", "Tips for getting started:"]
+    for tip in tips_lines:
+        right_content.append(f"> {tip}")
+
+    right_box_lines = _build_box_lines(right_title, right_content, padding_x)
+
+    left_width = len(left_box_lines[0]) if left_box_lines else 0
+    right_width = len(right_box_lines[0]) if right_box_lines else 0
+
+    total_rows = max(len(left_box_lines), len(right_box_lines))
+    while len(left_box_lines) < total_rows:
+        left_box_lines.append(" " * left_width)
+    while len(right_box_lines) < total_rows:
+        right_box_lines.append(" " * right_width)
+
+    for l, r in zip(left_box_lines, right_box_lines):
+        print(f"{l}{' ' * gap}{r}")

@@ -191,6 +191,7 @@ def get_launch_count():
     except Exception as e:
         print(e)
 
+
 def get_automatically_set_wallpaper():
     """
        Returns line 3 dict: {"automatically_set_wallpaper": "..."}
@@ -218,6 +219,7 @@ def get_automatically_set_wallpaper():
 
     # If we got here, line 3 doesn't exist yet
     return initial_automatically_set_wallpaper_dict
+
 
 def update_automatically_set_wallpaper():
     """

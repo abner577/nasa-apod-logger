@@ -10,7 +10,7 @@ Responsible for the main menu loop and user interaction flow.
 
 entry_flag = True
 while entry_flag:
-    print_startup_layout_1()
+    print_startup()
 
     raw = input(
         "[1] Get started\n"

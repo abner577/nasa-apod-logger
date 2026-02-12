@@ -29,6 +29,7 @@ while entry_flag:
 
         if raw == "1":
             entry_flag = False
+            clear_screen()
             break
 
         if raw.lower() == "q":
@@ -41,7 +42,7 @@ while entry_flag:
 # Main Menu
 flag = True
 while flag:
-    print("\n────────────────────── Main Menu ☄️ ──────────────────────\n")
+    print("────────────────────── Main Menu ☄️ ──────────────────────\n")
     increment_launch_count(int(get_launch_count()["launch_count"]))
 
     raw = input(
@@ -70,11 +71,17 @@ while flag:
 
     match user_choice:
         case 1:
+            clear_screen()
             nasa_apods_menu()
+            clear_screen()
         case 2:
+            clear_screen()
             output_files_menu()
+            clear_screen()
         case 3:
+            clear_screen()
             user_settings_menu()
+            clear_screen()
         case 4:
             print("\nGoodbye 👋")
             flag = False

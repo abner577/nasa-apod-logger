@@ -1,6 +1,6 @@
 from src.nasa.nasa_client import *
 from src.user_settings import *
-from src.utils.cli_commands import handle_global_command
+from src.utils.cli_commands import handle_global_command, clear_screen
 from src.startup.startup_art import *
 import random
 from rich.panel import Panel
@@ -11,10 +11,11 @@ from rich.rule import Rule
 
 
 def nasa_apods_menu():
+    clear_screen()
     flag = True
     while flag:
         print(
-            "\n─────────────────────── NASA APOD Requests 🌌 ───────────────────────\n"
+            "─────────────────────── NASA APOD Requests 🌌 ───────────────────────\n"
             "     Fetch Astronomy Picture of the Day (APOD) entries from NASA.\n")
 
         raw = input(
@@ -54,10 +55,11 @@ def nasa_apods_menu():
 
 
 def output_files_menu():
+    clear_screen()
     flag = True
     while flag:
         print(
-            "\n─────────────────────── Log & File Tools 🗃️ ───────────────────────\n"
+            "─────────────────────── Log & File Tools 🗃️ ───────────────────────\n"
             "         View, manage, and maintain your saved APOD logs\n")
 
 
@@ -113,10 +115,11 @@ def output_files_menu():
 
 
 def user_settings_menu():
+    clear_screen()
     flag = True
     while flag:
         print(
-            "\n─────────────────────── Preferences 📃 ───────────────────────\n"
+            "─────────────────────── Preferences 📃 ───────────────────────\n"
             "   Manage how the app behaves after fetching APOD entries.\n")
 
         raw = input(

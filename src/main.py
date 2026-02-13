@@ -1,5 +1,6 @@
 from src.startup.startup_utils import *
 from src.utils.cli_commands import handle_global_command, clear_screen
+from rich.text import Text
 
 """
 main.py
@@ -13,11 +14,16 @@ while entry_flag:
     print_startup()
 
     while True:
-        raw = input(
-            "[1] Get started\n"
-            "[Q] Quit\n\n"
-            "Option: "
-        ).strip()
+        line1 = Text("[1] Get started", style="menu.text")
+        line1.stylize("menu.key", 0, 3)
+        console.print(line1)
+
+        line2 = Text("[Q] Quit", style="menu.text")
+        line2.stylize("menu.key", 0, 3)
+        console.print(line2)
+        console.print()
+        console.print("Option: ", style="prompt", end="")
+        raw = input().strip()
 
         try:
             if handle_global_command(raw):
@@ -29,7 +35,6 @@ while entry_flag:
 
         if raw == "1":
             entry_flag = False
-            clear_screen()
             break
 
         if raw.lower() == "q":

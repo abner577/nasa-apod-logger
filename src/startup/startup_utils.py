@@ -3,6 +3,9 @@ from src.user_settings import *
 from src.utils.cli_commands import handle_global_command, clear_screen
 from src.startup.startup_art import *
 import random
+from src.startup.console import console
+
+from rich.text import Text
 from rich.panel import Panel
 from rich.text import Text
 from rich.table import Table
@@ -34,7 +37,7 @@ def nasa_apods_menu():
         try:
             user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 4.")
+            print("Invalid input: Please enter a number from 1 to 4.\n")
             continue
         except Exception as e:
             print(e)
@@ -48,10 +51,9 @@ def nasa_apods_menu():
             case 3:
                 get_random_n_apods()
             case 4:
-                print("\nReturning to Main Menu...")
                 flag = False
             case _:
-                print("Invalid input: Please enter a number from 1 to 4.")
+                print("Invalid input: Please enter a number from 1 to 4.\n")
 
 
 def output_files_menu():
@@ -82,7 +84,7 @@ def output_files_menu():
         try:
             user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 9 (or type /help).")
+            print("Invalid input: Please enter a number from 1 to 9.\n")
             continue
         except Exception as e:
             print(e)
@@ -108,10 +110,9 @@ def output_files_menu():
                 line_count = get_line_count(0)
                 print(f"\nTotal logged entries: {line_count}\n")
             case 9:
-                print("\nReturning to Main Menu...")
                 flag = False
             case _:
-                print("Invalid input: Please enter a number from 1 to 9 (or type /help).")
+                print("Invalid input: Please enter a number from 1 to 9.\n")
 
 
 def user_settings_menu():
@@ -138,7 +139,7 @@ def user_settings_menu():
         try:
             user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 4 (or type /help).")
+            print("Invalid input: Please enter a number from 1 to 4.\n")
             continue
         except Exception as e:
             print(e)
@@ -153,10 +154,9 @@ def user_settings_menu():
             case 3:
                 update_automatically_set_wallpaper()
             case 4:
-                print("\nReturning to Main Menu...")
                 flag = False
             case _:
-                print("Invalid input: Please enter a number from 1 to 4 (or type /help).")
+                print("Invalid input: Please enter a number from 1 to 4.\n")
 
 
 def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
@@ -208,11 +208,11 @@ def print_startup():
     # Header
     startup_banner2()
     render_random_startup_art()
-    print()
+    console.print()
 
     # Separator
-    print("─" * 90) # ━
-    print()
+    console.print("─" * 90, style="app.banner") # ━
+    console.print()
 
     # Checks
     checks_lines = run_startup_checks()
@@ -236,9 +236,9 @@ def print_startup():
     # for tip in startup_tips_lines():
     #     print(f"> {tip}")
 
-    print()
-    print("─" * 90)
-    print()
+    console.print()
+    console.print("─" * 90, style="app.banner")
+    console.print()
 
 
 def render_random_startup_art() -> None:
@@ -323,6 +323,67 @@ def run_startup_checks() -> list[str]:
     ]
 
 
+def stylize_all(text: Text) -> None:
+    s = text.plain
+
+    # Color [✓] green
+    i = 0
+    while True:
+        i = s.find("[✓]", i)
+        if i == -1:
+            break
+        text.stylize("ok", i, i + 3)
+        i += 3
+
+    # Color [X] red
+    i = 0
+    while True:
+        i = s.find("[X]", i)
+        if i == -1:
+            break
+        text.stylize("err", i, i + 3)
+        i += 3
+
+    # Bold + purple ONLY for "/help" (exact substring)
+    i = 0
+    while True:
+        i = s.find("/help", i)
+        if i == -1:
+            break
+        text.stylize("inline.help", i, i + 5)
+        i += 5
+
+
+def stylize_vertical_borders(text: Text) -> None:
+    # Style ALL border characters '│' on the line
+    s = text.plain
+    if "│" not in s:
+        return
+
+    start = 0
+    while True:
+        idx = s.find("│", start)
+        if idx == -1:
+            break
+        text.stylize("accent", idx, idx + 1)
+        start = idx + 1
+
+
+def stylize_box_corners(text: Text) -> None:
+    s = text.plain
+    corners = ("┌", "┐", "└", "┘")
+    start = 0
+    while True:
+        # find the next corner char among the set
+        idxs = [(s.find(c, start), c) for c in corners]
+        idxs = [(i, c) for (i, c) in idxs if i != -1]
+        if not idxs:
+            break
+        idx, _ = min(idxs, key=lambda x: x[0])
+        text.stylize("box.border.v", idx, idx + 1)
+        start = idx + 1
+
+
 def print_startup_info_two_column_boxed_right(
     checks_title: str,
     checks_lines: list[str],
@@ -391,4 +452,29 @@ def print_startup_info_two_column_boxed_right(
         right_box_lines.append(" " * right_width)
 
     for l, r in zip(left_box_lines, right_box_lines):
-        print(f"{l}{' ' * gap}{r}")
+        combined = f"{l}{' ' * gap}{r}"
+        stripped = combined.lstrip()
+
+        # Top/bottom borders (┌ ... ┐) or (└ ... ┘)
+        if stripped.startswith(("┌", "└")):
+            t = Text(combined, style="accent")
+
+            # Make the titles pop (same text, just styled)
+            for title in (" STARTUP CHECKS: ", " QUICK INFO: "):
+                start = combined.find(title)
+                if start != -1:
+                    t.stylize("title", start, start + len(title))
+
+            console.print(t)
+            continue
+
+        # Middle box lines (│ ... │)
+        if stripped.startswith("│"):
+            t = Text(combined, style="box.body")
+            stylize_vertical_borders(t)
+            stylize_all(t)
+            console.print(t)
+            continue
+
+        # Spacer rows (padding)
+        console.print(combined)

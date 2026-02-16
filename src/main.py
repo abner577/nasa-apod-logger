@@ -14,15 +14,15 @@ while entry_flag:
     print_startup()
 
     while True:
-        line1 = Text("[1] Get started", style="menu.text")
-        line1.stylize("menu.key", 0, 3)
+        line1 = Text("[1] Get started", style="body.text")
+        line1.stylize("app.secondary", 0, 3)
         console.print(line1)
 
-        line2 = Text("[Q] Quit", style="menu.text")
-        line2.stylize("menu.key", 0, 3)
+        line2 = Text("[Q] Quit", style="body.text")
+        line2.stylize("app.secondary", 0, 3)
         console.print(line2)
         console.print()
-        console.print("Option: ", style="prompt", end="")
+        console.print("Option: ", style="app.primary", end="")
         raw = input().strip()
 
         try:

@@ -6,45 +6,13 @@ from rich.theme import Theme
 STARTUP_ARTS_THEME = Theme({
 
     # Identity
-    "app.title": "bold color(69)",        # bluish-purple title
-    "app.banner": "bold color(63)",       # brighter cyan-purple for banner emphasis
-    "accent": "bold color(141)",               # purple accent for small highlights
+    "app.primary": "color(69)",       # blue for app primary color
+    "app.secondary": "color(29)",     # green for app secondary color
 
-    # Text
-    "body": "color(250)",  # slightly more gray (was 252 -> looked white)
-    "muted": "dim color(247)",  # dimmer helper text
-    "label": "bold color(63)",  # labels / emphasis
-    "value": "color(250)",
+    "body.text": "color(250)",  # gray-white for body text
 
-
-    "title": "bold color(63)",            # box titles like STARTUP CHECKS / QUICK INFO
-    "subtitle": "color(247)",
-
-
-    # Status
-    "ok": "color(82)",  # GREEN for [✓]
-    "err": "color(196)",  # RED for [X] / errors
-    "warn": "color(220)",  # yellow warnings
-
-    # Success
-    "msg.success": "color(252)",          # keep readable; pair with green [✓]
-    "msg.error": "color(252)",            # keep readable; pair with red [X]
-    "msg.info": "color(250)",             # returning..., saved..., etc.
-
-
-    # UI
-    "rule": "dim color(63)",              # horizontal separators (purple, dim)
-    "menu.key": "color(63)",         # [1] [Q]
-    "menu.text": "color(250)",            # normal menu text
-    "prompt": "color(63)",           # "Option:" prompt label
-
-    # Boxes (new)
-    "box.border.h": "color(63)",      # top/bottom border (purple)
-    "box.border.v": "dim color(208)",     # vertical sides (pink accent)
-    "box.body": "color(250)",             # inside box content
-
-    # Specific inline accent (new)
-    "inline.help": "bold color(63)",      # /help in tips
+    "ok": "dim color(82)",  # GREEN for [✓]
+    "err": "dim color(196)",  # RED for [X] / errors
 
     # ----------------------- STARTUP ARTS -----------------------
 

@@ -211,7 +211,7 @@ def print_startup():
     console.print()
 
     # Separator
-    console.print("─" * 90, style="app.banner") # ━
+    console.print("─" * 90, style="app.secondary") # ━
     console.print()
 
     # Checks
@@ -237,7 +237,7 @@ def print_startup():
     #     print(f"> {tip}")
 
     console.print()
-    console.print("─" * 90, style="app.banner")
+    console.print("─" * 90, style="app.secondary")
     console.print()
 
 
@@ -348,7 +348,7 @@ def stylize_all(text: Text) -> None:
         i = s.find("/help", i)
         if i == -1:
             break
-        text.stylize("inline.help", i, i + 5)
+        text.stylize("ok", i, i + 5)
         i += 5
 
 
@@ -363,7 +363,7 @@ def stylize_vertical_borders(text: Text) -> None:
         idx = s.find("│", start)
         if idx == -1:
             break
-        text.stylize("accent", idx, idx + 1)
+        text.stylize("app.primary", idx, idx + 1)
         start = idx + 1
 
 
@@ -378,7 +378,7 @@ def stylize_box_corners(text: Text) -> None:
         if not idxs:
             break
         idx, _ = min(idxs, key=lambda x: x[0])
-        text.stylize("box.border.v", idx, idx + 1)
+        text.stylize("app.primary", idx, idx + 1)
         start = idx + 1
 
 
@@ -455,20 +455,20 @@ def print_startup_info_two_column_boxed_right(
 
         # Top/bottom borders (┌ ... ┐) or (└ ... ┘)
         if stripped.startswith(("┌", "└")):
-            t = Text(combined, style="accent")
+            t = Text(combined, style="app.primary")
 
             # Make the titles pop (same text, just styled)
             for title in (" STARTUP CHECKS: ", " QUICK INFO: "):
                 start = combined.find(title)
                 if start != -1:
-                    t.stylize("title", start, start + len(title))
+                    t.stylize("app.primary", start, start + len(title))
 
             console.print(t)
             continue
 
         # Middle box lines (│ ... │)
         if stripped.startswith("│"):
-            t = Text(combined, style="box.body")
+            t = Text(combined, style="body.text")
             stylize_vertical_borders(t)
             stylize_all(t)
             console.print(t)

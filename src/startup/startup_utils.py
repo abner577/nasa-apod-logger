@@ -206,7 +206,7 @@ def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
 
 def print_startup():
     # Header
-    startup_banner2()
+    startup_banner1()
     render_random_startup_art()
     console.print()
 
@@ -242,27 +242,25 @@ def print_startup():
 
 
 def render_random_startup_art() -> None:
-    random_choice = random.randint(1, 10)
+    random_choice = random.randint(1, 9)
     match random_choice:
         case 1:
             render_space_startup_art_1()
         case 2:
-            render_space_startup_art_2()
-        case 3:
             render_spaceship_startup_art_1()
-        case 4:
+        case 3:
             render_spaceship_startup_art_2()
-        case 5:
+        case 4:
             render_moon_startup_art_1()
-        case 6:
+        case 5:
             render_astronaut_startup_art_1()
-        case 7:
+        case 6:
             render_astronaut_startup_art_2()
-        case 8:
+        case 7:
             render_alien_startup_art_1()
-        case 9:
+        case 8:
             render_alien_startup_art_2()
-        case 10:
+        case 9:
             render_satellite_startup_art1()
 
 

@@ -6,25 +6,6 @@ import random
 
 def startup_banner1():
     banner = r"""
-███╗   ██╗ █████╗ ███████╗ █████╗      █████╗ ██████╗  ██████╗ ██████╗        
-████╗  ██║██╔══██╗██╔════╝██╔══██╗    ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗       
-██╔██╗ ██║███████║███████╗███████║    ███████║██████╔╝██║   ██║██║  ██║       
-██║╚██╗██║██╔══██║╚════██║██╔══██║    ██╔══██║██╔═══╝ ██║   ██║██║  ██║       
-██║ ╚████║██║  ██║███████║██║  ██║    ██║  ██║██║     ╚██████╔╝██████╔╝       
-╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚═════╝        
-                                                                              
-      ██╗      ██████╗  ██████╗  ██████╗ ███████╗██████╗                    
-      ██║     ██╔═══██╗██╔════╝ ██╔════╝ ██╔════╝██╔══██╗                   
-      ██║     ██║   ██║██║  ███╗██║  ███╗█████╗  ██████╔╝                   
-      ██║     ██║   ██║██║   ██║██║   ██║██╔══╝  ██╔══██╗                   
-      ███████╗╚██████╔╝╚██████╔╝╚██████╔╝███████╗██║  ██║                   
-      ╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝                                                                                                    
-        """
-    console.print(banner, style="app.banner")
-
-
-def startup_banner2():
-    banner = r"""
  __   __     ______     ______     ______        ______     ______   ______     _____          
 /\ "-.\ \   /\  __ \   /\  ___\   /\  __ \      /\  __ \   /\  == \ /\  __ \   /\  __-.      
 \ \ \-.  \  \ \  __ \  \ \___  \  \ \  __ \     \ \  __ \  \ \  _-/ \ \ \/\ \  \ \ \/\ \   
@@ -36,23 +17,51 @@ def startup_banner2():
      \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \_\ 
       \/_____/   \/_____/   \/_____/   \/_____/   \/_____/   \/_/ /_/                                                                                                                   
         """
-    console.print(banner, style="app.banner")
+    console.print(banner, style="accent")
 
 
 def render_space_startup_art_1() -> None:
-    text = Text()
+    char_style_map = {
+        "{": "border.frame",
+        "}": "border.frame",
 
-    for line_index, line in enumerate(SPACE_STARTUP_ART_1.splitlines()):
-        if line_index > 0:
+        "O": "sun.primary",
+        "-": "sun.primary",
+        "|": "sun.primary",
+
+        "*": "star.purple",
+        "D": "star.blue",
+
+        "_": "planet.glow",
+        "/": "planet.glow",
+        "\\": "planet.glow",
+
+        "~": "sun.primary",
+
+        "`": "planet.glow",
+        "'": "planet.glow",
+        ",": "planet.glow",
+        ".": "planet.glow",
+    }
+
+    randomized_chars = {"@", "+", "o", ".", "=", ")", ">", "<"}
+
+    text = Text()
+    for line_idx, line in enumerate(SPACE_STARTUP_ART_1.splitlines()):
+        if line_idx > 0:
             text.append("\n")
 
         for ch in line:
-            if ch.isspace():
-                # Water
-                text.append(ch)
+            if ch in randomized_chars:
+                # randomized colors for the following chars
+                text.append(ch, style=random.choice(["star.purple", "star.blue"]))
+                continue
+
+            style = char_style_map.get(ch)
+            if style:
+                text.append(ch, style=style)
             else:
-                # Land
-                text.append(ch, style="earth.land")
+                text.append(ch)
 
     console.print(text)
 
@@ -434,52 +443,6 @@ def render_satellite_startup_art1() -> None:
             text.append("\n")
 
         for ch in line:
-            style = char_style_map.get(ch)
-            if style:
-                text.append(ch, style=style)
-            else:
-                text.append(ch)
-
-    console.print(text)
-
-
-def render_space_startup_art_2() -> None:
-    char_style_map = {
-        "{": "border.frame",
-        "}": "border.frame",
-
-        "O": "sun.primary",
-        "-": "sun.primary",
-        "|": "sun.primary",
-
-        "*": "star.purple",
-        "D": "star.blue",
-
-        "_": "planet.glow",
-        "/": "planet.glow",
-        "\\": "planet.glow",
-
-        "~": "sun.primary",
-
-        "`": "planet.glow",
-        "'": "planet.glow",
-        ",": "planet.glow",
-        ".": "planet.glow",
-    }
-
-    randomized_chars = {"@", "+", "o", ".", "=", ")", ">", "<"}
-
-    text = Text()
-    for line_idx, line in enumerate(SPACE_STARTUP_ART_2.splitlines()):
-        if line_idx > 0:
-            text.append("\n")
-
-        for ch in line:
-            if ch in randomized_chars:
-                # randomized colors for the following chars
-                text.append(ch, style=random.choice(["star.purple", "star.blue"]))
-                continue
-
             style = char_style_map.get(ch)
             if style:
                 text.append(ch, style=style)

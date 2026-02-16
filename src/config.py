@@ -29,33 +29,6 @@ README_URL = "https://github.com/abner577/NASA-APOD-Logger/blob/main/README.md"
 
 
 SPACE_STARTUP_ART_1 = r"""
-                  _-o#&&*''''?d:>b\_
-              _o/"`''  '',, dMF9MMMMMHo_
-           .o&#'        `"MbHMMMMMMMMMMMHo.
-         .o"" '         vodM*$&&HMMMMMMMMMM?.
-        ,'              $M&ood,~'`(&##MMMMMMH\
-       /               ,MMMMMMM#b?#bobMMMMHMMML
-      &              ?MMMMMMMMMMMMMMMMMMM7MMM$R*Hk
-     ?$.            :MMMMMMMMMMMMMMMMMMM/HMMM|`*L
-    |               |MMMMMMMMMMMMMMMMMMMMbMH'   T,
-    $H#:            `*MMMMMMMMMMMMMMMMMMMMb#}'  `?
-    ]MMH#             ""*""''*#MMMMMMMMMMMMM'    -
-    MMMMMb_                   |MMMMMMMMMMMP'     :
-    HMMMMMMMHo                 `MMMMMMMMMT       .
-    ?MMMMMMMMP                  9MMMMMMMM}       -
-    -?MMMMMMM                  |MMMMMMMMM?,d-    '
-     :|MMMMMM-                 `MMMMMMMT .M|.   :
-      .9MMM[                    &MMMMM*' `'    .
-       :9MMk                    `MMM#"        -
-         &M}                     `          .-
-          `&.                             .
-            `~,   .                     ./
-                . _                  .-
-                  '`--._,dd###pp=""'
-""".rstrip("\n")
-
-
-SPACE_STARTUP_ART_2 = r"""
 }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 {{            +             +                  +   @          {{
 }}   |                *           o     +                .    }}

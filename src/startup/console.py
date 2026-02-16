@@ -8,7 +8,7 @@ STARTUP_ARTS_THEME = Theme({
     # Identity
     "app.title": "bold color(69)",        # bluish-purple title
     "app.banner": "bold color(63)",       # brighter cyan-purple for banner emphasis
-    "accent": "color(141)",               # purple accent for small highlights
+    "accent": "bold color(141)",               # purple accent for small highlights
 
     # Text
     "body": "color(250)",  # slightly more gray (was 252 -> looked white)
@@ -48,9 +48,7 @@ STARTUP_ARTS_THEME = Theme({
 
     # ----------------------- STARTUP ARTS -----------------------
 
-    # SPACE STARTUP ARTS
-    "earth.land": "color(34)",  # dark green
-
+    # SPACE STARTUP ART
     "border.frame": "dim color(97)",  # navy-black / deep space blue
     "planet.glow": "dim color(39)",  # cool cyan glow
 
@@ -108,4 +106,4 @@ STARTUP_ARTS_THEME = Theme({
     "sat.light": "bold color(220)",  # warm gold ground/platform
 })
 
-console = Console(theme=STARTUP_ARTS_THEME)
+console = Console(theme=STARTUP_ARTS_THEME, highlight=False)

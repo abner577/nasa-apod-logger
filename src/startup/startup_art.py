@@ -17,7 +17,7 @@ def startup_banner1():
      \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \_\ 
       \/_____/   \/_____/   \/_____/   \/_____/   \/_____/   \/_/ /_/                                                                                                                   
         """
-    console.print(banner, style="app.primary")
+    console.print(banner, style="banner")
 
 
 def render_space_startup_art_1() -> None:

@@ -6,10 +6,11 @@ from rich.theme import Theme
 STARTUP_ARTS_THEME = Theme({
 
     # Identity
-    "app.primary": "color(69)",       # blue for app primary color
-    "app.secondary": "color(29)",     # green for app secondary color
+    "banner": "bold color(69)",
+    "app.primary": "dim color(69)",       # blue for app primary color
+     "app.secondary": "bold color(29)",     # green for app secondary color
 
-    "body.text": "color(252)",  # gray-white for body text
+    "body.text": "color(251)",  # gray-white for body text
 
     "ok": "color(40)",  # GREEN for ✓
     "err": "color(160)",  # RED for X & errors

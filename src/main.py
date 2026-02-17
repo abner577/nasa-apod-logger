@@ -14,14 +14,15 @@ while entry_flag:
     print_startup()
 
     while True:
-        line1 = Text("[1] Get started", style="body.text")
-        line1.stylize("app.secondary", 0, 3)
+        line1 = Text("[1] ", style="app.secondary")
+        line1.append("Get started", style="app.primary")
         console.print(line1)
 
-        line2 = Text("[Q] Quit", style="body.text")
-        line2.stylize("app.secondary", 0, 3)
+        line2 = Text("[Q] ", style="app.secondary")
+        line2.append("Quit", style="app.primary")
         console.print(line2)
         console.print()
+
         console.print("Option: ", style="app.primary", end="")
         raw = input().strip()
 
@@ -47,16 +48,36 @@ while entry_flag:
 # Main Menu
 flag = True
 while flag:
-    print("────────────────────── Main Menu ☄️ ──────────────────────\n")
+    console.print()
+
+    header = Text("────────────────────── ", style="app.secondary")
+    header.append("Main Menu ☄️", style="app.primary")
+    header.append(" ──────────────────────", style="app.secondary")
+
+    console.print(header)
+    console.print()
+
     increment_launch_count(int(get_launch_count()["launch_count"]))
 
-    raw = input(
-        "[1] Make a NASA APOD Request\n"
-        "[2] View/Manage saved logs\n"
-        "[3] Change Setting\n"
-        "[4] Goodbye 👋\n\n"
-        "Option: "
-    ).strip()
+    line1 = Text("[1] ", style="app.secondary")
+    line1.append("Make a NASA APOD Request", style="app.primary")
+    console.print(line1)
+
+    line2 = Text("[2] ", style="app.secondary")
+    line2.append("View/Manage saved logs", style="app.primary")
+    console.print(line2)
+
+    line3 = Text("[3] ", style="app.secondary")
+    line3.append("Change Setting", style="app.primary")
+    console.print(line3)
+
+    line4 = Text("[4] ", style="app.secondary")
+    line4.append("Goodbye 👋", style="app.primary")
+    console.print(line4)
+
+    console.print()
+    console.print("Option: ", style="app.primary", end="")
+    raw = input().strip()
 
     try:
         if handle_global_command(raw):

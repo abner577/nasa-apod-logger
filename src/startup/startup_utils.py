@@ -5,12 +5,8 @@ from src.startup.startup_art import *
 import random
 from src.startup.console import console
 
+
 from rich.text import Text
-from rich.panel import Panel
-from rich.text import Text
-from rich.table import Table
-from rich.align import Align
-from rich.rule import Rule
 
 
 def nasa_apods_menu():
@@ -302,84 +298,75 @@ def run_startup_checks() -> list[str]:
     automatically_set_wallpaper_setting = settings_dict["automatically_set_wallpaper"]
 
     if automatically_redirect_setting == 'yes':
-        automatically_redirect_setting_message = f"Auto-open in browser  [✓] ON"
+        automatically_redirect_setting_message = f"Auto-open in browser  ✓ ON"
     else:
-        automatically_redirect_setting_message = f"Auto-open in browser  [X] OFF"
+        automatically_redirect_setting_message = f"Auto-open in browser  X OFF"
 
     if automatically_set_wallpaper_setting == 'yes':
-        automatically_set_wallpaper_setting_message = f"Auto-set-wallpaper    [✓] ON"
+        automatically_set_wallpaper_setting_message = f"Auto-set-wallpaper    ✓ ON"
     else:
-        automatically_set_wallpaper_setting_message = f"Auto-set-wallpaper    [X] OFF"
+        automatically_set_wallpaper_setting_message = f"Auto-set-wallpaper    X OFF"
 
     return [
-        f"Data directory        [✓] {data_dir_status}",
-        f"JSONL log             [✓] {json_status}",
-        f"CSV log               [✓] {csv_status}",
-        f"User settings         [✓] {settings_status}",
+        f"Data directory        ✓ {data_dir_status}",
+        f"JSONL log             ✓ {json_status}",
+        f"CSV log               ✓ {csv_status}",
+        f"User settings         ✓ {settings_status}",
         automatically_redirect_setting_message,
         automatically_set_wallpaper_setting_message,
     ]
 
 
-def stylize_all(text: Text) -> None:
+def stylize_line(text: Text) -> None:
+    """
+    Single-pass stylizer for any line in the startup boxes.
+    """
+
     s = text.plain
-
-    # Color [✓] green
-    i = 0
-    while True:
-        i = s.find("[✓]", i)
-        if i == -1:
-            break
-        text.stylize("ok", i, i + 3)
-        i += 3
-
-    # Color [X] red
-    i = 0
-    while True:
-        i = s.find("[X]", i)
-        if i == -1:
-            break
-        text.stylize("err", i, i + 3)
-        i += 3
-
-    # Bold + purple ONLY for "/help" (exact substring)
-    i = 0
-    while True:
-        i = s.find("/help", i)
-        if i == -1:
-            break
-        text.stylize("ok", i, i + 5)
-        i += 5
-
-
-def stylize_vertical_borders(text: Text) -> None:
-    # Style ALL border characters '│' on the line
-    s = text.plain
-    if "│" not in s:
+    if not s:
         return
 
+    border_chars = {"┌", "┐", "└", "┘", "│", "─"}
+
+    def is_boundary(ch: str) -> bool:
+        return ch == "" or (not ch.isalnum())
+
+    stripped = s.lstrip()
+
+    if stripped.startswith(("┌", "└")):
+        text.stylize("app.primary", 0, len(s))
+
+        for title in (" STARTUP CHECKS: ", " QUICK INFO: "):
+            start = s.find(title)
+            if start != -1:
+                text.stylize("app.primary", start, start + len(title))
+
+    # 2️Style individual characters
+    for idx, ch in enumerate(s):
+        if ch in border_chars:
+            text.stylize("app.primary", idx, idx + 1)
+        elif ch == "✓":
+            text.stylize("ok", idx, idx + 1)
+
+    # 'X' coloring
+    for idx, ch in enumerate(s):
+        if ch != "X":
+            continue
+
+        left = s[idx - 1] if idx - 1 >= 0 else ""
+        right = s[idx + 1] if idx + 1 < len(s) else ""
+
+        if is_boundary(left) and is_boundary(right):
+            text.stylize("err", idx, idx + 1)
+
+    # /help highlighting
     start = 0
     while True:
-        idx = s.find("│", start)
-        if idx == -1:
+        i = s.find("/help", start)
+        if i == -1:
             break
-        text.stylize("app.primary", idx, idx + 1)
-        start = idx + 1
-
-
-def stylize_box_corners(text: Text) -> None:
-    s = text.plain
-    corners = ("┌", "┐", "└", "┘")
-    start = 0
-    while True:
-        # find the next corner char among the set
-        idxs = [(s.find(c, start), c) for c in corners]
-        idxs = [(i, c) for (i, c) in idxs if i != -1]
-        if not idxs:
-            break
-        idx, _ = min(idxs, key=lambda x: x[0])
-        text.stylize("app.primary", idx, idx + 1)
-        start = idx + 1
+        text.stylize("app.primary", i, i + 5)
+        start = i + 5
 
 
 def print_startup_info_two_column_boxed_right(
@@ -451,28 +438,6 @@ def print_startup_info_two_column_boxed_right(
 
     for l, r in zip(left_box_lines, right_box_lines):
         combined = f"{l}{' ' * gap}{r}"
-        stripped = combined.lstrip()
-
-        # Top/bottom borders (┌ ... ┐) or (└ ... ┘)
-        if stripped.startswith(("┌", "└")):
-            t = Text(combined, style="app.primary")
-
-            # Make the titles pop (same text, just styled)
-            for title in (" STARTUP CHECKS: ", " QUICK INFO: "):
-                start = combined.find(title)
-                if start != -1:
-                    t.stylize("app.primary", start, start + len(title))
-
-            console.print(t)
-            continue
-
-        # Middle box lines (│ ... │)
-        if stripped.startswith("│"):
-            t = Text(combined, style="body.text")
-            stylize_vertical_borders(t)
-            stylize_all(t)
-            console.print(t)
-            continue
-
-        # Spacer rows (padding)
-        console.print(combined)
+        t = Text(combined, style="body.text")
+        stylize_line(t)
+        console.print(t)

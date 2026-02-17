@@ -9,10 +9,10 @@ STARTUP_ARTS_THEME = Theme({
     "app.primary": "color(69)",       # blue for app primary color
     "app.secondary": "color(29)",     # green for app secondary color
 
-    "body.text": "color(250)",  # gray-white for body text
+    "body.text": "color(252)",  # gray-white for body text
 
-    "ok": "dim color(82)",  # GREEN for [✓]
-    "err": "dim color(196)",  # RED for [X] / errors
+    "ok": "color(40)",  # GREEN for ✓
+    "err": "color(160)",  # RED for X & errors
 
     # ----------------------- STARTUP ARTS -----------------------
 

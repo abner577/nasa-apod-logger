@@ -54,26 +54,26 @@ while flag:
     header.append("Main Menu ☄️", style="app.primary")
     header.append(" ──────────────────────", style="app.secondary")
 
+    information_line = Text("     Fetch APODs, manage logs, or update settings.\n", style="body.text")
+
     console.print(header)
-    console.print()
+    console.print(information_line)
 
     increment_launch_count(int(get_launch_count()["launch_count"]))
 
     line1 = Text("[1] ", style="app.secondary")
     line1.append("Make a NASA APOD Request", style="app.primary")
+    line1.append("      ", style="body.text")  # spacing between columns
+    line1.append("[3] ", style="app.secondary")
+    line1.append("Change Setting", style="app.primary")
     console.print(line1)
 
     line2 = Text("[2] ", style="app.secondary")
     line2.append("View/Manage saved logs", style="app.primary")
+    line2.append("        ", style="body.text")  # spacing between columns
+    line2.append("[4] ", style="app.secondary")
+    line2.append("Goodbye 👋", style="app.primary")
     console.print(line2)
-
-    line3 = Text("[3] ", style="app.secondary")
-    line3.append("Change Setting", style="app.primary")
-    console.print(line3)
-
-    line4 = Text("[4] ", style="app.secondary")
-    line4.append("Goodbye 👋", style="app.primary")
-    console.print(line4)
 
     console.print()
     console.print("Option: ", style="app.primary", end="")

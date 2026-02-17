@@ -13,15 +13,33 @@ def nasa_apods_menu():
     clear_screen()
     flag = True
     while flag:
-        print(
-            "─────────────────────── NASA APOD Requests 🌌 ───────────────────────\n"
-            "     Fetch Astronomy Picture of the Day (APOD) entries from NASA.\n")
+        header = Text("─────────────────────── ", style="app.secondary")
+        header.append("NASA APOD Requests 🌌", style="app.primary")
+        header.append(" ───────────────────────", style="app.secondary")
+        console.print(header)
 
-        raw = input(
-            "[1] Today’s APOD           [3] Random APODs\n"
-            "[2] APOD by date           [4] Return to Main Menu\n\n"
-            "Option: "
-        ).strip()
+        console.print(
+            "      Fetch Astronomy Picture of the Day entries from NASA.\n",
+            style="body.text"
+        )
+
+        line1 = Text("[1] ", style="app.secondary")
+        line1.append("Today’s APOD", style="app.primary")
+        line1.append("         ", style="body.text")
+        line1.append("[3] ", style="app.secondary")
+        line1.append("Random APODs", style="app.primary")
+        console.print(line1)
+
+        line2 = Text("[2] ", style="app.secondary")
+        line2.append("APOD by date", style="app.primary")
+        line2.append("         ", style="body.text")
+        line2.append("[4] ", style="app.secondary")
+        line2.append("Return to Main Menu", style="app.primary")
+        console.print(line2)
+
+        console.print()
+        console.print("Option: ", style="app.primary", end="")
+        raw = input().strip()
 
         try:
             if handle_global_command(raw):
@@ -56,19 +74,51 @@ def output_files_menu():
     clear_screen()
     flag = True
     while flag:
-        print(
-            "─────────────────────── Log & File Tools 🗃️ ───────────────────────\n"
-            "         View, manage, and maintain your saved APOD logs\n")
+        header = Text("─────────────────────── ", style="app.secondary")
+        header.append("Log & File Tools 🗃️", style="app.primary")
+        header.append(" ───────────────────────", style="app.secondary")
+        console.print(header)
 
+        console.print(
+            "               View and manage your saved APOD logs.\n",
+            style="body.text"
+        )
 
-        raw = input(
-            "[1] View first N entries           [6] Show oldest entry (by date)\n"
-            "[2] View last N entries            [7] Clear logs (CSV + JSONL)\n"
-            "[3] View all entries               [8] Count logged entries\n"
-            "[4] Delete entry by date           [9] Return to Main Menu\n"
-            "[5] Show most recent entry (by date)\n\n"
-            "Option: "
-        ).strip()
+        line1 = Text("[1] ", style="app.secondary")
+        line1.append("View first N entries", style="app.primary")
+        line1.append("           ", style="body.text")
+        line1.append("[6] ", style="app.secondary")
+        line1.append("Show oldest entry (by date)", style="app.primary")
+        console.print(line1)
+
+        line2 = Text("[2] ", style="app.secondary")
+        line2.append("View last N entries", style="app.primary")
+        line2.append("            ", style="body.text")
+        line2.append("[7] ", style="app.secondary")
+        line2.append("Clear logs (CSV + JSONL)", style="app.primary")
+        console.print(line2)
+
+        line3 = Text("[3] ", style="app.secondary")
+        line3.append("View all entries", style="app.primary")
+        line3.append("               ", style="body.text")
+        line3.append("[8] ", style="app.secondary")
+        line3.append("Count logged entries", style="app.primary")
+        console.print(line3)
+
+        line4 = Text("[4] ", style="app.secondary")
+        line4.append("Delete entry by date", style="app.primary")
+        line4.append("           ", style="body.text")
+        line4.append("[9] ", style="app.secondary")
+        line4.append("Return to Main Menu", style="app.primary")
+        console.print(line4)
+
+        line5 = Text("[5] ", style="app.secondary")
+        line5.append("Show most recent entry (by date)", style="app.primary")
+        console.print(line5)
+
+        console.print()
+        console.print("Option: ", style="app.primary", end="")
+        raw = input().strip()
 
         try:
             if handle_global_command(raw):
@@ -115,15 +165,35 @@ def user_settings_menu():
     clear_screen()
     flag = True
     while flag:
-        print(
-            "─────────────────────── Preferences 📃 ───────────────────────\n"
-            "   Manage how the app behaves after fetching APOD entries.\n")
+        # --- Header ---
+        header = Text("─────────────────────── ", style="app.secondary")
+        header.append("Preferences 📃", style="app.primary")
+        header.append(" ───────────────────────", style="app.secondary")
+        console.print(header)
 
-        raw = input(
-            "[1] View settings                  [3] Change auto-set-wallpaper setting\n"
-            "[2] Change auto-redirect setting   [4] Return to Main Menu\n\n"
-            "Option: "
-        ).strip()
+        console.print(
+            "   Manage how the app behaves after fetching APOD entries.\n",
+            style="body.text"
+        )
+
+        line1 = Text("[1] ", style="app.secondary")
+        line1.append("View settings", style="app.primary")
+        line1.append("                  ", style="body.text")
+        line1.append("[3] ", style="app.secondary")
+        line1.append("Change auto-set-wallpaper setting", style="app.primary")
+        console.print(line1)
+
+        line2 = Text("[2] ", style="app.secondary")
+        line2.append("Change auto-redirect setting", style="app.primary")
+        line2.append("   ", style="body.text")
+        line2.append("[4] ", style="app.secondary")
+        line2.append("Return to Main Menu", style="app.primary")
+        console.print(line2)
+
+        console.print()
+        console.print("Option: ", style="app.primary", end="")
+        raw = input().strip()
+
 
         try:
             if handle_global_command(raw):

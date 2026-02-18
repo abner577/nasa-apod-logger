@@ -27,7 +27,7 @@ def create_data_directory():
     """
 
     if check_if_data_exists():
-        print("Data directory already exists. Skipping creation")
+        print("Data directory already exists. Skipping creation.")
         return
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)

@@ -51,7 +51,7 @@ def nasa_apods_menu():
         try:
             user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 4.\n")
+            print("Input error: Please enter a number from 1 to 4.\n")
             continue
         except Exception as e:
             print(e)
@@ -67,7 +67,7 @@ def nasa_apods_menu():
             case 4:
                 flag = False
             case _:
-                print("Invalid input: Please enter a number from 1 to 4.\n")
+                print("Input error: Please enter a number from 1 to 4.\n")
 
 
 def output_files_menu():
@@ -130,7 +130,7 @@ def output_files_menu():
         try:
             user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 9.\n")
+            print("Input error: Please enter a number from 1 to 9.\n")
             continue
         except Exception as e:
             print(e)
@@ -158,7 +158,7 @@ def output_files_menu():
             case 9:
                 flag = False
             case _:
-                print("Invalid input: Please enter a number from 1 to 9.\n")
+                print("Input error: Please enter a number from 1 to 9.\n")
 
 
 def user_settings_menu():
@@ -205,7 +205,7 @@ def user_settings_menu():
         try:
             user_choice = int(raw)
         except ValueError:
-            print("Invalid input: Please enter a number from 1 to 4.\n")
+            print("Input error: Please enter a number from 1 to 4.\n")
             continue
         except Exception as e:
             print(e)
@@ -222,7 +222,7 @@ def user_settings_menu():
             case 4:
                 flag = False
             case _:
-                print("Invalid input: Please enter a number from 1 to 4.\n")
+                print("Input error: Please enter a number from 1 to 4.\n")
 
 
 def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
@@ -487,10 +487,10 @@ def print_startup_info_two_column_boxed_right(
 
         return [top] + mid_lines + [bottom]
 
-    # --- Left box ---
+    # Left box
     left_box_lines = _build_box_lines(checks_title, checks_lines, padding_x)
 
-    # --- Right box ---
+    # Right box
     right_content: list[str] = [version_str, "", "Tips for getting started:"]
     for tip in tips_lines:
         right_content.append(f"> {tip}")

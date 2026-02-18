@@ -89,7 +89,7 @@ while flag:
     try:
         user_choice = int(raw)
     except ValueError:
-        print("Invalid input: Please enter a number from 1 to 4.\n")
+        print("Input error: Please enter a number from 1 to 4 (or type --help).\n")
         continue
     except Exception as e:
         print(e)
@@ -112,4 +112,4 @@ while flag:
             print("\nGoodbye 👋")
             flag = False
         case _:
-            print("Invalid input: Please enter a number from 1 to 4 (or type --help).\n")
+            print("Input error: Please enter a number from 1 to 4 (or type --help).\n")

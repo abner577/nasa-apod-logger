@@ -38,7 +38,8 @@ def get_todays_apod():
     response = requests.get(full_url)
 
     if response.status_code == 200:
-        print("Success: Today's APOD was retrieved [✓].\n")
+        print("\nSuccess: Today's APOD was retrieved ✓\n")
+        # print("[DEBUG]: HTTP Response = 200")
         apod_data = response.json()
         apod_data = format_apod_data(apod_data)
 
@@ -56,10 +57,10 @@ def get_todays_apod():
         if automatically_redirect_setting['automatically_redirect'] == 'yes':
             take_user_to_browser(redirect_url)
         else:
-            print(f"APOD link: {redirect_url}\n")
+            print(f"\nAPOD link: {redirect_url}\n")
 
     elif response.status_code == 404 or response.status_code == 403:
-        print("Request failed: Verify your API key and try again.")
+        print("Request error: Verify your API key and try again.")
         return
     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
         print("NASA API error: Please try again later.")
@@ -129,7 +130,8 @@ def get_apod_for_specific_day():
                 response = requests.get(full_url)
 
                 if response.status_code == 200:
-                    print("\nSuccess: APOD was retrieved [✓]\n")
+                    print("\nSuccess: Today's APOD was retrieved ✓\n")
+                    # print("[DEBUG]: HTTP Response = 200")
                     apod_data = response.json()
                     apod_data = format_apod_data(apod_data)
 
@@ -142,16 +144,16 @@ def get_apod_for_specific_day():
                     if automatically_redirect_setting['automatically_redirect'] == 'yes':
                         take_user_to_browser(redirect_url)
                     else:
-                        print(f"APOD link: {redirect_url}\n")
+                        print(f"\nAPOD link: {redirect_url}")
 
                 elif response.status_code == 404 or response.status_code == 403:
-                    print("Request failed: Verify your API key and try again.")
+                    print("Request error: Verify your API key and try again.")
                 elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
                     print("NASA API error: Please try again later.")
 
             case 2:
-                print("Returning...")
                 flag = False
+                print()
 
 
 def get_random_n_apods():
@@ -174,7 +176,7 @@ def get_random_n_apods():
             ))
 
             if user_choice != 1 and user_choice != 2:
-                print("Invalid option: Please enter 1 or 2.")
+                print("Input error: Please enter 1 or 2.")
                 continue
 
             match user_choice:
@@ -183,7 +185,7 @@ def get_random_n_apods():
 
                     # Max of 20, because we don't want to open like 100 tabs in the users browser and cause a crash.
                     if not (0 < n <= 20):
-                        print("Invalid input: Number of APODs must be between 1 and 20.")
+                        print("Input error: Number of APODs must be between 1 and 20.")
                         continue
 
                     # print(f"\nFetching {n} random APODs...")
@@ -196,7 +198,8 @@ def get_random_n_apods():
                     list_of_unformatted_apod_entries = []
 
                     if response.status_code == 200:
-                        print(f"\nSuccess: {n} Random APODs were retrieved [✓]\n")
+                        print(f"\nSuccess: {n} Random APODs were retrieved ✓\n")
+                        # print("[DEBUG]: HTTP Response = 200")
                         list_of_unformatted_apod_entries = response.json()
                         for apod in list_of_unformatted_apod_entries:
                             apod = format_apod_data(apod)
@@ -224,18 +227,18 @@ def get_random_n_apods():
                                 print(f"APOD link: {redirect_url}")
 
                     elif response.status_code == 404 or response.status_code == 403:
-                        print("Request failed: Verify your API key and try again.")
+                        print("Request error: Verify your API key and try again.")
                         continue
                     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
                         print("NASA API error: Please try again later.")
                         continue
 
                 case 2:
-                    print("Returning...")
                     flag = False
+                    print()
 
         except ValueError:
-            print("Invalid input: Please enter a number.")
+            print("Input error: Please enter a number.")
         except Exception as e:
             print('Unexpected error: Please try again.')
             print(e)

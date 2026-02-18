@@ -34,10 +34,10 @@ def log_data_to_csv(formatted_apod_data):
             # DictWriter writes dict values in the exact order of fieldnames.
             writer = csv.DictWriter(csv_file, fieldnames=formatted_apod_data.keys())
             writer.writerow(formatted_apod_data)
-            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {csv_file_name} [✓]")
+            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {csv_file_name} ✓")
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to write '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -56,7 +56,7 @@ def show_first_n_csv_log_entries():
         entries_amount = int(input("\nEnter number of entries: "))
 
     except ValueError:
-        print("Invalid input: Enter a valid number.\n")
+        print("Input error: Enter a valid number.\n")
         return
     except Exception as e:
         print(e)
@@ -64,7 +64,7 @@ def show_first_n_csv_log_entries():
 
 
     if entries_amount < 1:
-        print("Invalid input. Enter a number of 1 or more.\n")
+        print("Input error: Enter a number of 1 or more.\n")
         return
 
     if not check_if_csv_output_exists():
@@ -96,7 +96,7 @@ def show_first_n_csv_log_entries():
 
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -116,7 +116,7 @@ def show_last_n_csv_log_entries():
         entries_amount = int(input("\nEnter number of entries: "))
 
     except ValueError:
-        print("Invalid input: Enter a valid number.\n")
+        print("Input error: Enter a valid number.\n")
         return
     except Exception as e:
         print(e)
@@ -125,7 +125,7 @@ def show_last_n_csv_log_entries():
     entries_list = []
 
     if entries_amount < 1:
-        print("Invalid input. Enter a number of 1 or more.\n")
+        print("Input error: Enter a number of 1 or more.\n")
         return
 
     if not check_if_csv_output_exists():
@@ -158,7 +158,7 @@ def show_last_n_csv_log_entries():
                     count -= 1
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -193,7 +193,7 @@ def show_all_csv_entries():
 
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -224,7 +224,7 @@ def delete_one_csv_entry():
         day = int(input("Day (DD): "))
 
     except ValueError:
-        print("Invalid input. Year, month, and day must be numbers.\n")
+        print("Input error: Year, month, and day must be numbers.\n")
         return
     except Exception as e:
         print(e)
@@ -253,7 +253,7 @@ def delete_one_csv_entry():
                 entries_to_keep.append(row)
 
         if not found:
-            print("\nNo entry found for {target_date} [X]\n")
+            print("\nNo entry found for {target_date} X\n")
             return
 
         # Write phase
@@ -263,10 +263,10 @@ def delete_one_csv_entry():
             writer.writeheader()
             writer.writerows(entries_to_keep)
 
-        print(f"\nDeleted entry: {target_date} [✓]\n")
+        print(f"\nDeleted entry: {target_date} ✓\n")
 
     except PermissionError:
-        print(f"Permission denied: Unable to read/write '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to read/write '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -306,7 +306,7 @@ def fetch_most_recent_csv_apod():
             format_raw_csv_entry(most_recent_apod, 0)
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -346,7 +346,7 @@ def fetch_oldest_csv_apod():
             format_raw_csv_entry(oldest_apod, 0)
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 

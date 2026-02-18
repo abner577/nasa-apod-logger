@@ -21,7 +21,7 @@ def check_if_user_settings_exist():
 
 def create_user_settings():
     if check_if_user_settings_exist():
-        print(f"Settings file already exists: '{user_settings_name}'. Skipping.")
+        print(f"Settings file already exists: '{user_settings_name}'. Skipping creation.")
         return
 
     Path(user_settings_path).touch()
@@ -33,11 +33,11 @@ def create_user_settings():
             file.write(json.dumps(initial_automatically_set_wallpaper_dict, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission error: Unable to write '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
-    print(f"Created settings file: '{user_settings_name}' [✓]")
+    print(f"Created settings file: '{user_settings_name}' ✓")
 
 
 def get_all_user_settings():
@@ -59,7 +59,7 @@ def get_all_user_settings():
             return settings_dict
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission error: Unable to read '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
@@ -70,14 +70,14 @@ def format_all_user_settings(settings_dict):
    print("Settings:")
 
    if settings_dict['automatically_redirect'] == 'yes':
-    print(f"Auto-open in browser: [✓] ON")
+    print(f"Auto-open in browser: ✓ ON")
    else:
-    print(f"Auto-open in browser: [X] OFF")
+    print(f"Auto-open in browser: X OFF")
 
    if settings_dict['automatically_set_wallpaper'] == 'yes':
-    print(f"Auto-set-wallpaper: [✓] ON")
+    print(f"Auto-set-wallpaper: ✓ ON")
    else:
-    print(f"Auto-set-wallpaper: [X] OFF")
+    print(f"Auto-set-wallpaper: X OFF")
 
    print(f"Amount of times logged in: {settings_dict['launch_count']}")
 
@@ -96,7 +96,7 @@ def update_automatically_redirect_setting():
         elif updated_setting == "n" or updated_setting == "no":
             updated_setting = "no"
         else:
-            print('Invalid input. Please enter "y" or "n".\n')
+            print('Input error: Please enter "y" or "n".\n')
             return
 
     except Exception as e:
@@ -114,11 +114,11 @@ def update_automatically_redirect_setting():
             file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Permission denied: Unable to read/write '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission denied: Unable to read/write '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
-    print(f"Updated settings: '{user_settings_name}' [✓]")
+    print(f"Updated settings: '{user_settings_name}' ✓")
 
 
 def get_automatically_redirect_setting():
@@ -141,7 +141,7 @@ def get_automatically_redirect_setting():
                     return content
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission error: Unable to write '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
@@ -169,7 +169,7 @@ def increment_launch_count(current_launch_count):
             file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission error: Unable to write '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
@@ -189,7 +189,7 @@ def get_launch_count():
                     return content
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission error: Unable to read '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
@@ -215,7 +215,7 @@ def get_automatically_set_wallpaper():
                     return content
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission error: Unable to read '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
@@ -242,7 +242,7 @@ def update_automatically_set_wallpaper():
         elif updated_setting == "n" or updated_setting == "no":
             updated_setting = "no"
         else:
-            print('Invalid input. Please enter "y" or "n".\n')
+            print('Input error: Please enter "y" or "n".\n')
             return
 
     except Exception as e:
@@ -260,8 +260,8 @@ def update_automatically_set_wallpaper():
             file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Permission denied: Unable to read/write '{user_settings_name}' at '{user_settings_path}' [X]")
+        print(f"Permission error: Unable to read/write '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
         print(e)
 
-    print(f"Updated settings: '{user_settings_name}' [✓]")
+    print(f"Updated settings: '{user_settings_name}' ✓")

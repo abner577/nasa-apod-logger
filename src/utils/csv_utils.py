@@ -33,7 +33,7 @@ def create_csv_output_file():
 
     Path(csv_file_path).touch()
     write_header_to_csv()
-    print(f"Created log file: '{csv_file_name}' [✓]")
+    print(f"Created log file: '{csv_file_name}' ✓")
 
 
 def clear_csv_output_file():
@@ -52,7 +52,7 @@ def clear_csv_output_file():
             return True
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to write '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -68,7 +68,7 @@ def delete_csv_output_file():
     """
 
     Path(f"{csv_file_path}").unlink()
-    print(f"Deleted: '{csv_file_name}' [✓]")
+    print(f"Deleted: '{csv_file_name}' ✓")
 
 
 def write_header_to_csv():
@@ -85,7 +85,7 @@ def write_header_to_csv():
             writer.writeheader()
 
     except PermissionError:
-        print(f"Permission denied: Unable to write '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to write '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -114,7 +114,7 @@ def check_for_duplicate_csv_entries(formatted_apod_data):
                    return True
 
     except PermissionError:
-        print(f"Permission denied: Unable to read '{csv_file_name}' at '{csv_file_path}' [X]")
+        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 
@@ -177,7 +177,7 @@ def get_line_count(count):
                 count += 1
 
     except PermissionError:
-        print(f"Dont have permission to read file: '{csv_file_name}' at path: '{csv_file_path}'.")
+        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
     except Exception as e:
         print(e)
 

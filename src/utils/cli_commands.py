@@ -208,7 +208,6 @@ def print_help() -> None:
         style="body.text"
     ))
 
-    # Footer divider line (green)
     console.print(Text("─" * 68, style="app.secondary"))
 
 def run_plain_modal(fn) -> None:

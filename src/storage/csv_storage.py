@@ -202,7 +202,7 @@ def show_all_csv_entries():
         return
 
 
-def delete_one_csv_entry():
+def delete_one_csv_entry(target_date):
     """
         Delete a single CSV entry by its APOD date.
 
@@ -210,35 +210,14 @@ def delete_one_csv_entry():
         CSV file with the remaining entries.
 
         Returns:
-            None:
+        Boolean:
     """
 
     entries_to_keep = []
 
     if not check_if_csv_output_exists():
-        return
+        return False
 
-    try:
-        year = int(input("\nYear (YYYY): "))
-        month = int(input("Month (MM): "))
-        day = int(input("Day (DD): "))
-
-    except ValueError:
-        print("Input error: Year, month, and day must be numbers.\n")
-        return
-    except Exception as e:
-        print(e)
-        return
-
-    date_object = datetime.date(year, month, day)
-    check_result = check_valid_nasa_date(date_object)
-
-    if check_result is not None:
-        print(check_result)
-        return
-
-
-    target_date = date_object.isoformat()
     found = False
 
     try:
@@ -253,8 +232,8 @@ def delete_one_csv_entry():
                 entries_to_keep.append(row)
 
         if not found:
-            print("\nNo entry found for {target_date} X\n")
-            return
+            print(f"\nNo entry found for {target_date} X\n")
+            return False
 
         # Write phase
         with open(csv_file_path, mode="w", encoding="utf-8", newline="") as csv_file:
@@ -263,7 +242,7 @@ def delete_one_csv_entry():
             writer.writeheader()
             writer.writerows(entries_to_keep)
 
-        print(f"\nDeleted entry: {target_date} ✓\n")
+        return True
 
     except PermissionError:
         print(f"Permission error: Unable to read/write '{csv_file_name}' at '{csv_file_path}' X")

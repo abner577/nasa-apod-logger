@@ -207,7 +207,7 @@ def show_all_json_entries():
         return
 
 
-def delete_one_json_entry():
+def delete_one_json_entry(target_date):
     """
        Delete a single JSONL entry by its APOD date.
 
@@ -215,34 +215,14 @@ def delete_one_json_entry():
        the JSONL file with the remaining entries.
 
        Returns:
-        None:
+        Boolean:
     """
 
     entries_to_keep = []
 
     if not check_if_json_output_exists():
-        pass
+        return False
 
-    try:
-        year = int(input("\nYear (YYYY): "))
-        month = int(input("Month (MM): "))
-        day = int(input("Day (DD): "))
-
-    except ValueError:
-        print("Invalid input. Year, month, and day must be numbers.\n")
-        return
-    except Exception as e:
-        print(e)
-        return
-
-    date_object = datetime.date(year, month, day)
-    check_result = check_valid_nasa_date(date_object)
-
-    if check_result is not None:
-        print(check_result)
-        return
-
-    target_date = date_object.isoformat()
     found = False
 
     try:
@@ -262,15 +242,14 @@ def delete_one_json_entry():
                     entries_to_keep.append(content)
 
             if not found:
-                print(f"\nNo entry found for {target_date} X\n")
-                return
+                return False
 
-            else:
-                print(f"\nDeleted entry: {target_date} ✓\n")
             # Write phase
             with open(file=json_file_path, mode='w') as file:
                 for entry in entries_to_keep:
                     file.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+            return True
 
     except PermissionError:
         print(f"Permission error: Unable to read/write '{json_file_name}' at '{json_file_path}' X")

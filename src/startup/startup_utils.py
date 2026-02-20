@@ -1,4 +1,5 @@
 from src.nasa.nasa_client import *
+from src.nasa.nasa_date import ask_user_for_date
 from src.user_settings import *
 from src.utils.cli_commands import handle_global_command, clear_screen
 from src.startup.startup_art import *
@@ -143,7 +144,15 @@ def output_files_menu():
             case 3:
                 show_all_json_entries()
             case 4:
-                delete_one_json_entry()
+                target_date = ask_user_for_date()
+
+                found_json = delete_one_json_entry(target_date)
+                found_csv = delete_one_csv_entry(target_date)
+
+                if found_json and found_csv:
+                    print(f"\nDeleted entry: {target_date} ✓\n")
+                else:
+                    print(f"\nNo entry found for {target_date} X\n")
             case 5:
                 fetch_most_recent_json_apod()
             case 6:
@@ -151,6 +160,7 @@ def output_files_menu():
             case 7:
                 if clear_json_output_file() and clear_csv_output_file():
                     print("\nAll log files have been cleared.\n")
+                    write_header_to_csv()
             case 8:
                 line_count = get_line_count(0)
                 print(f"\nTotal logged entries: {line_count}\n")

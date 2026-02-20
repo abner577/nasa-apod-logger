@@ -50,6 +50,7 @@ def get_todays_apod():
 
         log_data_to_csv(apod_data)
         log_data_to_json(apod_data)
+        print()
 
         redirect_url = apod_data['url']
         automatically_redirect_setting = get_automatically_redirect_setting()

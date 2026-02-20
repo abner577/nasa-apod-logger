@@ -5,7 +5,6 @@ from src.startup.startup_art import *
 import random
 from src.startup.console import console
 
-
 from rich.text import Text
 
 

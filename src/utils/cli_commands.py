@@ -11,11 +11,12 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
-
 from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, get_all_user_settings, format_all_user_settings)
 
 from src.utils.browser_utils import take_user_to_browser
 from src.config import README_URL
+from rich.text import Text
+from src.startup.console import console
 
 
 @dataclass(frozen=True)
@@ -160,27 +161,55 @@ def _open_readme() -> None:
 def _show_help_modal() -> None:
     clear_screen()
     print_help()
-    input("\nPress Enter to return... ")
+
+    prompt = Text("\nPress ", style="body.text")
+    prompt.append("Enter", style="app.primary")
+    prompt.append(" to return... ", style="body.text")
+
+    console.print(prompt)
+    input()
+
     clear_screen()
 
 
 def print_help() -> None:
-    print("\n───────────────────────────── HELP MENU ─────────────────────────────\n")
-    print("COMMANDS:")
-    print("  --help, /help                        Show this help menu")
-    print("  --readme, /readme                    Open README in browser")
-    print("  --quit, /quit, q                     Exit the application")
-    print("  --settings, /settings                View settings configuration")
-    print("  --auto-redirect, /auto-redirect      Change auto-redirect setting")
-    print("  --auto-wallpaper, /auto-wallpaper    Change auto-wallpaper setting")
+    title = Text("\n", style="body.text")
+    title.append("───────────────────────────── ", style="app.secondary")
+    title.append("HELP MENU", style="app.primary")
+    title.append(" ─────────────────────────────\n", style="app.secondary")
+    console.print(title)
 
-    print("\nNOTES:")
-    print("  New here? I recommend opening the README before getting started.\n"
-          "  It explains how this tool fetches, stores, and manages NASA APOD entries.\n"
-          "  Dont forget to check out the Configuration section to learn how to customize behavior!")
+    console.print(Text("COMMANDS:", style="app.secondary"))
 
-    print()
-    print("─" * 68)
+    # Command rows helper
+    def cmd_row(left: str, right: str) -> None:
+        row = Text("", style="body.text")
+        row.append(left, style="app.primary")
+        padding = max(1, 35 - len(left))
+        row.append(" " * padding, style="body.text")
+        row.append(right, style="body.text")
+        console.print(row)
+
+    cmd_row("--help, /help", "Show this help menu")
+    cmd_row("--readme, /readme", "Open README in browser")
+    cmd_row("--quit, /quit, q", "Exit the application")
+    cmd_row("--settings, /settings", "View settings configuration")
+    cmd_row("--auto-redirect, /auto-redirect", "Change auto-redirect setting")
+    cmd_row("--auto-wallpaper, /auto-wallpaper", "Change auto-wallpaper setting")
+
+    console.print()
+
+    console.print(Text("NOTES:", style="app.secondary"))
+
+    console.print(Text(
+        "New here? I recommend opening the README before getting started.\n"
+        "It explains how this tool fetches, stores, and manages NASA APOD entries.\n"
+        "Dont forget to check out the Configuration section to learn how to customize behavior!\n",
+        style="body.text"
+    ))
+
+    # Footer divider line (green)
+    console.print(Text("─" * 68, style="app.secondary"))
 
 def run_plain_modal(fn) -> None:
     """

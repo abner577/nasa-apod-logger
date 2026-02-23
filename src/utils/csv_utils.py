@@ -9,6 +9,8 @@ import csv
 
 from pathlib import Path
 from src.config import csv_file_path, csv_file_name
+from rich.text import Text
+from src.startup.console import console
 
 HEADERS = {
     "date": "",
@@ -28,12 +30,18 @@ def create_csv_output_file():
     """
 
     if check_if_csv_output_exists():
-        print(f"CSV log already exists: '{csv_file_name}'. Skipping creation.")
+        msg = Text("\nCSV log already exists: ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(". Skipping creation.", style="body.text")
+        console.print(msg)
         return
 
     Path(csv_file_path).touch()
     write_header_to_csv()
-    print(f"Created log file: '{csv_file_name}' ✓")
+    msg = Text("Created log file: ", style="ok")
+    msg.append(f"'{csv_file_name}' ", style="app.primary")
+    msg.append("✓", style="ok")
+    console.print(msg)
 
 
 def clear_csv_output_file():
@@ -52,9 +60,16 @@ def clear_csv_output_file():
             return True
 
     except PermissionError:
-        print(f"Permission error: Unable to write '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to write ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+        
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
     return False
 
@@ -68,7 +83,10 @@ def delete_csv_output_file():
     """
 
     Path(f"{csv_file_path}").unlink()
-    print(f"Deleted: '{csv_file_name}' ✓")
+    msg = Text("Deleted: ", style="ok")
+    msg.append(f"'{csv_file_name}' ", style="app.primary")
+    msg.append("✓", style="ok")
+    console.print(msg)
 
 
 def write_header_to_csv():
@@ -85,9 +103,17 @@ def write_header_to_csv():
             writer.writeheader()
 
     except PermissionError:
-        print(f"Permission error: Unable to write '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to write ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X.", style="err")
+        console.print(msg)
+        
     except Exception as e:
-        print(e)
+        console.print()
+        console.print(Text(str(e), style="err"))
 
 
 def check_for_duplicate_csv_entries(formatted_apod_data):
@@ -110,13 +136,26 @@ def check_for_duplicate_csv_entries(formatted_apod_data):
                   continue
 
               if row[0] == formatted_apod_data['date']:
-                   print(f"Skipped (duplicate): {formatted_apod_data['date']} already exists in {csv_file_name}.")
+                   msg = Text("Skipped (duplicate): ", style="app.secondary")
+                   msg.append(str(formatted_apod_data['date']), style="app.primary")
+                   msg.append(" already exists in ", style="body.text")
+                   msg.append(str(csv_file_name), style="app.primary")
+                   msg.append(".", style="body.text")
+                   console.print(msg)
                    return True
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X.", style="err")
+        console.print(msg)
+        
     except Exception as e:
-        print(e)
+        console.print()
+        console.print(Text(str(e), style="err"))
 
     return False
 
@@ -147,7 +186,10 @@ def format_raw_csv_entry(formatted_csv_entry, count):
         None:
     """
 
-    print(f"=====================================")
+    console.print("─" * 37, style="app.secondary")
+    if count == 0:
+        console.print()
+        
     print(f"Entry #{count + 1} ({formatted_csv_entry[1]}):")
     print(f"Date: {formatted_csv_entry[0]}\n"
           f"Title: {formatted_csv_entry[1]}\n"
@@ -177,8 +219,16 @@ def get_line_count(count):
                 count += 1
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X.", style="err")
+        console.print(msg)
+        
     except Exception as e:
-        print(e)
+        console.print()
+        console.print(Text(str(e), style="err"))
 
     return count

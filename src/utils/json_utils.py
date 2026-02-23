@@ -9,6 +9,8 @@ import json
 
 from pathlib import Path
 from src.config import json_file_path, json_file_name
+from rich.text import Text
+from src.startup.console import console
 
 
 def create_json_output_file():
@@ -20,11 +22,17 @@ def create_json_output_file():
     """
 
     if check_if_json_output_exists():
-        print(f"JSONL log already exists: '{json_file_name}'. Skipping creation.")
+        msg = Text("\nJSONL log already exists: ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(". Skipping creation.", style="body.text")
+        console.print(msg)
         return
 
     Path(json_file_path).touch()
-    print(f"Created log file: '{json_file_name}' ✓")
+    msg = Text("Created log file: ", style="ok")
+    msg.append(f"'{json_file_name}' ", style="app.primary")
+    msg.append("✓", style="ok")
+    console.print(msg)
 
 
 def clear_json_output_file():
@@ -43,9 +51,16 @@ def clear_json_output_file():
             return True
 
     except PermissionError:
-        print(f"Permission error: Unable to write '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to write ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
     return False
 
@@ -58,7 +73,10 @@ def delete_json_output_file():
     """
 
     Path(f"{json_file_path}").unlink()
-    print(f"Deleted: '{json_file_name}' ✓")
+    msg = Text("Deleted: ", style="ok")
+    msg.append(f"'{json_file_name}' ", style="app.primary")
+    msg.append("✓", style="ok")
+    console.print(msg)
 
 
 def get_line_count(count):
@@ -78,11 +96,24 @@ def get_line_count(count):
                 count += 1
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{json_file_name}' at '{json_file_path}' X.")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X.", style="err")
+        console.print(msg)
+
     except json.decoder.JSONDecodeError:
-        print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("\nJSONL parse error: ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print()
+        console.print(Text(str(e), style="err"))
 
     return count
 
@@ -106,15 +137,31 @@ def check_for_duplicate_json_entries(formatted_apod_data):
 
                 content = json.loads(line)
                 if content['date'] == formatted_apod_data['date']:
-                    print(f"Skipped (duplicate): {content['date']} already exists in {json_file_name}.")
+                    msg = Text("Skipped (duplicate): ", style="app.secondary")
+                    msg.append(str(content["date"]), style="app.primary")
+                    msg.append(" already exists in ", style="body.text")
+                    msg.append(str(json_file_name), style="app.primary")
+                    msg.append(".", style="body.text")
+                    console.print(msg)
                     return True
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{json_file_name}' at '{json_file_path}' X.")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X.", style="err")
+        console.print(msg)
+
     except json.decoder.JSONDecodeError:
-        print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("\nJSONL parse error: ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
     return False
 
@@ -145,9 +192,9 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
         None:
     """
 
-    print("=====================================")
+    console.print("─" * 37, style="app.secondary")
     if count == 0:
-        print()
+        console.print()
     print(
         f"Entry #{count + 1} ({formatted_jsonl_entry['title']}):\n"
         f"Date: {formatted_jsonl_entry['date']}\n"

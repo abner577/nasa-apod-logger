@@ -50,11 +50,15 @@ def nasa_apods_menu():
 
         try:
             user_choice = int(raw)
+
         except ValueError:
-            print("Input error: Please enter a number from 1 to 4.\n")
+            msg = Text("\nInput error: ", style="err")
+            msg.append("Please enter a number from 1 to 4.\n", style="body.text")
+            console.print(msg)
             continue
+
         except Exception as e:
-            print(e)
+            console.print(Text(str(e), style="err"))
             return
 
         match user_choice:
@@ -67,7 +71,9 @@ def nasa_apods_menu():
             case 4:
                 flag = False
             case _:
-                print("Input error: Please enter a number from 1 to 4.\n")
+                msg = Text("\nInput error: ", style="err")
+                msg.append("Please enter a number from 1 to 4.\n", style="body.text")
+                console.print(msg)
 
 
 def output_files_menu():
@@ -130,10 +136,13 @@ def output_files_menu():
         try:
             user_choice = int(raw)
         except ValueError:
-            print("Input error: Please enter a number from 1 to 9.\n")
+            msg = Text("\nInput error: ", style="err")
+            msg.append("Please enter a number from 1 to 9.\n", style="body.text")
+            console.print(msg)
             continue
+
         except Exception as e:
-            print(e)
+            console.print(Text(str(e), style="err"))
             return
 
         match user_choice:
@@ -167,14 +176,15 @@ def output_files_menu():
             case 9:
                 flag = False
             case _:
-                print("Input error: Please enter a number from 1 to 9.\n")
+                msg = Text("\nInput error: ", style="err")
+                msg.append("Please enter a number from 1 to 9.\n", style="body.text")
+                console.print(msg)
 
 
 def user_settings_menu():
     clear_screen()
     flag = True
     while flag:
-        # --- Header ---
         header = Text("─────────────────────── ", style="app.secondary")
         header.append("Preferences 📃", style="app.primary")
         header.append(" ───────────────────────", style="app.secondary")
@@ -213,11 +223,15 @@ def user_settings_menu():
 
         try:
             user_choice = int(raw)
+
         except ValueError:
-            print("Input error: Please enter a number from 1 to 4.\n")
+            msg = Text("\nInput error: ", style="err")
+            msg.append("Please enter a number from 1 to 9.\n", style="body.text")
+            console.print(msg)
             continue
+
         except Exception as e:
-            print(e)
+            console.print(Text(str(e), style="err"))
             return
 
         match user_choice:
@@ -231,13 +245,16 @@ def user_settings_menu():
             case 4:
                 flag = False
             case _:
-                print("Input error: Please enter a number from 1 to 4.\n")
+                msg = Text("\nInput error: ", style="err")
+                msg.append("Please enter a number from 1 to 4.\n", style="body.text")
+                console.print(msg)
 
 
 def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
     """
     Prints a clean Unicode box around a section.
     """
+
     # Compute inner width
     max_line_len = max((len(line) for line in lines), default=0)
     inner_width = max_line_len + (padding_x * 2)

@@ -42,7 +42,11 @@ while entry_flag:
             print("\nGoodbye 👋")
             raise SystemExit
 
-        print("Invalid input: Please enter 1 or Q (or type --help).\n")
+        msg = Text("\nInput error: ", style="err")
+        msg.append("Please enter 1 or Q (or type", style="body.text")
+        msg.append(" /help", style="app.primary")
+        msg.append(").\n", style="body.text")
+        console.print(msg)
 
 
 # Main Menu
@@ -89,10 +93,16 @@ while flag:
     try:
         user_choice = int(raw)
     except ValueError:
-        print("Input error: Please enter a number from 1 to 4 (or type --help).\n")
+        msg = Text("\nInput error: ", style="err")
+        msg.append("Please enter a number from 1 to 4 (or type", style="body.text")
+        msg.append(" /help", style="app.primary")
+        msg.append(").\n", style="body.text")
+        console.print(msg)
+
         continue
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
         continue
 
     match user_choice:
@@ -112,4 +122,8 @@ while flag:
             print("\nGoodbye 👋")
             flag = False
         case _:
-            print("Input error: Please enter a number from 1 to 4 (or type --help).\n")
+            msg = Text("\nInput error: ", style="err")
+            msg.append("Please enter a number from 1 to 4 (or type", style="body.text")
+            msg.append(" /help", style="app.primary")
+            msg.append(").\n", style="body.text")
+            console.print(msg)

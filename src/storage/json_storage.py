@@ -9,6 +9,8 @@ from src.utils.json_utils import *
 from src.utils.data_utils import *
 from src.nasa.nasa_date import check_valid_nasa_date
 from src.config import json_file_path, json_file_name, NASA_APOD_START_DATE, DATE_TODAY
+from rich.text import Text
+from src.startup.console import console
 
 
 def log_data_to_json(formatted_apod_data):
@@ -33,12 +35,26 @@ def log_data_to_json(formatted_apod_data):
             # One JSON object per line so we can safely append.
             # Need to use .dumps to write JSON as a string
             json_file.write(json.dumps(formatted_apod_data, ensure_ascii=False) + "\n")
-            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {json_file_name} ✓")
+
+            msg = Text("Saved: ", style="ok")
+            msg.append("APOD ", style="body.text")
+            msg.append(f"'{formatted_apod_data['date']}'", style="app.primary")
+            msg.append(" -> ", style="body.text")
+            msg.append(f"{json_file_name} ", style="app.primary")
+            msg.append("✓", style="ok")
+            console.print(msg)
 
     except PermissionError:
-        print(f"Permission error: Unable to write '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to write ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
     return None
 
@@ -58,14 +74,17 @@ def show_first_n_json_log_entries():
         entries_amount = int(input("\nEnter number of entries: "))
 
     except ValueError:
-        print("Invalid input. Enter a valid number.\n")
+        console.print(Text("Input error: ", style="err").append("Enter a valid number.", style="body.text"))
+        console.print()
         return
+    
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
         return
 
     if entries_amount < 1:
-        print("Invalid input. Enter a number of 1 or more.\n")
+        console.print(Text("Input error: ", style="err").append("Enter a number of 1 or more.", style="body.text"))
+        console.print()
         return
 
     if not check_if_json_output_exists():
@@ -74,11 +93,15 @@ def show_first_n_json_log_entries():
     line_count = get_line_count(0)
 
     if line_count == 0:
-        print("\nNo entries found.\n")
+        console.print(Text("\nNo entries found.\n", style="body.text"))
         return
 
     if entries_amount > line_count:
-        print(f"Only {line_count} entries available. Showing all.\n")
+        msg = Text("Only ", style="body.text")
+        msg.append(str(line_count), style="app.primary")
+        msg.append(" entries available. Showing all.\n", style="body.text")
+        console.print(msg)
+
         entries_amount = line_count
     count = 0
 
@@ -97,11 +120,23 @@ def show_first_n_json_log_entries():
                     break
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except json.decoder.JSONDecodeError:
-        print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("JSONL parse error: ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def show_last_n_json_log_entries():
@@ -119,16 +154,17 @@ def show_last_n_json_log_entries():
         entries_amount = int(input("\nEnter number of entries: "))
 
     except ValueError:
-        print("Invalid input: Enter a valid number.\n")
-        return
-    except Exception as e:
-        print(e)
+        console.print(Text("Input error: ", style="err").append("Enter a valid number.", style="body.text"))
+        console.print()
         return
 
-    entries_list = []
+    except Exception as e:
+        console.print(Text(str(e), style="err"))
+        return
 
     if entries_amount < 1:
-        print("Invalid input. Enter a number of 1 or more.\n")
+        console.print(Text("Input error: ", style="err").append("Enter a number of 1 or more.", style="body.text"))
+        console.print()
         return
 
     if not check_if_json_output_exists():
@@ -137,14 +173,18 @@ def show_last_n_json_log_entries():
     line_count = get_line_count(count=0)
 
     if line_count == 0:
-        print("\nNo entries found.\n")
+        console.print(Text("\nNo entries found.\n", style="body.text"))
         return
 
     if entries_amount > line_count:
-        print(f"Only {line_count} entries available. Showing all.\n")
+        msg = Text("Only ", style="body.text")
+        msg.append(str(line_count), style="app.primary")
+        msg.append(" entries available. Showing all.\n", style="body.text")
+        console.print(msg)
         entries_amount = line_count
 
     count = 0
+    entries_list = []
 
     try:
         with open(file=json_file_path, mode='r') as json_file:
@@ -161,11 +201,26 @@ def show_last_n_json_log_entries():
                     count -= 1
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+        return
+
     except json.decoder.JSONDecodeError:
-        print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("JSONL parse error: ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+        return
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
+        return
 
     count = 0
     for entry in entries_list:
@@ -196,14 +251,26 @@ def show_all_json_entries():
                 count += 1
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except json.decoder.JSONDecodeError:
-        print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("JSONL parse error: ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
     if count == 0:
-        print("\nNo entries found.\n")
+        console.print(Text("\nNo entries found.\n", style="body.text"))
         return
 
 
@@ -242,6 +309,11 @@ def delete_one_json_entry(target_date):
                     entries_to_keep.append(content)
 
             if not found:
+                msg = Text("\nNo entry found for ", style="body.text")
+                msg.append(str(target_date), style="app.primary")
+                msg.append(" ", style="body.text")
+                msg.append("X\n", style="err")
+                console.print(msg)
                 return False
 
             # Write phase
@@ -252,11 +324,24 @@ def delete_one_json_entry(target_date):
             return True
 
     except PermissionError:
-        print(f"Permission error: Unable to read/write '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("JSONL parse Error : ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}' ", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def fetch_most_recent_json_apod():
@@ -287,7 +372,10 @@ def fetch_most_recent_json_apod():
                     most_recent_apod = content
 
             if most_recent_apod is None:
-                print(f"\nNo entries found in {json_file_name}.\n")
+                msg = Text("\nNo entries found in ", style="body.text")
+                msg.append(json_file_name, style="app.primary")
+                msg.append(".\n", style="body.text")
+                console.print(msg)
                 return
 
             most_recent_apod = format_apod_data(most_recent_apod)
@@ -295,11 +383,24 @@ def fetch_most_recent_json_apod():
             format_raw_jsonl_entry(most_recent_apod, 0)
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("JSONL parse Error : ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}' ", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def fetch_oldest_json_apod():
@@ -339,11 +440,24 @@ def fetch_oldest_json_apod():
             format_raw_jsonl_entry(oldest_apod, 0)
 
     except PermissionError:
-        print(f"Permission error: Unable to write '{json_file_name}' at '{json_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except json.decoder.JSONDecodeError:
         print(f"JSONL parse Error: Could not decode JSON from file '{json_file_name}'. Check the file format.")
+        msg = Text("JSONL parse Error : ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}' ", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def log_multiple_json_entries(list_formatted_apod_data):

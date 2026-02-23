@@ -9,6 +9,8 @@ from src.utils.csv_utils import *
 from src.utils.data_utils import *
 from src.config import csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY
 from src.nasa.nasa_date import check_valid_nasa_date
+from rich.text import Text
+from src.startup.console import console
 
 
 def log_data_to_csv(formatted_apod_data):
@@ -34,12 +36,26 @@ def log_data_to_csv(formatted_apod_data):
             # DictWriter writes dict values in the exact order of fieldnames.
             writer = csv.DictWriter(csv_file, fieldnames=formatted_apod_data.keys())
             writer.writerow(formatted_apod_data)
-            print(f"Saved: APOD '{formatted_apod_data['date']}' -> {csv_file_name} ✓")
+
+            msg = Text("Saved: ", style="ok")
+            msg.append("APOD ", style="body.text")
+            msg.append(f"'{formatted_apod_data['date']}'", style="app.primary")
+            msg.append(" -> ", style="body.text")
+            msg.append(f"{csv_file_name} ", style="app.primary")
+            msg.append("✓", style="ok")
+            console.print(msg)
 
     except PermissionError:
-        print(f"Permission error: Unable to write '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to write ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def show_first_n_csv_log_entries():
@@ -54,17 +70,19 @@ def show_first_n_csv_log_entries():
     """
     try:
         entries_amount = int(input("\nEnter number of entries: "))
-
     except ValueError:
-        print("Input error: Enter a valid number.\n")
+        msg = Text("Input error: ", style="err")
+        msg.append("Enter a valid number.\n", style="body.text")
+        console.print(msg)
         return
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
         return
 
-
     if entries_amount < 1:
-        print("Input error: Enter a number of 1 or more.\n")
+        msg = Text("Input error: ", style="err")
+        msg.append("Enter a number of 1 or more.\n", style="body.text")
+        console.print(msg)
         return
 
     if not check_if_csv_output_exists():
@@ -73,32 +91,39 @@ def show_first_n_csv_log_entries():
     line_count = get_line_count(count=0)
 
     if line_count == 0:
-        print("\nNo entries found.\n")
+        console.print(Text("\nNo entries found.\n", style="body.text"))
         return
 
     if entries_amount > line_count:
-        print(f"Only {line_count} entries available. Showing all.\n")
+        msg = Text("Only ", style="body.text")
+        msg.append(str(line_count), style="app.primary")
+        msg.append(" entries available. Showing all.\n", style="body.text")
+        console.print(msg)
         entries_amount = line_count
-    count = 0
 
+    count = 0
     try:
         with open(file=csv_file_path, mode='r', encoding='utf-8') as csv_file:
             content = csv.reader(csv_file)
-
             for row in content:
                 if not row or row[0] == 'date':
                     continue
-
                 format_raw_csv_entry(row, count)
                 count += 1
                 if count == entries_amount:
                     break
 
-
     except PermissionError:
-        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def show_last_n_csv_log_entries():
@@ -116,16 +141,19 @@ def show_last_n_csv_log_entries():
         entries_amount = int(input("\nEnter number of entries: "))
 
     except ValueError:
-        print("Input error: Enter a valid number.\n")
-        return
-    except Exception as e:
-        print(e)
+        msg = Text("Input error: ", style="err")
+        msg.append("Enter a valid number.\n", style="body.text")
+        console.print(msg)
         return
 
-    entries_list = []
+    except Exception as e:
+        console.print(Text(str(e), style="err"))
+        return
 
     if entries_amount < 1:
-        print("Input error: Enter a number of 1 or more.\n")
+        msg = Text("Input error: ", style="err")
+        msg.append("Enter a number of 1 or more.\n", style="body.text")
+        console.print(msg)
         return
 
     if not check_if_csv_output_exists():
@@ -134,12 +162,17 @@ def show_last_n_csv_log_entries():
     line_count = get_line_count(count=0)
 
     if line_count == 0:
-        print("N\nNo entries found.\n")
+        console.print(Text("\nNo entries found.\n", style="body.text"))
         return
 
     if entries_amount > line_count:
-        print(f"Only {line_count} entries available. Showing all.\n")
+        msg = Text("Only ", style="body.text")
+        msg.append(str(line_count), style="app.primary")
+        msg.append(" entries available. Showing all.\n", style="body.text")
+        console.print(msg)
         entries_amount = line_count
+
+    entries_list = []
     count = 0
 
     try:
@@ -158,9 +191,18 @@ def show_last_n_csv_log_entries():
                     count -= 1
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+        return
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
+        return
 
     count = 0
     for entry in entries_list:
@@ -193,12 +235,19 @@ def show_all_csv_entries():
 
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
     if count == 0:
-        print("\nNo entries found.\n")
+        console.print(Text("\nNo entries found.\n", style="body.text"))
         return
 
 
@@ -232,7 +281,11 @@ def delete_one_csv_entry(target_date):
                 entries_to_keep.append(row)
 
         if not found:
-            print(f"\nNo entry found for {target_date} X\n")
+            msg = Text("\nNo entry found for ", style="body.text")
+            msg.append(str(target_date), style="app.primary")
+            msg.append(" ", style="body.text")
+            msg.append("X\n", style="err")
+            console.print(msg)
             return False
 
         # Write phase
@@ -245,9 +298,16 @@ def delete_one_csv_entry(target_date):
         return True
 
     except PermissionError:
-        print(f"Permission error: Unable to read/write '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def fetch_most_recent_csv_apod():
@@ -278,16 +338,26 @@ def fetch_most_recent_csv_apod():
                     most_recent_apod = row
 
             if most_recent_apod is None:
-                print(f"\nNo entries found in {csv_file_name}.\n")
+                msg = Text("\nNo entries found in ", style="body.text")
+                msg.append(csv_file_name, style="app.primary")
+                msg.append(".\n", style="body.text")
+                console.print(msg)
                 return
 
             print()
             format_raw_csv_entry(most_recent_apod, 0)
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def fetch_oldest_csv_apod():
@@ -318,16 +388,26 @@ def fetch_oldest_csv_apod():
                     oldest_apod = row
 
             if oldest_apod is None:
-                print(f"nNo entries found in {csv_file_name}.\n")
+                msg = Text("\nNo entries found in ", style="body.text")
+                msg.append(csv_file_name, style="app.primary")
+                msg.append(".\n", style="body.text")
+                console.print(msg)
                 return
 
             print()
             format_raw_csv_entry(oldest_apod, 0)
 
     except PermissionError:
-        print(f"Permission error: Unable to read '{csv_file_name}' at '{csv_file_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
 
 
 def log_multiple_csv_entries(list_formatted_apod_data):

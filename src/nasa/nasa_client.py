@@ -38,14 +38,19 @@ def get_todays_apod():
     response = requests.get(full_url)
 
     if response.status_code == 200:
-        print("\nSuccess: Today's APOD was retrieved ✓\n")
+        msg = Text("\nSuccess: ", style="ok")
+        msg.append("Today's APOD was retrieved ", style="body.text")
+        msg.append("✓", style="ok")
+        msg.append("\n", style="body.text")
+        console.print(msg)
         # print("[DEBUG]: HTTP Response = 200")
         apod_data = response.json()
         apod_data = format_apod_data(apod_data)
 
 
         if not check_if_data_exists():
-            print("Data directory not found. Creating it...\n")
+            msg = Text("Data directory not found. Creating it...\n", style="body.text")
+            console.print(msg)
             create_data_directory()
 
         log_data_to_csv(apod_data)
@@ -55,16 +60,24 @@ def get_todays_apod():
         automatically_redirect_setting = get_automatically_redirect_setting()
 
         if automatically_redirect_setting['automatically_redirect'] == 'yes':
-            print()
+            console.print()
             take_user_to_browser(redirect_url)
         else:
-            print(f"\nAPOD link: {redirect_url}\n")
+            link = Text("\nAPOD link: ", style="body.text")
+            link.append(redirect_url, style="app.primary")
+            link.append("\n", style="body.text")
+            console.print(link)
 
     elif response.status_code == 404 or response.status_code == 403:
-        print("Request error: Verify your API key and try again.")
+        msg = Text("\nRequest error: ", style="err")
+        msg.append("Verify your API key and try again.", style="body.text")
+        console.print(msg)
         return
+
     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
-        print("NASA API error: Please try again later.")
+        msg = Text("\nNASA API error: ", style="err")
+        msg.append("Please try again later.", style="body.text")
+        console.print(msg)
         return
 
 
@@ -82,47 +95,70 @@ def get_apod_for_specific_day():
     flag = True
     while flag:
 
-        # Catch non-numeric input here (e.g., "abc")
+        # Catch non-numeric input here
         try:
-            user_choice = int(input(
-                "\n[1] Enter a date\n"
-                "[2] Back\n\n"
-                "Option: "
-            ))
+            console.print()
+            line1 = Text("[1] ", style="app.secondary")
+            line1.append("Enter a date", style="app.primary")
+            console.print(line1)
+
+            line2 = Text("[2] ", style="app.secondary")
+            line2.append("Back", style="app.primary")
+            console.print(line2)
+            console.print()
+
+            prompt = Text("Option: ", style="app.secondary")
+            console.print(prompt, end="")
+            user_choice = int(input().strip())
+
         except ValueError:
-            print("Invalid input: Please enter 1 or 2.")
+            msg = Text("\nInput error: ", style="err")
+            msg.append("Please enter 1 or 2.", style="body.text")
+            console.print(msg)
             continue
 
         if user_choice != 1 and user_choice != 2:
-            print("Invalid input: Please enter 1 or 2.")
+            msg = Text("\nInput error: ", style="err")
+            msg.append("Please enter 1 or 2.", style="body.text")
+            console.print(msg)
             continue
 
         match user_choice:
             case 1:
-                # Catch non-numeric input here (e.g., "Jan")
+                # Catch non-numeric input here
                 try:
-                    year = int(input("\nYear (YYYY): "))
-                    month = int(input("Month (MM): "))
-                    day = int(input("Day (DD): "))
+                    console.print()
+                    console.print(Text("Year (YYYY): ", style="app.secondary"), end="")
+                    year = int(input().strip())
+                    console.print(Text("Month (MM): ", style="app.secondary"), end="")
+                    month = int(input().strip())
+                    console.print(Text("Day (DD): ", style="app.secondary"), end="")
+                    day = int(input().strip())
+
                 except ValueError:
-                    print("Invalid input: Year, month, and day must be numbers.")
+                    msg = Text("\nInput error: ", style="err")
+                    msg.append("Year, month, and day must be numbers.", style="body.text")
+                    console.print(msg)
                     continue
 
                 try:
                     date_object = datetime.date(year, month, day)
                 except ValueError as e:
-                    print(e)
+                    console.print(Text(str(e), style="err"))
                     continue
 
                 check_result = check_valid_nasa_date(date_object)
 
                 # If an invalid NASA APOD date is entered, try again
                 if check_result is not None:
-                    print(check_result)
+                    msg = Text("\nInput error: ", style="err")
+                    msg.append(str(check_result).replace("\nInput error: ", ""), style="body.text")
+                    console.print(msg)
                     continue
 
                 if not check_if_data_exists():
-                    print('Data directory not found. Creating it...')
+                    msg = Text("Data directory not found. Creating it...\n", style="body.text")
+                    console.print(msg)
                     create_data_directory()
 
                 # Valid date at this point
@@ -131,7 +167,11 @@ def get_apod_for_specific_day():
                 response = requests.get(full_url)
 
                 if response.status_code == 200:
-                    print("\nSuccess: Today's APOD was retrieved ✓\n")
+                    msg = Text("\nSuccess: ", style="ok")
+                    msg.append("APOD was retrieved ", style="body.text")
+                    msg.append("✓", style="ok")
+                    msg.append("\n", style="body.text")
+                    console.print(msg)
                     # print("[DEBUG]: HTTP Response = 200")
                     apod_data = response.json()
                     apod_data = format_apod_data(apod_data)
@@ -145,16 +185,23 @@ def get_apod_for_specific_day():
                     if automatically_redirect_setting['automatically_redirect'] == 'yes':
                         take_user_to_browser(redirect_url)
                     else:
-                        print(f"\nAPOD link: {redirect_url}")
+                        link = Text("\nAPOD link: ", style="body.text")
+                        link.append(redirect_url, style="app.primary")
+                        console.print(link)
 
                 elif response.status_code == 404 or response.status_code == 403:
-                    print("Request error: Verify your API key and try again.")
+                    msg = Text("\nRequest error: ", style="err")
+                    msg.append("Verify your API key and try again.", style="body.text")
+                    console.print(msg)
+
                 elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
-                    print("NASA API error: Please try again later.")
+                    msg = Text("\nNASA API error: ", style="err")
+                    msg.append("Please try again later.", style="body.text")
+                    console.print(msg)
 
             case 2:
                 flag = False
-                print()
+                console.print()
 
 
 def get_random_n_apods():
@@ -170,28 +217,48 @@ def get_random_n_apods():
     flag = True
     while flag:
         try:
-            user_choice = int(input(
-                "\n[1] Request Random APODs\n"
-                "[2] Back\n\n"
-                "Option: "
-            ))
+            console.print()
+            line1 = Text("[1] ", style="app.secondary")
+            line1.append("Request Random APODs", style="app.primary")
+            console.print(line1)
+
+            line2 = Text("[2] ", style="app.secondary")
+            line2.append("Back", style="app.primary")
+            console.print(line2)
+            console.print()
+
+            console.print(Text("Option: ", style="app.secondary"), end="")
+            user_choice = int(input().strip())
 
             if user_choice != 1 and user_choice != 2:
-                print("Input error: Please enter 1 or 2.")
+                msg = Text("\nInput error: ", style="err")
+                msg.append("Please enter 1 or 2.", style="body.text")
+                console.print(msg)
                 continue
 
             match user_choice:
                 case 1:
-                    n = int(input('\nHow many random APODs should we fetch? (1-20): \n'))
+                    console.print()
+                    prompt = Text("How many random APODs should we fetch? ", style="body.text")
+                    prompt.append("(1-20):", style="app.primary")
+                    console.print(prompt)
+
+                    n = int(input().strip())
 
                     # Max of 20, because we don't want to open like 100 tabs in the users browser and cause a crash.
                     if not (0 < n <= 20):
-                        print("Input error: Number of APODs must be between 1 and 20.")
+                        msg = Text("\nInput error: ", style="err")
+                        msg.append("Number of APODs must be between ", style="body.text")
+                        msg.append("1", style="app.primary")
+                        msg.append(" and ", style="body.text")
+                        msg.append("20", style="app.primary")
+                        msg.append(".", style="body.text")
+                        console.print(msg)
                         continue
 
-                    # print(f"\nFetching {n} random APODs...")
 
                     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}&count={n}"
+                    # print(f"[DEBUG]: Fetching {n} random APODs...")
                     # print(f"[DEBUG] Request URL: {full_url}")
                     response = requests.get(full_url)
 
@@ -199,7 +266,13 @@ def get_random_n_apods():
                     list_of_unformatted_apod_entries = []
 
                     if response.status_code == 200:
-                        print(f"\nSuccess: {n} Random APODs were retrieved ✓\n")
+                        msg = Text("\nSuccess: ", style="ok")
+                        msg.append(str(n), style="app.primary")
+                        msg.append(" Random APODs were retrieved ", style="body.text")
+                        msg.append("✓", style="ok")
+                        msg.append("\n", style="body.text")
+                        console.print(msg)
+
                         # print("[DEBUG]: HTTP Response = 200")
                         list_of_unformatted_apod_entries = response.json()
                         for apod in list_of_unformatted_apod_entries:
@@ -207,11 +280,12 @@ def get_random_n_apods():
                             list_of_formatted_apod_entries.append(apod)
 
                         if not check_if_data_exists():
-                            print("Data directory not found. Creating it now...\n")
+                            msg = Text("Data directory not found. Creating it now...\n", style="body.text")
+                            console.print(msg)
                             create_data_directory()
 
                         log_multiple_csv_entries(list_of_formatted_apod_entries)
-                        print()
+                        console.print()
                         log_multiple_json_entries(list_of_formatted_apod_entries)
 
                         automatically_redirect_setting = get_automatically_redirect_setting()
@@ -221,16 +295,22 @@ def get_random_n_apods():
                                 redirect_url = apod['url']
                                 take_user_to_browser(redirect_url)
                         else:
-                            print()
+                            console.print()
                             for apod in list_of_formatted_apod_entries:
-                                redirect_url = apod['url']
-                                print(f"APOD link: {redirect_url}")
+                                link = Text("APOD link: ", style="body.text")
+                                link.append(apod["url"], style="app.primary")
+                                console.print(link)
 
                     elif response.status_code == 404 or response.status_code == 403:
-                        print("Request error: Verify your API key and try again.")
+                        msg = Text("\nRequest error: ", style="err")
+                        msg.append("Verify your API key and try again.", style="body.text")
+                        console.print(msg)
                         continue
+
                     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
-                        print("NASA API error: Please try again later.")
+                        msg = Text("\nNASA API error: ", style="err")
+                        msg.append("Please try again later.", style="body.text")
+                        console.print(msg)
                         continue
 
                 case 2:
@@ -238,7 +318,12 @@ def get_random_n_apods():
                     print()
 
         except ValueError:
-            print("Input error: Please enter a number.")
+            msg = Text("\nInput error: ", style="err")
+            msg.append("Please enter a number.", style="body.text")
+            console.print(msg)
+
         except Exception as e:
-            print('Unexpected error: Please try again.')
-            print(e)
+            msg = Text("\nUnexpected error: ", style="err")
+            msg.append("Please try again.", style="body.text")
+            console.print(msg)
+            console.print(Text(str(e), style="err"))

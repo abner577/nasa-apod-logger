@@ -4,6 +4,8 @@ nasa_date.py
 Date validation helpers for NASA APOD constraints.
 """
 import datetime
+from rich.text import Text
+from src.startup.console import console
 
 from src.config import NASA_APOD_START_DATE, DATE_TODAY
 
@@ -27,23 +29,53 @@ def check_valid_nasa_date(date_object):
 
 def ask_user_for_date():
     try:
-        year = int(input("\nYear (YYYY): "))
-        month = int(input("Month (MM): "))
-        day = int(input("Day (DD): "))
+        console.print()
+        console.print(Text("Year (YYYY): ", style="app.secondary"), end="")
+        year = int(input().strip())
+
+        console.print(Text("Month (MM): ", style="app.secondary"), end="")
+        month = int(input().strip())
+
+        console.print(Text("Day (DD): ", style="app.secondary"), end="")
+        day = int(input().strip())
 
     except ValueError:
-        print("Invalid input. Year, month, and day must be numbers.\n")
+        msg = Text("Input error: ", style="err")
+        msg.append("Year, month, and day must be numbers.\n", style="body.text")
+        console.print(msg)
         return None
+
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
         return None
 
-    date_object = datetime.date(year, month, day)
+    try:
+        date_object = datetime.date(year, month, day)
+    except ValueError as e:
+        console.print(Text(str(e), style="err"))
+        return None
+
     check_result = check_valid_nasa_date(date_object)
-
     if check_result is not None:
-        print(check_result)
+        body = check_result.replace("Input error: ", "")
+        msg = Text("Input error: ", style="err")
+
+
+        if str(NASA_APOD_START_DATE) in body:
+            before, after = body.split(str(NASA_APOD_START_DATE), 1)
+            msg.append(before, style="body.text")
+            msg.append(str(NASA_APOD_START_DATE), style="app.primary")
+            msg.append(after, style="body.text")
+
+        elif str(DATE_TODAY) in body:
+            before, after = body.split(str(DATE_TODAY), 1)
+            msg.append(before, style="body.text")
+            msg.append(str(DATE_TODAY), style="app.primary")
+            msg.append(after, style="body.text")
+        else:
+            msg.append(body, style="body.text")
+
+        console.print(msg)
         return None
 
-    target_date = date_object.isoformat()
-    return target_date
+    return date_object.isoformat()

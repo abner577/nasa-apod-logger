@@ -46,7 +46,7 @@ def log_data_to_csv(formatted_apod_data):
             console.print(msg)
 
     except PermissionError:
-        msg = Text("Permission error: ", style="err")
+        msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to write ", style="body.text")
         msg.append(f"'{csv_file_name}'", style="app.primary")
         msg.append(" at ", style="body.text")
@@ -71,7 +71,7 @@ def show_first_n_csv_log_entries():
     try:
         entries_amount = int(input("\nEnter number of entries: "))
     except ValueError:
-        msg = Text("Input error: ", style="err")
+        msg = Text("\nInput error: ", style="err")
         msg.append("Enter a valid number.\n", style="body.text")
         console.print(msg)
         return
@@ -80,7 +80,7 @@ def show_first_n_csv_log_entries():
         return
 
     if entries_amount < 1:
-        msg = Text("Input error: ", style="err")
+        msg = Text("\nInput error: ", style="err")
         msg.append("Enter a number of 1 or more.\n", style="body.text")
         console.print(msg)
         return
@@ -114,7 +114,7 @@ def show_first_n_csv_log_entries():
                     break
 
     except PermissionError:
-        msg = Text("Permission error: ", style="err")
+        msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read ", style="body.text")
         msg.append(f"'{csv_file_name}'", style="app.primary")
         msg.append(" at ", style="body.text")
@@ -141,7 +141,7 @@ def show_last_n_csv_log_entries():
         entries_amount = int(input("\nEnter number of entries: "))
 
     except ValueError:
-        msg = Text("Input error: ", style="err")
+        msg = Text("\nInput error: ", style="err")
         msg.append("Enter a valid number.\n", style="body.text")
         console.print(msg)
         return
@@ -151,7 +151,7 @@ def show_last_n_csv_log_entries():
         return
 
     if entries_amount < 1:
-        msg = Text("Input error: ", style="err")
+        msg = Text("\nInput error: ", style="err")
         msg.append("Enter a number of 1 or more.\n", style="body.text")
         console.print(msg)
         return
@@ -191,7 +191,7 @@ def show_last_n_csv_log_entries():
                     count -= 1
 
     except PermissionError:
-        msg = Text("Permission error: ", style="err")
+        msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read ", style="body.text")
         msg.append(f"'{csv_file_name}'", style="app.primary")
         msg.append(" at ", style="body.text")
@@ -235,7 +235,7 @@ def show_all_csv_entries():
 
 
     except PermissionError:
-        msg = Text("Permission error: ", style="err")
+        msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read ", style="body.text")
         msg.append(f"'{csv_file_name}'", style="app.primary")
         msg.append(" at ", style="body.text")
@@ -298,7 +298,7 @@ def delete_one_csv_entry(target_date):
         return True
 
     except PermissionError:
-        msg = Text("Permission error: ", style="err")
+        msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read/write ", style="body.text")
         msg.append(f"'{csv_file_name}'", style="app.primary")
         msg.append(" at ", style="body.text")
@@ -348,7 +348,7 @@ def fetch_most_recent_csv_apod():
             format_raw_csv_entry(most_recent_apod, 0)
 
     except PermissionError:
-        msg = Text("Permission error: ", style="err")
+        msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read ", style="body.text")
         msg.append(f"'{csv_file_name}'", style="app.primary")
         msg.append(" at ", style="body.text")
@@ -398,7 +398,7 @@ def fetch_oldest_csv_apod():
             format_raw_csv_entry(oldest_apod, 0)
 
     except PermissionError:
-        msg = Text("Permission error: ", style="err")
+        msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read ", style="body.text")
         msg.append(f"'{csv_file_name}'", style="app.primary")
         msg.append(" at ", style="body.text")

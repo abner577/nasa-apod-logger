@@ -253,7 +253,7 @@ def show_all_csv_entries():
         console.print(Text(str(e), style="err"))
 
     if count == 0:
-        console.print(Text("\nNo entries found.\n", style="body.text"))
+        console.print(Text("No entries found.\n", style="body.text"))
         return
 
 
@@ -287,11 +287,6 @@ def delete_one_csv_entry(target_date):
                 entries_to_keep.append(row)
 
         if not found:
-            msg = Text("\nNo entry found for ", style="body.text")
-            msg.append(str(target_date), style="app.primary")
-            msg.append(" ", style="body.text")
-            msg.append("X\n", style="err")
-            console.print(msg)
             return False
 
         # Write phase
@@ -345,13 +340,10 @@ def fetch_most_recent_csv_apod():
                     most_recent_apod = row
 
             if most_recent_apod is None:
-                msg = Text("\nNo entries found in ", style="body.text")
-                msg.append(csv_file_name, style="app.primary")
-                msg.append(".\n", style="body.text")
-                console.print(msg)
+                console.print(Text("\nNo entries found.\n", style="body.text"))
                 return
 
-            print()
+            console.print()
             format_raw_csv_entry(most_recent_apod, 0)
 
     except PermissionError:
@@ -396,10 +388,7 @@ def fetch_oldest_csv_apod():
                     oldest_apod = row
 
             if oldest_apod is None:
-                msg = Text("\nNo entries found in ", style="body.text")
-                msg.append(csv_file_name, style="app.primary")
-                msg.append(".\n", style="body.text")
-                console.print(msg)
+                console.print(Text("\nNo entries found.\n", style="body.text"))
                 return
 
             print()

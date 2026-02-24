@@ -187,10 +187,7 @@ def format_raw_csv_entry(formatted_csv_entry, count):
         None:
     """
 
-    console.print("─" * 37, style="app.secondary")
-    if count == 0:
-        console.print()
-        
+    console.print("─" * 60, style="app.secondary")
     print(f"Entry #{count + 1} ({formatted_csv_entry[1]}):")
     print(f"Date: {formatted_csv_entry[0]}\n"
           f"Title: {formatted_csv_entry[1]}\n"

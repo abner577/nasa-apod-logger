@@ -195,13 +195,36 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
     """
 
     console.print("─" * 60, style="app.secondary")
-    # if count == 0:
-    #     console.print()
-    print(
-        f"Entry #{count + 1} ({formatted_jsonl_entry['title']}):\n"
-        f"Date: {formatted_jsonl_entry['date']}\n"
-        f"Title: {formatted_jsonl_entry['title']}\n"
-        f"URL: {formatted_jsonl_entry['url']}\n"
-        f"Explanation: {formatted_jsonl_entry['explanation']}\n"
-        f"Logged at: {formatted_jsonl_entry['logged_at']}\n"
-    )
+
+    entry_number = count + 1
+    title = formatted_jsonl_entry["title"]
+    date = formatted_jsonl_entry["date"]
+    url = formatted_jsonl_entry["url"]
+    explanation = formatted_jsonl_entry["explanation"]
+    logged_at = formatted_jsonl_entry["logged_at"]
+
+    header = Text(f"Entry #{entry_number} ({title}):\n", style="app.primary")
+    console.print(header)
+
+    # Date
+    line = Text()
+    line.append("Date: ", style="app.secondary")
+    line.append(f"{date}\n", style="body.text")
+
+    # Title
+    line.append("Title: ", style="app.secondary")
+    line.append(f"{title}\n", style="body.text")
+
+    # URL
+    line.append("URL: ", style="app.secondary")
+    line.append(f"{url}\n", style="app.url")
+
+    # Explanation
+    line.append("Explanation: ", style="app.secondary")
+    line.append(f"{explanation}\n", style="body.text")
+
+    # Logged at
+    line.append("Logged at: ", style="app.secondary")
+    line.append(f"{logged_at}\n", style="body.text")
+
+    console.print(line)

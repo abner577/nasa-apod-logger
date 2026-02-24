@@ -161,20 +161,36 @@ def output_files_menu():
                 found_csv = delete_one_csv_entry(target_date)
 
                 if found_json and found_csv:
-                    print(f"\nDeleted entry: {target_date} ✓\n")
+                    msg = Text("\nDeleted entry: ", style="body.text")
+                    msg.append(str(target_date), style="app.primary")
+                    msg.append(" ", style="body.text")
+                    msg.append("✓\n", style="ok")
+                    console.print(msg)
                 else:
-                    print(f"\nNo entry found for {target_date} X\n")
+                    msg = Text("\nNo entry found for ", style="body.text")
+                    msg.append(str(target_date), style="app.primary")
+                    msg.append(" ", style="body.text")
+                    msg.append("X\n", style="err")
+                    console.print(msg)
             case 5:
                 fetch_most_recent_json_apod()
             case 6:
                 fetch_oldest_json_apod()
             case 7:
                 if clear_json_output_file() and clear_csv_output_file():
-                    print("\nAll log files have been cleared.\n")
+                    msg = Text("\nAll log files have been cleared ", style="body.text")
+                    msg.append("✓\n", style="ok")
+                    console.print(msg)
+
                     write_header_to_csv()
             case 8:
                 line_count = get_line_count(0)
-                print(f"\nTotal logged entries: {line_count}\n")
+
+                msg = Text("\nTotal logged entries: ", style="app.secondary")
+                msg.append(f"{line_count}", style="app.primary")
+                msg.append("\n", style="body.text")
+
+                console.print(msg)
             case 9:
                 flag = False
             case _:

@@ -72,7 +72,8 @@ def show_first_n_json_log_entries():
     """
 
     try:
-        entries_amount = int(input("\nEnter number of entries: "))
+        console.print("\nEnter number of entries: ", style="app.secondary", end="")
+        entries_amount = int(input())
 
     except ValueError:
         console.print(Text("\nInput error: ", style="err").append("Enter a valid number.", style="body.text"))
@@ -158,7 +159,8 @@ def show_last_n_json_log_entries():
     """
 
     try:
-        entries_amount = int(input("\nEnter number of entries: "))
+        console.print("\nEnter number of entries: ", style="app.secondary", end="")
+        entries_amount = int(input())
 
     except ValueError:
         console.print(Text("\nInput error: ", style="err").append("Enter a valid number.", style="body.text"))
@@ -265,8 +267,6 @@ def show_all_json_entries():
                 format_raw_jsonl_entry(content, count)
                 count += 1
 
-        console.print()
-
     except PermissionError:
         msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read ", style="body.text")
@@ -288,8 +288,10 @@ def show_all_json_entries():
         console.print(Text(str(e), style="err"))
 
     if count == 0:
-        console.print(Text("\nNo entries found.\n", style="body.text"))
+        console.print(Text("No entries found.\n", style="body.text"))
         return
+
+    console.print()
 
 
 def delete_one_json_entry(target_date):
@@ -327,11 +329,6 @@ def delete_one_json_entry(target_date):
                     entries_to_keep.append(content)
 
             if not found:
-                msg = Text("\nNo entry found for ", style="body.text")
-                msg.append(str(target_date), style="app.primary")
-                msg.append(" ", style="body.text")
-                msg.append("X\n", style="err")
-                console.print(msg)
                 return False
 
             # Write phase
@@ -391,10 +388,7 @@ def fetch_most_recent_json_apod():
                     most_recent_apod = content
 
             if most_recent_apod is None:
-                msg = Text("\nNo entries found in ", style="body.text")
-                msg.append(json_file_name, style="app.primary")
-                msg.append(".\n", style="body.text")
-                console.print(msg)
+                console.print(Text("\nNo entries found.\n", style="body.text"))
                 return
 
             most_recent_apod = format_apod_data(most_recent_apod)
@@ -453,7 +447,7 @@ def fetch_oldest_json_apod():
                     oldest_apod = content
 
             if oldest_apod is None:
-                print(f"{json_file_name} is empty.")
+                console.print(Text("\nNo entries found.\n", style="body.text"))
                 return
 
             oldest_apod = format_apod_data(oldest_apod)

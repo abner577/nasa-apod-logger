@@ -58,6 +58,7 @@ def nasa_apods_menu():
             continue
 
         except Exception as e:
+            console.print()
             console.print(Text(str(e), style="err"))
             return
 
@@ -142,6 +143,7 @@ def output_files_menu():
             continue
 
         except Exception as e:
+            console.print()
             console.print(Text(str(e), style="err"))
             return
 
@@ -231,6 +233,7 @@ def user_settings_menu():
             continue
 
         except Exception as e:
+            console.print()
             console.print(Text(str(e), style="err"))
             return
 

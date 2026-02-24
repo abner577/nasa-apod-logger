@@ -69,6 +69,7 @@ def clear_csv_output_file():
         console.print(msg)
         
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
     return False

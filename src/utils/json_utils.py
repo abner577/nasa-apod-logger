@@ -60,6 +60,7 @@ def clear_json_output_file():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
     return False
@@ -161,6 +162,7 @@ def check_for_duplicate_json_entries(formatted_apod_data):
         msg.append(". Check the file format.", style="body.text")
         console.print(msg)
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
     return False
@@ -192,9 +194,9 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
         None:
     """
 
-    console.print("─" * 37, style="app.secondary")
-    if count == 0:
-        console.print()
+    console.print("─" * 60, style="app.secondary")
+    # if count == 0:
+    #     console.print()
     print(
         f"Entry #{count + 1} ({formatted_jsonl_entry['title']}):\n"
         f"Date: {formatted_jsonl_entry['date']}\n"

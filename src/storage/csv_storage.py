@@ -55,6 +55,7 @@ def log_data_to_csv(formatted_apod_data):
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 
@@ -76,6 +77,7 @@ def show_first_n_csv_log_entries():
         console.print(msg)
         return
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         return
 
@@ -123,6 +125,7 @@ def show_first_n_csv_log_entries():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 
@@ -147,6 +150,7 @@ def show_last_n_csv_log_entries():
         return
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         return
 
@@ -201,6 +205,7 @@ def show_last_n_csv_log_entries():
         return
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         return
 
@@ -244,6 +249,7 @@ def show_all_csv_entries():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
     if count == 0:
@@ -307,6 +313,7 @@ def delete_one_csv_entry(target_date):
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 
@@ -357,6 +364,7 @@ def fetch_most_recent_csv_apod():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 
@@ -407,6 +415,7 @@ def fetch_oldest_csv_apod():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 

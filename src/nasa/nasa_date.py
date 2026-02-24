@@ -46,6 +46,7 @@ def ask_user_for_date():
         return None
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         return None
 

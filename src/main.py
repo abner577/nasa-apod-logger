@@ -102,6 +102,7 @@ while flag:
         continue
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         continue
 

@@ -54,6 +54,7 @@ def log_data_to_json(formatted_apod_data):
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
     return None
@@ -79,6 +80,7 @@ def show_first_n_json_log_entries():
         return
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         return
 
@@ -103,6 +105,8 @@ def show_first_n_json_log_entries():
         console.print(msg)
 
         entries_amount = line_count
+
+    console.print()
     count = 0
 
     try:
@@ -118,6 +122,8 @@ def show_first_n_json_log_entries():
                 count += 1
                 if count == entries_amount:
                     break
+
+        console.print()
 
     except PermissionError:
         msg = Text("\nPermission error: ", style="err")
@@ -136,6 +142,7 @@ def show_first_n_json_log_entries():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 
@@ -159,6 +166,7 @@ def show_last_n_json_log_entries():
         return
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         return
 
@@ -219,13 +227,18 @@ def show_last_n_json_log_entries():
         return
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
         return
 
+    console.print()
     count = 0
+
     for entry in entries_list:
         format_raw_jsonl_entry(entry, count)
         count += 1
+
+    console.print()
 
 
 def show_all_json_entries():
@@ -239,7 +252,9 @@ def show_all_json_entries():
     if not check_if_json_output_exists():
         return
 
+    console.print()
     count = 0
+
     try:
         with open(file=json_file_path, mode='r') as json_file:
             for line in json_file:
@@ -249,6 +264,8 @@ def show_all_json_entries():
                 content = json.loads(line)
                 format_raw_jsonl_entry(content, count)
                 count += 1
+
+        console.print()
 
     except PermissionError:
         msg = Text("\nPermission error: ", style="err")
@@ -267,6 +284,7 @@ def show_all_json_entries():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
     if count == 0:
@@ -341,6 +359,7 @@ def delete_one_json_entry(target_date):
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 
@@ -379,8 +398,9 @@ def fetch_most_recent_json_apod():
                 return
 
             most_recent_apod = format_apod_data(most_recent_apod)
-            print()
+            console.print()
             format_raw_jsonl_entry(most_recent_apod, 0)
+            console.print()
 
     except PermissionError:
         msg = Text("\nPermission error: ", style="err")
@@ -400,6 +420,7 @@ def fetch_most_recent_json_apod():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 
@@ -436,8 +457,9 @@ def fetch_oldest_json_apod():
                 return
 
             oldest_apod = format_apod_data(oldest_apod)
-            print()
+            console.print()
             format_raw_jsonl_entry(oldest_apod, 0)
+            console.print()
 
     except PermissionError:
         msg = Text("\nPermission error: ", style="err")
@@ -457,6 +479,7 @@ def fetch_oldest_json_apod():
         console.print(msg)
 
     except Exception as e:
+        console.print()
         console.print(Text(str(e), style="err"))
 
 

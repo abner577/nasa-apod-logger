@@ -245,7 +245,7 @@ def user_settings_menu():
 
         except ValueError:
             msg = Text("\nInput error: ", style="err")
-            msg.append("Please enter a number from 1 to 9.\n", style="body.text")
+            msg.append("Please enter a number from 1 to 4.\n", style="body.text")
             console.print(msg)
             continue
 

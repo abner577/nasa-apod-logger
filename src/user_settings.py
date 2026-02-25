@@ -69,99 +69,35 @@ def get_all_user_settings():
     return None
 
 
-def stylize_settings_content(t: Text) -> None:
-    """
-    Adds settings-specific styles (labels, ON/OFF, launch_count value) on top of stylize_line().
-    """
-    s = t.plain
-    if not s or not s.startswith("│"):
-        return
-
-    def is_boundary(ch: str) -> bool:
-        return ch == "" or (not ch.isalnum())
-    def stylize_substring(substr: str, style: str) -> None:
-        i = s.find(substr)
-        if i != -1:
-            t.stylize(style, i, i + len(substr))
-
-    stylize_substring("Auto-open in browser:", "app.secondary")
-    stylize_substring("Auto-set-wallpaper:", "app.secondary")
-    stylize_substring("Amount of times logged in:", "app.secondary")
-
-    start = 0
-    while True:
-        i = s.find("ON", start)
-        if i == -1:
-            break
-        left = s[i - 1] if i - 1 >= 0 else ""
-        right = s[i + 2] if i + 2 < len(s) else ""
-        if is_boundary(left) and is_boundary(right):
-            t.stylize("ok", i, i + 2)
-        start = i + 2
-
-    start = 0
-    while True:
-        i = s.find("OFF", start)
-        if i == -1:
-            break
-        left = s[i - 1] if i - 1 >= 0 else ""
-        right = s[i + 3] if i + 3 < len(s) else ""
-        if is_boundary(left) and is_boundary(right):
-            t.stylize("err", i, i + 3)
-        start = i + 3
-
-    marker = "Amount of times logged in:"
-    i = s.find(marker)
-    if i != -1:
-        j = i + len(marker)
-        while j < len(s) and s[j] == " ":
-            j += 1
-        k = j
-        while k < len(s) and s[k].isdigit():
-            k += 1
-        if k > j:
-            t.stylize("app.primary", j, k)
-
-
-def print_settings_box(settings_dict: dict) -> None:
-    auto_redirect = settings_dict.get("automatically_redirect", "no")
-    auto_wallpaper = settings_dict.get("automatically_set_wallpaper", "no")
-    launch_count = settings_dict.get("launch_count", "0")
-
-    lines = [
-        f"Auto-open in browser:       {'✓ ON' if auto_redirect == 'yes' else 'X OFF'}",
-        f"Auto-set-wallpaper:         {'✓ ON' if auto_wallpaper == 'yes' else 'X OFF'}",
-        f"Amount of times logged in:  {launch_count}",
-    ]
-
-    box_lines = build_box_lines("SETTINGS:", lines, padding_x=2)
-
-    for raw in box_lines:
-        t = Text(raw, style="body.text")
-        stylize_line(t)  # borders, title, ✓, X
-        stylize_settings_content(t)  # labels + ON/OFF + count value
-        console.print(t)
-
-
 # when we update, we need to write back all the other settings as well
 def update_automatically_redirect_setting():
     if not check_if_user_settings_exist():
-        print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
+        msg = Text("Settings file not found: ", style="err")
+        msg.append(f"'{user_settings_name}'", style="app.primary")
+        msg.append(". Please create it first.", style="body.text")
+        console.print(msg)
         return
 
     try:
-        updated_setting = input('\nAuto-open APOD links in your browser? (y/n): ').strip().lower()
+        prompt = Text("\nAuto-open APOD links in your browser? ", style="app.secondary")
+        prompt.append("(y/n): ", style="app.primary")
+        console.print(prompt, end="")
+
+        updated_setting = input().strip().lower()
 
         if updated_setting == "y" or updated_setting == "yes":
             updated_setting = "yes"
         elif updated_setting == "n" or updated_setting == "no":
             updated_setting = "no"
         else:
-            print('Input error: Please enter "y" or "n".\n')
+            msg = Text('\nInput error: ', style="err")
+            msg.append('Please enter "y" or "n".\n', style="body.text")
+            console.print(msg)
             return
 
     except Exception as e:
-        print(e)
+        console.print()
+        console.print(Text(str(e), style="err"))
         return
 
     current_automatically_redirect_dict = {"automatically_redirect": updated_setting}
@@ -175,11 +111,25 @@ def update_automatically_redirect_setting():
             file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Permission denied: Unable to read/write '{user_settings_name}' at '{user_settings_path}' X")
+        msg = Text("Permission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{user_settings_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{user_settings_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+        return
     except Exception as e:
-        print(e)
+        console.print(Text(str(e), style="err"))
+        return
 
-    print(f"Updated settings: '{user_settings_name}' ✓")
+    console.print()
+    msg = Text("Updated ", style="body.text")
+    msg.append("'auto-redirect' ", style="app.primary")
+    msg.append("setting", style="body.text")
+    msg.append(" ✓", style="ok")
+    console.print(msg)
+    console.print()
 
 
 def get_automatically_redirect_setting():
@@ -292,22 +242,32 @@ def update_automatically_set_wallpaper():
     """
 
     if not check_if_user_settings_exist():
-        print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
+        msg = Text("Settings file not found: ", style="err")
+        msg.append(f"'{user_settings_name}'", style="app.primary")
+        msg.append(". Please create it first.", style="body.text")
+        console.print(msg)
         return
 
     try:
-        updated_setting = input('\nAutomatically set APOD as wallpaper? (y/n): ').strip().lower()
+        prompt = Text("\nAutomatically set APOD as wallpaper? ", style="app.secondary")
+        prompt.append("(y/n): ", style="app.primary")
+        console.print(prompt, end="")
 
-        if updated_setting == "y" or updated_setting == "yes":
+        updated_setting = input().strip().lower()
+
+        if updated_setting in ("y", "yes"):
             updated_setting = "yes"
-        elif updated_setting == "n" or updated_setting == "no":
+        elif updated_setting in ("n", "no"):
             updated_setting = "no"
         else:
-            print('Input error: Please enter "y" or "n".\n')
+            msg = Text('\nInput error: ', style="err")
+            msg.append('Please enter "y" or "n".\n', style="body.text")
+            console.print(msg)
             return
 
     except Exception as e:
-        print(e)
+        console.print()
+        console.print(Text(str(e), style="err"))
         return
 
     current_automatically_redirect_dict = get_automatically_redirect_setting()
@@ -321,8 +281,97 @@ def update_automatically_set_wallpaper():
             file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
 
     except PermissionError:
-        print(f"Permission error: Unable to read/write '{user_settings_name}' at '{user_settings_path}' X")
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{user_settings_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{user_settings_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+        return
     except Exception as e:
-        print(e)
+        console.print()
+        console.print(Text(str(e), style="err"))
+        return
 
-    print(f"Updated settings: '{user_settings_name}' ✓")
+    console.print()
+    msg = Text("Updated ", style="body.text")
+    msg.append("'auto-set-wallpaper' ", style="app.primary")
+    msg.append("setting", style="body.text")
+    msg.append(" ✓", style="ok")
+    console.print(msg)
+    console.print()
+
+
+def stylize_settings_content(t: Text) -> None:
+    """
+    Adds settings-specific styles (labels, ON/OFF, launch_count value) on top of stylize_line().
+    """
+    s = t.plain
+    if not s or not s.startswith("│"):
+        return
+
+    def is_boundary(ch: str) -> bool:
+        return ch == "" or (not ch.isalnum())
+    def stylize_substring(substr: str, style: str) -> None:
+        i = s.find(substr)
+        if i != -1:
+            t.stylize(style, i, i + len(substr))
+
+    stylize_substring("Auto-open in browser:", "app.secondary")
+    stylize_substring("Auto-set-wallpaper:", "app.secondary")
+    stylize_substring("Amount of times logged in:", "app.secondary")
+
+    start = 0
+    while True:
+        i = s.find("ON", start)
+        if i == -1:
+            break
+        left = s[i - 1] if i - 1 >= 0 else ""
+        right = s[i + 2] if i + 2 < len(s) else ""
+        if is_boundary(left) and is_boundary(right):
+            t.stylize("ok", i, i + 2)
+        start = i + 2
+
+    start = 0
+    while True:
+        i = s.find("OFF", start)
+        if i == -1:
+            break
+        left = s[i - 1] if i - 1 >= 0 else ""
+        right = s[i + 3] if i + 3 < len(s) else ""
+        if is_boundary(left) and is_boundary(right):
+            t.stylize("err", i, i + 3)
+        start = i + 3
+
+    marker = "Amount of times logged in:"
+    i = s.find(marker)
+    if i != -1:
+        j = i + len(marker)
+        while j < len(s) and s[j] == " ":
+            j += 1
+        k = j
+        while k < len(s) and s[k].isdigit():
+            k += 1
+        if k > j:
+            t.stylize("app.primary", j, k)
+
+
+def print_settings_box(settings_dict: dict) -> None:
+    auto_redirect = settings_dict.get("automatically_redirect", "no")
+    auto_wallpaper = settings_dict.get("automatically_set_wallpaper", "no")
+    launch_count = settings_dict.get("launch_count", "0")
+
+    lines = [
+        f"Auto-open in browser:       {'✓ ON' if auto_redirect == 'yes' else 'X OFF'}",
+        f"Auto-set-wallpaper:         {'✓ ON' if auto_wallpaper == 'yes' else 'X OFF'}",
+        f"Amount of times logged in:  {launch_count}",
+    ]
+
+    box_lines = build_box_lines("SETTINGS:", lines, padding_x=2)
+
+    for raw in box_lines:
+        t = Text(raw, style="body.text")
+        stylize_line(t)  # borders, title, ✓, X
+        stylize_settings_content(t)  # labels + ON/OFF + count value
+        console.print(t)

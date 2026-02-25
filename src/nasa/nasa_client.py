@@ -64,7 +64,7 @@ def get_todays_apod():
             take_user_to_browser(redirect_url)
         else:
             link = Text("\nAPOD link: ", style="body.text")
-            link.append(redirect_url, style="app.primary")
+            link.append(redirect_url, style="app.url")
             link.append("\n", style="body.text")
             console.print(link)
 
@@ -186,7 +186,7 @@ def get_apod_for_specific_day():
                         take_user_to_browser(redirect_url)
                     else:
                         link = Text("\nAPOD link: ", style="body.text")
-                        link.append(redirect_url, style="app.primary")
+                        link.append(redirect_url, style="app.url")
                         console.print(link)
 
                 elif response.status_code == 404 or response.status_code == 403:
@@ -298,7 +298,7 @@ def get_random_n_apods():
                             console.print()
                             for apod in list_of_formatted_apod_entries:
                                 link = Text("APOD link: ", style="body.text")
-                                link.append(apod["url"], style="app.primary")
+                                link.append(apod["url"], style="app.url")
                                 console.print(link)
 
                     elif response.status_code == 404 or response.status_code == 403:

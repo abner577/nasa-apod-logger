@@ -7,7 +7,7 @@ STARTUP_ARTS_THEME = Theme({
 
     # Identity
     "banner": "bold color(69)",
-    "app.primary": "dim color(69)",       # blue for app primary color
+    "app.primary": "color(69)",          # blue for app primary color
     "app.secondary": "bold color(29)",     # green for app secondary color
     "app.url": "underline color(75)",
 

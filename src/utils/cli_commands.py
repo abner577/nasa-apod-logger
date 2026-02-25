@@ -9,7 +9,7 @@ from __future__ import annotations
 import os
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Callable, Optional
 
 from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, get_all_user_settings, print_settings_box)
 
@@ -109,24 +109,22 @@ def handle_global_command(raw: str) -> bool:
         return False
 
     if match.name == CMD_HELP:
-        _show_help_modal()
+        run_plain_modal(print_help)
         return True
 
     if match.name == CMD_README:
-        run_plain_modal(_open_readme)
+        run_plain_modal(open_readme)
         return True
 
     if match.name == CMD_AUTO_REDIRECT:
         def change_auto_redirect():
             update_automatically_redirect_setting()
-            print()
 
             settings_dict = get_all_user_settings()
             if not settings_dict:
                 return
-            console.print()
+
             print_settings_box(settings_dict)
-            console.print()
 
         run_plain_modal(change_auto_redirect)
         return True
@@ -134,25 +132,18 @@ def handle_global_command(raw: str) -> bool:
     if match.name == CMD_AUTO_WALLPAPER:
         def change_auto_wallpaper():
             update_automatically_set_wallpaper()
-            print()
 
             settings_dict = get_all_user_settings()
             if not settings_dict:
                 return
-            console.print()
+
             print_settings_box(settings_dict)
-            console.print()
 
         run_plain_modal(change_auto_wallpaper)
         return True
 
     if match.name == CMD_VIEW_SETTINGS:
-        def show_settings():
-            settings_dict = get_all_user_settings()
-            if not settings_dict:
-                return
-            print_settings_box(settings_dict)
-        run_plain_modal(show_settings)
+        run_plain_modal(show_settings_modal)
         return True
 
     if match.name == CMD_QUIT:
@@ -161,25 +152,18 @@ def handle_global_command(raw: str) -> bool:
     return False
 
 
-def _open_readme() -> None:
+def open_readme() -> None:
     try:
         take_user_to_browser(README_URL)
     except Exception as e:
-        print(f"\nCould not open README: {e}\n")
+        console.print(f"\nCould not open README: {e}\n")
 
 
-def _show_help_modal() -> None:
-    clear_screen()
-    print_help()
-
-    prompt = Text("\nPress ", style="body.text")
-    prompt.append("Enter", style="app.primary")
-    prompt.append(" to return... ", style="body.text")
-
-    console.print(prompt)
-    input()
-
-    clear_screen()
+def show_settings_modal() -> None:
+    settings_dict = get_all_user_settings()
+    if not settings_dict:
+        return
+    print_settings_box(settings_dict)
 
 
 def print_help() -> None:
@@ -220,14 +204,19 @@ def print_help() -> None:
 
     console.print(Text("─" * 68, style="app.secondary"))
 
-def run_plain_modal(fn) -> None:
+def run_plain_modal(fn: Optional[Callable[[], None]] = None) -> None:
     """
-    Clear screen, run fn(), then wait for Enter and clear screen again.
-    Use this for commands that should not print into the startup screen scrollback.
+    Clear screen, run fn() (if provided), then wait for Enter and clear screen again.
     """
     clear_screen()
     try:
-        fn()
+        if fn is not None:
+            fn()
     finally:
-        input("\nPress Enter to return... ")
+        prompt = Text("\nPress ", style="body.text")
+        prompt.append("Enter", style="app.primary")
+        prompt.append(" to return... ", style="body.text")
+
+        console.print(prompt)
+        input()
         clear_screen()

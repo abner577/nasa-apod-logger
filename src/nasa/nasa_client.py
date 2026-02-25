@@ -13,6 +13,7 @@ from src.storage.csv_storage import *
 from src.storage.json_storage import *
 from src.utils.browser_utils import *
 from src.utils.data_utils import *
+from src.utils.viewer_utils import build_apod_viewer
 from src.user_settings import *
 
 load_dotenv()
@@ -56,15 +57,19 @@ def get_todays_apod():
         log_data_to_csv(apod_data)
         log_data_to_json(apod_data)
 
-        redirect_url = apod_data['url']
+        viewer_path = build_apod_viewer(apod_data)
+        redirect_url = viewer_path.as_uri()
         automatically_redirect_setting = get_automatically_redirect_setting()
 
         if automatically_redirect_setting['automatically_redirect'] == 'yes':
             console.print()
             take_user_to_browser(redirect_url)
         else:
-            link = Text("\nAPOD link: ", style="body.text")
+            link = Text("\nAPOD viewer: ", style="body.text")
             link.append(redirect_url, style="app.url")
+            link.append("\n", style="body.text")
+            link.append("Original APOD: ", style="body.text")
+            link.append(apod_data["url"], style="app.url")
             link.append("\n", style="body.text")
             console.print(link)
 
@@ -179,14 +184,18 @@ def get_apod_for_specific_day():
                     log_data_to_csv(apod_data)
                     log_data_to_json(apod_data)
 
-                    redirect_url = apod_data['url']
+                    viewer_path = build_apod_viewer(apod_data)
+                    redirect_url = viewer_path.as_uri()
                     automatically_redirect_setting = get_automatically_redirect_setting()
 
                     if automatically_redirect_setting['automatically_redirect'] == 'yes':
                         take_user_to_browser(redirect_url)
                     else:
-                        link = Text("\nAPOD link: ", style="body.text")
+                        link = Text("\nAPOD viewer: ", style="body.text")
                         link.append(redirect_url, style="app.url")
+                        link.append("\n", style="body.text")
+                        link.append("Original APOD: ", style="body.text")
+                        link.append(apod_data["url"], style="app.url")
                         console.print(link)
 
                 elif response.status_code == 404 or response.status_code == 403:
@@ -263,6 +272,7 @@ def get_random_n_apods():
                     response = requests.get(full_url)
 
                     list_of_formatted_apod_entries = []
+                    list_of_viewer_paths = []
                     list_of_unformatted_apod_entries = []
 
                     if response.status_code == 200:
@@ -278,6 +288,7 @@ def get_random_n_apods():
                         for apod in list_of_unformatted_apod_entries:
                             apod = format_apod_data(apod)
                             list_of_formatted_apod_entries.append(apod)
+                            list_of_viewer_paths.append(build_apod_viewer(apod))
 
                         if not check_if_data_exists():
                             msg = Text("Data directory not found. Creating it now...\n", style="body.text")
@@ -291,13 +302,16 @@ def get_random_n_apods():
                         automatically_redirect_setting = get_automatically_redirect_setting()
 
                         if automatically_redirect_setting['automatically_redirect'] == 'yes':
-                            for apod in list_of_formatted_apod_entries:
-                                redirect_url = apod['url']
+                            for viewer_path in list_of_viewer_paths:
+                                redirect_url = viewer_path.as_uri()
                                 take_user_to_browser(redirect_url)
                         else:
                             console.print()
-                            for apod in list_of_formatted_apod_entries:
-                                link = Text("APOD link: ", style="body.text")
+                            for apod, viewer_path in zip(list_of_formatted_apod_entries, list_of_viewer_paths):
+                                link = Text("APOD viewer: ", style="body.text")
+                                link.append(viewer_path.as_uri(), style="app.url")
+                                link.append("\n", style="body.text")
+                                link.append("Original APOD: ", style="body.text")
                                 link.append(apod["url"], style="app.url")
                                 console.print(link)
 

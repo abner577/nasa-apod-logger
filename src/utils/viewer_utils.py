@@ -1,5 +1,6 @@
 import html
 from pathlib import Path
+import os
 
 from src.config import DATA_DIR
 
@@ -13,6 +14,33 @@ Utilities for generating local HTML viewer pages for APOD entries.
 def _is_image_url(url: str) -> bool:
     lower = url.lower()
     return lower.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp"))
+
+
+def _is_wsl() -> bool:
+    try:
+        return "microsoft" in os.uname().release.lower() or "wsl" in os.uname().release.lower()
+    except AttributeError:
+        return False
+
+
+def _wsl_file_uri_to_windows(uri: str) -> str:
+    prefix = "file:///mnt/"
+    if not uri.startswith(prefix) or len(uri) <= len(prefix):
+        return uri
+
+    drive_letter = uri[len(prefix)]
+    if drive_letter < "a" or drive_letter > "z":
+        return uri
+
+    rest = uri[len(prefix) + 1:]
+    return f"file:///{drive_letter.upper()}:{rest}"
+
+
+def viewer_path_to_uri(path: Path) -> str:
+    uri = path.as_uri()
+    if _is_wsl():
+        return _wsl_file_uri_to_windows(uri)
+    return uri
 
 
 def build_apod_viewer(apod: dict) -> Path:

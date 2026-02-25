@@ -7,6 +7,8 @@ Includes test payloads for when NASA APOD API is down.
 
 import datetime
 
+from src.utils.viewer_utils import build_apod_viewer, viewer_path_to_uri
+
 TEST_DATA = {'resource': {
         'image_set': "apod"
     },
@@ -96,7 +98,7 @@ TEST_DATA7 =  {
     "url": "https://apod.nasa.gov/apod/image/9701/galcen_msx.jpg"
   }
 
-def format_apod_data(apod_data):
+def format_apod_data(apod_data, build_viewer: bool = True):
     """
       Format raw APOD API data into a normalized snapshot structure.
 
@@ -120,15 +122,31 @@ def format_apod_data(apod_data):
     title = apod_data["title"].strip()
     url = apod_data["url"].strip()
 
-    dict_to_return = {'date': date, 'title': title, 'url': url,
-                      'explanation': explanation, 'logged_at': cur_time}
+    if build_viewer:
+        viewer_path = build_apod_viewer({
+            "date": date,
+            "title": title,
+            "url": url,
+            "explanation": explanation,
+        })
+        url_to_store = viewer_path_to_uri(viewer_path)
+    else:
+        url_to_store = url
+
+    dict_to_return = {
+        'date': date,
+        'title': title,
+        'url': url_to_store,
+        'explanation': explanation,
+        'logged_at': cur_time,
+    }
 
     return dict_to_return
 
-FORMATTED_TEST_DATA = format_apod_data(TEST_DATA)
-FORMATTED_TEST_DATA2 = format_apod_data(TEST_DATA2)
-FORMATTED_TEST_DATA3 = format_apod_data(TEST_DATA3)
-FORMATTED_TEST_DATA4 = format_apod_data(TEST_DATA4)
-FORMATTED_TEST_DATA5 = format_apod_data(TEST_DATA5)
-FORMATTED_TEST_DATA6 = format_apod_data(TEST_DATA6)
-FORMATTED_TEST_DATA7 = format_apod_data(TEST_DATA7)
+FORMATTED_TEST_DATA = format_apod_data(TEST_DATA, build_viewer=False)
+FORMATTED_TEST_DATA2 = format_apod_data(TEST_DATA2, build_viewer=False)
+FORMATTED_TEST_DATA3 = format_apod_data(TEST_DATA3, build_viewer=False)
+FORMATTED_TEST_DATA4 = format_apod_data(TEST_DATA4, build_viewer=False)
+FORMATTED_TEST_DATA5 = format_apod_data(TEST_DATA5, build_viewer=False)
+FORMATTED_TEST_DATA6 = format_apod_data(TEST_DATA6, build_viewer=False)
+FORMATTED_TEST_DATA7 = format_apod_data(TEST_DATA7, build_viewer=False)

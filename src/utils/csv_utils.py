@@ -8,7 +8,7 @@ Includes duplicate detection, file checks, and display formatting.
 import csv
 
 from pathlib import Path
-from src.config import csv_file_path, csv_file_name
+from src.config import csv_file_path, csv_file_name, DATA_DIR
 from rich.text import Text
 from src.startup.console import console
 
@@ -57,6 +57,10 @@ def clear_csv_output_file():
 
     try:
         with open(file=csv_file_path, mode='w', encoding='utf-8') as csv_file:
+            viewer_dir = DATA_DIR / "viewer"
+            if viewer_dir.exists() and viewer_dir.is_dir():
+                for html_file in viewer_dir.glob("*.html"):
+                    html_file.unlink()
             return True
 
     except PermissionError:
@@ -189,11 +193,16 @@ def format_raw_csv_entry(formatted_csv_entry, count):
 
     console.print("─" * 60, style="app.secondary")
     print(f"Entry #{count + 1} ({formatted_csv_entry[1]}):")
-    print(f"Date: {formatted_csv_entry[0]}\n"
-          f"Title: {formatted_csv_entry[1]}\n"
-          f"Url: {formatted_csv_entry[2]}\n"
-          f"Explanation: {formatted_csv_entry[3]}\n"
-          f"Logged_At: {formatted_csv_entry[4]}")
+    line = Text()
+    line.append(f"Entry #{count + 1} ({formatted_csv_entry[1]}):\n", style="app.primary")
+    line.append(f"Date: {formatted_csv_entry[0]}\n", style="body.text")
+    line.append(f"Title: {formatted_csv_entry[1]}\n", style="body.text")
+    line.append("URL: ", style="app.secondary")
+    line.append(f"{formatted_csv_entry[2]}\n", style=f"app.url link {formatted_csv_entry[2]}")
+    line.append(f"Explanation: {formatted_csv_entry[3]}\n", style="body.text")
+    line.append(f"Logged_At: {formatted_csv_entry[4]}", style="body.text")
+    console.print("â”€" * 60, style="app.secondary")
+    console.print(line)
 
 
 def get_line_count(count):

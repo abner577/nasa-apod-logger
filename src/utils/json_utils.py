@@ -8,7 +8,7 @@ Includes file checks, duplicate detection, and display formatting.
 import json
 
 from pathlib import Path
-from src.config import json_file_path, json_file_name
+from src.config import json_file_path, json_file_name, DATA_DIR
 from rich.text import Text
 from src.startup.console import console
 
@@ -48,6 +48,10 @@ def clear_json_output_file():
 
     try:
         with open(file=json_file_path, mode='w') as json_file:
+            viewer_dir = DATA_DIR / "viewer"
+            if viewer_dir.exists() and viewer_dir.is_dir():
+                for html_file in viewer_dir.glob("*.html"):
+                    html_file.unlink()
             return True
 
     except PermissionError:

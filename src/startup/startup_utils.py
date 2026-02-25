@@ -5,6 +5,7 @@ from src.utils.cli_commands import handle_global_command, clear_screen
 from src.startup.startup_art import *
 import random
 from src.startup.console import console
+from src.utils.box_utils import build_box_lines, stylize_line
 
 from rich.text import Text
 
@@ -255,8 +256,11 @@ def user_settings_menu():
 
         match user_choice:
             case 1:
+                console.print()
                 settings_dict = get_all_user_settings()
-                format_all_user_settings(settings_dict)
+                if settings_dict:
+                    print_settings_box(settings_dict)
+                console.print()
             case 2:
                 update_automatically_redirect_setting()
             case 3:
@@ -268,52 +272,6 @@ def user_settings_menu():
                 msg.append("Please enter a number from 1 to 4.\n", style="body.text")
                 console.print(msg)
 
-
-def print_box(title: str, lines: list[str], padding_x: int = 2) -> None:
-    """
-    Prints a clean Unicode box around a section.
-    """
-
-    # Compute inner width
-    max_line_len = max((len(line) for line in lines), default=0)
-    inner_width = max_line_len + (padding_x * 2)
-
-    # Build top border with title
-    title_str = f" {title} "
-    if len(title_str) > inner_width:
-        inner_width = len(title_str)
-
-    # Top
-    left_top = "┌"
-    right_top = "┐"
-    horiz = "─"
-
-    remaining = inner_width - len(title_str)
-    left_run = remaining // 2
-    right_run = remaining - left_run
-    top = f"{left_top}{horiz * left_run}{title_str}{horiz * right_run}{right_top}"
-
-    # Sides of box
-    side = "│"
-    mid_lines = []
-    for line in lines:
-        space = inner_width - len(line)
-        left_pad = " " * padding_x
-        right_pad = " " * (space - padding_x) if space >= padding_x else ""
-        if len(line) > inner_width:
-            mid_lines.append(f"{side}{left_pad}{line}{side}")
-        else:
-            mid_lines.append(f"{side}{left_pad}{line}{right_pad}{side}")
-
-    # Bottom
-    left_bot = "└"
-    right_bot = "┘"
-    bottom = f"{left_bot}{horiz * inner_width}{right_bot}"
-
-    print(top)
-    for m in mid_lines:
-        print(m)
-    print(bottom)
 
 def print_startup():
     # Header
@@ -336,16 +294,6 @@ def print_startup():
         gap=6,
         padding_x=2,
     )
-
-    # Alternate startup screen version
-    # print_box("Startup Checks:", checks_lines)
-    # print()
-    #
-    # print("Version: 1.0.0\n")
-    #
-    # print("Tips for getting started:")
-    # for tip in startup_tips_lines():
-    #     print(f"> {tip}")
 
     console.print()
     console.print("─" * 90, style="app.secondary")
@@ -432,58 +380,6 @@ def run_startup_checks() -> list[str]:
     ]
 
 
-def stylize_line(text: Text) -> None:
-    """
-    Single-pass stylizer for any line in the startup boxes.
-    """
-
-    s = text.plain
-    if not s:
-        return
-
-    border_chars = {"┌", "┐", "└", "┘", "│", "─"}
-
-    def is_boundary(ch: str) -> bool:
-        return ch == "" or (not ch.isalnum())
-
-    stripped = s.lstrip()
-
-    if stripped.startswith(("┌", "└")):
-        text.stylize("app.primary", 0, len(s))
-
-        for title in (" STARTUP CHECKS: ", " QUICK INFO: "):
-            start = s.find(title)
-            if start != -1:
-                text.stylize("app.primary", start, start + len(title))
-
-    # 2️Style individual characters
-    for idx, ch in enumerate(s):
-        if ch in border_chars:
-            text.stylize("app.primary", idx, idx + 1)
-        elif ch == "✓":
-            text.stylize("ok", idx, idx + 1)
-
-    # 'X' coloring
-    for idx, ch in enumerate(s):
-        if ch != "X":
-            continue
-
-        left = s[idx - 1] if idx - 1 >= 0 else ""
-        right = s[idx + 1] if idx + 1 < len(s) else ""
-
-        if is_boundary(left) and is_boundary(right):
-            text.stylize("err", idx, idx + 1)
-
-    # /help highlighting
-    start = 0
-    while True:
-        i = s.find("/help", start)
-        if i == -1:
-            break
-        text.stylize("app.primary", i, i + 5)
-        start = i + 5
-
-
 def print_startup_info_two_column_boxed_right(
     checks_title: str,
     checks_lines: list[str],
@@ -498,49 +394,15 @@ def print_startup_info_two_column_boxed_right(
     Right: boxed panel containing Version + Tips.
     """
 
-    def _build_box_lines(title: str, lines: list[str], padding_x_local: int) -> list[str]:
-        max_line_len = max((len(line) for line in lines), default=0)
-        inner_width = max_line_len + (padding_x_local * 2)
-
-        title_str = f" {title} "
-        if len(title_str) > inner_width:
-            inner_width = len(title_str)
-
-        left_top = "┌"
-        right_top = "┐"
-        horiz = "─"
-
-        remaining = inner_width - len(title_str)
-        left_run = remaining // 2
-        right_run = remaining - left_run
-        top = f"{left_top}{horiz * left_run}{title_str}{horiz * right_run}{right_top}"
-
-        side = "│"
-        mid_lines = []
-        for line in lines:
-            space = inner_width - len(line)
-            left_pad = " " * padding_x_local
-            right_pad = " " * (space - padding_x_local) if space >= padding_x_local else ""
-            if len(line) > inner_width:
-                mid_lines.append(f"{side}{left_pad}{line}{side}")
-            else:
-                mid_lines.append(f"{side}{left_pad}{line}{right_pad}{side}")
-
-        left_bot = "└"
-        right_bot = "┘"
-        bottom = f"{left_bot}{horiz * inner_width}{right_bot}"
-
-        return [top] + mid_lines + [bottom]
-
     # Left box
-    left_box_lines = _build_box_lines(checks_title, checks_lines, padding_x)
+    left_box_lines = build_box_lines(checks_title, checks_lines, padding_x)
 
     # Right box
     right_content: list[str] = [version_str, "", "Tips for getting started:"]
     for tip in tips_lines:
         right_content.append(f"> {tip}")
 
-    right_box_lines = _build_box_lines(right_title, right_content, padding_x)
+    right_box_lines = build_box_lines(right_title, right_content, padding_x)
 
     left_width = len(left_box_lines[0]) if left_box_lines else 0
     right_width = len(right_box_lines[0]) if right_box_lines else 0

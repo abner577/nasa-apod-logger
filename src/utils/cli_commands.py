@@ -11,7 +11,7 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
-from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, get_all_user_settings, format_all_user_settings)
+from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, get_all_user_settings, print_settings_box)
 
 from src.utils.browser_utils import take_user_to_browser
 from src.config import README_URL
@@ -122,7 +122,11 @@ def handle_global_command(raw: str) -> bool:
             print()
 
             settings_dict = get_all_user_settings()
-            format_all_user_settings(settings_dict)
+            if not settings_dict:
+                return
+            console.print()
+            print_settings_box(settings_dict)
+            console.print()
 
         run_plain_modal(change_auto_redirect)
         return True
@@ -133,7 +137,11 @@ def handle_global_command(raw: str) -> bool:
             print()
 
             settings_dict = get_all_user_settings()
-            format_all_user_settings(settings_dict)
+            if not settings_dict:
+                return
+            console.print()
+            print_settings_box(settings_dict)
+            console.print()
 
         run_plain_modal(change_auto_wallpaper)
         return True
@@ -141,7 +149,9 @@ def handle_global_command(raw: str) -> bool:
     if match.name == CMD_VIEW_SETTINGS:
         def show_settings():
             settings_dict = get_all_user_settings()
-            format_all_user_settings(settings_dict)
+            if not settings_dict:
+                return
+            print_settings_box(settings_dict)
         run_plain_modal(show_settings)
         return True
 

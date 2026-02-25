@@ -37,7 +37,7 @@ def log_data_to_csv(formatted_apod_data):
             writer = csv.DictWriter(csv_file, fieldnames=formatted_apod_data.keys())
             writer.writerow(formatted_apod_data)
 
-            msg = Text("Saved: ", style="ok")
+            msg = Text("Saved: ", style="app.secondary")
             msg.append("APOD ", style="body.text")
             msg.append(f"'{formatted_apod_data['date']}'", style="app.primary")
             msg.append(" -> ", style="body.text")

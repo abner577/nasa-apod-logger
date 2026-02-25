@@ -36,7 +36,7 @@ def log_data_to_json(formatted_apod_data):
             # Need to use .dumps to write JSON as a string
             json_file.write(json.dumps(formatted_apod_data, ensure_ascii=False) + "\n")
 
-            msg = Text("Saved: ", style="ok")
+            msg = Text("Saved: ", style="app.secondary")
             msg.append("APOD ", style="body.text")
             msg.append(f"'{formatted_apod_data['date']}'", style="app.primary")
             msg.append(" -> ", style="body.text")

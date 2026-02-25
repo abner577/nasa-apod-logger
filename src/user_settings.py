@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 from src.config import user_settings_path, user_settings_name
+from src.startup.console import console
+from rich.text import Text
+from src.utils.box_utils import build_box_lines, stylize_line
 
 initial_automatically_redirect_dict = {
     "automatically_redirect": "yes"
@@ -66,20 +69,78 @@ def get_all_user_settings():
     return None
 
 
-def format_all_user_settings(settings_dict):
-   print("Settings:")
+def stylize_settings_content(t: Text) -> None:
+    """
+    Adds settings-specific styles (labels, ON/OFF, launch_count value) on top of stylize_line().
+    """
+    s = t.plain
+    if not s or not s.startswith("│"):
+        return
 
-   if settings_dict['automatically_redirect'] == 'yes':
-    print(f"Auto-open in browser: ✓ ON")
-   else:
-    print(f"Auto-open in browser: X OFF")
+    def is_boundary(ch: str) -> bool:
+        return ch == "" or (not ch.isalnum())
+    def stylize_substring(substr: str, style: str) -> None:
+        i = s.find(substr)
+        if i != -1:
+            t.stylize(style, i, i + len(substr))
 
-   if settings_dict['automatically_set_wallpaper'] == 'yes':
-    print(f"Auto-set-wallpaper: ✓ ON")
-   else:
-    print(f"Auto-set-wallpaper: X OFF")
+    stylize_substring("Auto-open in browser:", "app.secondary")
+    stylize_substring("Auto-set-wallpaper:", "app.secondary")
+    stylize_substring("Amount of times logged in:", "app.secondary")
 
-   print(f"Amount of times logged in: {settings_dict['launch_count']}")
+    start = 0
+    while True:
+        i = s.find("ON", start)
+        if i == -1:
+            break
+        left = s[i - 1] if i - 1 >= 0 else ""
+        right = s[i + 2] if i + 2 < len(s) else ""
+        if is_boundary(left) and is_boundary(right):
+            t.stylize("ok", i, i + 2)
+        start = i + 2
+
+    start = 0
+    while True:
+        i = s.find("OFF", start)
+        if i == -1:
+            break
+        left = s[i - 1] if i - 1 >= 0 else ""
+        right = s[i + 3] if i + 3 < len(s) else ""
+        if is_boundary(left) and is_boundary(right):
+            t.stylize("err", i, i + 3)
+        start = i + 3
+
+    marker = "Amount of times logged in:"
+    i = s.find(marker)
+    if i != -1:
+        j = i + len(marker)
+        while j < len(s) and s[j] == " ":
+            j += 1
+        k = j
+        while k < len(s) and s[k].isdigit():
+            k += 1
+        if k > j:
+            t.stylize("app.primary", j, k)
+
+
+def print_settings_box(settings_dict: dict) -> None:
+    auto_redirect = settings_dict.get("automatically_redirect", "no")
+    auto_wallpaper = settings_dict.get("automatically_set_wallpaper", "no")
+    launch_count = settings_dict.get("launch_count", "0")
+
+    lines = [
+        f"Auto-open in browser:       {'✓ ON' if auto_redirect == 'yes' else 'X OFF'}",
+        f"Auto-set-wallpaper:         {'✓ ON' if auto_wallpaper == 'yes' else 'X OFF'}",
+        f"Amount of times logged in:  {launch_count}",
+    ]
+
+    box_lines = build_box_lines("SETTINGS:", lines, padding_x=2)
+
+    for raw in box_lines:
+        t = Text(raw, style="body.text")
+        stylize_line(t)  # borders, title, ✓, X
+        stylize_settings_content(t)  # labels + ON/OFF + count value
+        console.print(t)
 
 
 # when we update, we need to write back all the other settings as well

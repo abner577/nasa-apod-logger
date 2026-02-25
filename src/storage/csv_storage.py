@@ -7,7 +7,7 @@ Responsible for creating, writing, reading, and rewriting the CSV log.
 
 from src.utils.csv_utils import *
 from src.utils.data_utils import *
-from src.config import csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY
+from src.config import csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY, DATA_DIR
 from src.nasa.nasa_date import check_valid_nasa_date
 from rich.text import Text
 from src.startup.console import console
@@ -269,6 +269,8 @@ def delete_one_csv_entry(target_date):
     """
 
     entries_to_keep = []
+    viewer_filename = f"apod-{target_date}.html"
+    viewer_path = (DATA_DIR / "viewer" / viewer_filename)
 
     if not check_if_csv_output_exists():
         return False
@@ -295,6 +297,9 @@ def delete_one_csv_entry(target_date):
 
             writer.writeheader()
             writer.writerows(entries_to_keep)
+
+        if viewer_path.exists() and viewer_path.is_file():
+            viewer_path.unlink()
 
         return True
 

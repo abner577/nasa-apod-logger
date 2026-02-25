@@ -8,7 +8,7 @@ Responsible for creating, writing, reading, and rewriting the JSONL log.
 from src.utils.json_utils import *
 from src.utils.data_utils import *
 from src.nasa.nasa_date import check_valid_nasa_date
-from src.config import json_file_path, json_file_name, NASA_APOD_START_DATE, DATE_TODAY
+from src.config import json_file_path, json_file_name, NASA_APOD_START_DATE, DATE_TODAY, DATA_DIR
 from rich.text import Text
 from src.startup.console import console
 
@@ -306,6 +306,8 @@ def delete_one_json_entry(target_date):
     """
 
     entries_to_keep = []
+    viewer_filename = f"apod-{target_date}.html"
+    viewer_path = (DATA_DIR / "viewer" / viewer_filename)
 
     if not check_if_json_output_exists():
         return False
@@ -335,6 +337,9 @@ def delete_one_json_entry(target_date):
             with open(file=json_file_path, mode='w') as file:
                 for entry in entries_to_keep:
                     file.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+            if viewer_path.exists() and viewer_path.is_file():
+                viewer_path.unlink()
 
             return True
 
@@ -391,7 +396,6 @@ def fetch_most_recent_json_apod():
                 console.print(Text("\nNo entries found.\n", style="body.text"))
                 return
 
-            most_recent_apod = format_apod_data(most_recent_apod)
             console.print()
             format_raw_jsonl_entry(most_recent_apod, 0)
             console.print()
@@ -450,7 +454,6 @@ def fetch_oldest_json_apod():
                 console.print(Text("\nNo entries found.\n", style="body.text"))
                 return
 
-            oldest_apod = format_apod_data(oldest_apod)
             console.print()
             format_raw_jsonl_entry(oldest_apod, 0)
             console.print()

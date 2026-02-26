@@ -217,16 +217,20 @@ def user_settings_menu():
         line1 = Text("[1] ", style="app.secondary")
         line1.append("View settings", style="app.primary")
         line1.append("                  ", style="body.text")
-        line1.append("[3] ", style="app.secondary")
-        line1.append("Change auto-set-wallpaper setting", style="app.primary")
+        line1.append("[4] ", style="app.secondary")
+        line1.append("Change auto-save-apod-files setting", style="app.primary")
         console.print(line1)
 
         line2 = Text("[2] ", style="app.secondary")
         line2.append("Change auto-redirect setting", style="app.primary")
-        line2.append("   ", style="body.text")
-        line2.append("[4] ", style="app.secondary")
+        line2.append("        ", style="body.text")
+        line2.append("[5] ", style="app.secondary")
         line2.append("Return to Main Menu", style="app.primary")
         console.print(line2)
+
+        line3 = Text("[3] ", style="app.secondary")
+        line3.append("Change auto-set-wallpaper setting", style="app.primary")
+        console.print(line3)
 
         console.print()
         console.print("Option: ", style="app.primary", end="")
@@ -245,7 +249,7 @@ def user_settings_menu():
 
         except ValueError:
             msg = Text("\nInput error: ", style="err")
-            msg.append("Please enter a number from 1 to 4.\n", style="body.text")
+            msg.append("Please enter a number from 1 to 5.\n", style="body.text")
             console.print(msg)
             continue
 
@@ -266,10 +270,12 @@ def user_settings_menu():
             case 3:
                 update_automatically_set_wallpaper()
             case 4:
+                update_automatically_save_apod_files_setting()
+            case 5:
                 flag = False
             case _:
                 msg = Text("\nInput error: ", style="err")
-                msg.append("Please enter a number from 1 to 4.\n", style="body.text")
+                msg.append("Please enter a number from 1 to 5.\n", style="body.text")
                 console.print(msg)
 
 
@@ -359,6 +365,7 @@ def run_startup_checks() -> list[str]:
     settings_dict = get_all_user_settings()
     automatically_redirect_setting = settings_dict["automatically_redirect"]
     automatically_set_wallpaper_setting = settings_dict["automatically_set_wallpaper"]
+    automatically_save_apod_files_setting = settings_dict["automatically_save_apod_files"]
 
     if automatically_redirect_setting == 'yes':
         automatically_redirect_setting_message = f"Auto-open in browser  ✓ ON"
@@ -370,6 +377,11 @@ def run_startup_checks() -> list[str]:
     else:
         automatically_set_wallpaper_setting_message = f"Auto-set-wallpaper    X OFF"
 
+    if automatically_save_apod_files_setting == 'yes':
+        automatically_save_apod_files_message = f"Auto-save APOD files  ✓ ON"
+    else:
+        automatically_save_apod_files_message = f"Auto-save APOD files  X OFF"
+
     return [
         f"Data directory        ✓ {data_dir_status}",
         f"JSONL log             ✓ {json_status}",
@@ -377,6 +389,7 @@ def run_startup_checks() -> list[str]:
         f"User settings         ✓ {settings_status}",
         automatically_redirect_setting_message,
         automatically_set_wallpaper_setting_message,
+        automatically_save_apod_files_message,
     ]
 
 

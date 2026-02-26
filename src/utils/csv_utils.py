@@ -18,6 +18,7 @@ HEADERS = {
     "url": "",
     "explanation": "",
     "logged_at": "",
+    "local_file_path": "",
 }
 
 
@@ -200,7 +201,10 @@ def format_raw_csv_entry(formatted_csv_entry, count):
     line.append("URL: ", style="app.secondary")
     line.append(f"{formatted_csv_entry[2]}\n", style=f"app.url link {formatted_csv_entry[2]}")
     line.append(f"Explanation: {formatted_csv_entry[3]}\n", style="body.text")
-    line.append(f"Logged_At: {formatted_csv_entry[4]}", style="body.text")
+    local_file_path = formatted_csv_entry[5] if len(formatted_csv_entry) > 5 else ""
+    line.append(f"Logged_At: {formatted_csv_entry[4]}\n", style="body.text")
+    line.append("Local file path: ", style="app.secondary")
+    line.append(f"{local_file_path}", style="body.text")
     console.print("â”€" * 60, style="app.secondary")
     console.print(line)
 

@@ -1,9 +1,12 @@
 import json
 from pathlib import Path
-from src.config import user_settings_path, user_settings_name
-from src.startup.console import console
+
 from rich.text import Text
+
+from src.config import user_settings_name, user_settings_path
+from src.startup.console import console
 from src.utils.box_utils import build_box_lines, stylize_line
+
 
 initial_automatically_redirect_dict = {
     "automatically_redirect": "yes"
@@ -16,6 +19,27 @@ initial_launch_count_dict = {
 initial_automatically_set_wallpaper_dict = {
     "automatically_set_wallpaper": "no"
 }
+
+initial_automatically_save_apod_files_dict = {
+    "automatically_save_apod_files": "no"
+}
+
+
+def _normalize_and_persist_settings(settings_dict: dict) -> dict:
+    normalized_settings = {
+        "automatically_redirect": settings_dict.get("automatically_redirect", "yes"),
+        "launch_count": settings_dict.get("launch_count", "0"),
+        "automatically_set_wallpaper": settings_dict.get("automatically_set_wallpaper", "no"),
+        "automatically_save_apod_files": settings_dict.get("automatically_save_apod_files", "no"),
+    }
+
+    with open(file=user_settings_path, mode="w", encoding="utf-8") as file:
+        file.write(json.dumps({"automatically_redirect": normalized_settings["automatically_redirect"]}, ensure_ascii=False) + "\n")
+        file.write(json.dumps({"launch_count": normalized_settings["launch_count"]}, ensure_ascii=False) + "\n")
+        file.write(json.dumps({"automatically_set_wallpaper": normalized_settings["automatically_set_wallpaper"]}, ensure_ascii=False) + "\n")
+        file.write(json.dumps({"automatically_save_apod_files": normalized_settings["automatically_save_apod_files"]}, ensure_ascii=False) + "\n")
+
+    return normalized_settings
 
 
 def check_if_user_settings_exist():
@@ -34,6 +58,7 @@ def create_user_settings():
             file.write(json.dumps(initial_automatically_redirect_dict, ensure_ascii=False) + "\n")
             file.write(json.dumps(initial_launch_count_dict, ensure_ascii=False) + "\n")
             file.write(json.dumps(initial_automatically_set_wallpaper_dict, ensure_ascii=False) + "\n")
+            file.write(json.dumps(initial_automatically_save_apod_files_dict, ensure_ascii=False) + "\n")
 
     except PermissionError:
         print(f"Permission error: Unable to write '{user_settings_name}' at '{user_settings_path}' X")
@@ -55,11 +80,10 @@ def get_all_user_settings():
             for line in file:
                 if not line:
                     continue
-
                 content = json.loads(line)
                 settings_dict.update(content)
 
-            return settings_dict
+        return _normalize_and_persist_settings(settings_dict)
 
     except PermissionError:
         print(f"Permission error: Unable to read '{user_settings_name}' at '{user_settings_path}' X")
@@ -69,7 +93,29 @@ def get_all_user_settings():
     return None
 
 
-# when we update, we need to write back all the other settings as well
+def _prompt_yes_no(prompt_text: str) -> str | None:
+    try:
+        prompt = Text(f"\n{prompt_text} ", style="app.secondary")
+        prompt.append("(y/n): ", style="app.primary")
+        console.print(prompt, end="")
+
+        updated_setting = input().strip().lower()
+        if updated_setting in ("y", "yes"):
+            return "yes"
+        if updated_setting in ("n", "no"):
+            return "no"
+
+        msg = Text("\nInput error: ", style="err")
+        msg.append('Please enter "y" or "n".\n', style="body.text")
+        console.print(msg)
+        return None
+
+    except Exception as e:
+        console.print()
+        console.print(Text(str(e), style="err"))
+        return None
+
+
 def update_automatically_redirect_setting():
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
@@ -78,38 +124,18 @@ def update_automatically_redirect_setting():
         console.print(msg)
         return
 
-    try:
-        prompt = Text("\nAuto-open APOD links in your browser? ", style="app.secondary")
-        prompt.append("(y/n): ", style="app.primary")
-        console.print(prompt, end="")
-
-        updated_setting = input().strip().lower()
-
-        if updated_setting == "y" or updated_setting == "yes":
-            updated_setting = "yes"
-        elif updated_setting == "n" or updated_setting == "no":
-            updated_setting = "no"
-        else:
-            msg = Text('\nInput error: ', style="err")
-            msg.append('Please enter "y" or "n".\n', style="body.text")
-            console.print(msg)
-            return
-
-    except Exception as e:
-        console.print()
-        console.print(Text(str(e), style="err"))
+    updated_setting = _prompt_yes_no("Auto-open APOD links in your browser?")
+    if updated_setting is None:
         return
 
-    current_automatically_redirect_dict = {"automatically_redirect": updated_setting}
-    current_launch_count_dict = get_launch_count()
-    current_wallpaper_dict = get_automatically_set_wallpaper()
+    settings_dict = get_all_user_settings()
+    if not settings_dict:
+        return
+
+    settings_dict["automatically_redirect"] = updated_setting
 
     try:
-        with open(file=user_settings_path, mode="w", encoding="utf-8") as file:
-            file.write(json.dumps(current_automatically_redirect_dict, ensure_ascii=False) + "\n")
-            file.write(json.dumps(current_launch_count_dict, ensure_ascii=False) + "\n")
-            file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
-
+        _normalize_and_persist_settings(settings_dict)
     except PermissionError:
         msg = Text("Permission error: ", style="err")
         msg.append("Unable to read/write ", style="body.text")
@@ -133,52 +159,23 @@ def update_automatically_redirect_setting():
 
 
 def get_automatically_redirect_setting():
-    """
-    Returns line 1 dict: {"automatically_redirect": "..."}
-    """
-    if not check_if_user_settings_exist():
-        print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
+    settings_dict = get_all_user_settings()
+    if settings_dict is None:
         return None
-
-    count = 0
-
-    try:
-        with open(file=user_settings_path, mode="r", encoding="utf-8") as file:
-            for line in file:
-                count += 1
-                content = json.loads(line)
-
-                if count == 1:
-                    return content
-
-    except PermissionError:
-        print(f"Permission error: Unable to write '{user_settings_name}' at '{user_settings_path}' X")
-    except Exception as e:
-        print(e)
-
-    return None
+    return {"automatically_redirect": settings_dict.get("automatically_redirect", "yes")}
 
 
 def increment_launch_count(current_launch_count):
-    """
-     Updates launch_count (line 2) and writes back automatically_redirect (line 1)
-     AND automatically_set_wallpaper (line 3).
-     """
     current_launch_count += 1
 
-    current_automatically_redirect_dict = get_automatically_redirect_setting() # returns user settings
-    current_wallpaper_dict = get_automatically_set_wallpaper()
+    settings_dict = get_all_user_settings()
+    if not settings_dict:
+        return
 
-    current_launch_count_dict = {
-        "launch_count": f"{current_launch_count}"
-    }
+    settings_dict["launch_count"] = f"{current_launch_count}"
 
     try:
-        with open(file=user_settings_path, mode="w", encoding="utf-8") as file:
-            file.write(json.dumps(current_automatically_redirect_dict, ensure_ascii=False) + "\n")
-            file.write(json.dumps(current_launch_count_dict, ensure_ascii=False) + "\n")
-            file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
-
+        _normalize_and_persist_settings(settings_dict)
     except PermissionError:
         print(f"Permission error: Unable to write '{user_settings_name}' at '{user_settings_path}' X")
     except Exception as e:
@@ -186,61 +183,27 @@ def increment_launch_count(current_launch_count):
 
 
 def get_launch_count():
-    """
-    Returns line 2 dict: {"launch_count": "..."}
-    """
-    count = 0
-
-    try:
-        with open(file=user_settings_path, mode="r", encoding="utf-8") as file:
-            for line in file:
-                count += 1
-                content = json.loads(line)
-                if count == 2:
-                    return content
-
-    except PermissionError:
-        print(f"Permission error: Unable to read '{user_settings_name}' at '{user_settings_path}' X")
-    except Exception as e:
-        print(e)
+    settings_dict = get_all_user_settings()
+    if settings_dict is None:
+        return None
+    return {"launch_count": settings_dict.get("launch_count", "0")}
 
 
 def get_automatically_set_wallpaper():
-    """
-       Returns line 3 dict: {"automatically_set_wallpaper": "..."}
-    """
-    if not check_if_user_settings_exist():
-        print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
+    settings_dict = get_all_user_settings()
+    if settings_dict is None:
         return None
+    return {"automatically_set_wallpaper": settings_dict.get("automatically_set_wallpaper", "no")}
 
-    count = 0
 
-    try:
-        with open(file=user_settings_path, mode="r", encoding="utf-8") as file:
-            for line in file:
-                if not line:
-                    continue
-                count += 1
-                content = json.loads(line)
-                if count == 3:
-                    return content
-
-    except PermissionError:
-        print(f"Permission error: Unable to read '{user_settings_name}' at '{user_settings_path}' X")
-    except Exception as e:
-        print(e)
-
-    # If we got here, line 3 doesn't exist yet
-    return initial_automatically_set_wallpaper_dict
+def get_automatically_save_apod_files():
+    settings_dict = get_all_user_settings()
+    if settings_dict is None:
+        return None
+    return {"automatically_save_apod_files": settings_dict.get("automatically_save_apod_files", "no")}
 
 
 def update_automatically_set_wallpaper():
-    """
-    Updates automatically_set_wallpaper (line 3) and writes back:
-    - automatically_redirect (line 1)
-    - launch_count (line 2)
-    """
-
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
         msg.append(f"'{user_settings_name}'", style="app.primary")
@@ -248,38 +211,18 @@ def update_automatically_set_wallpaper():
         console.print(msg)
         return
 
-    try:
-        prompt = Text("\nAutomatically set APOD as wallpaper? ", style="app.secondary")
-        prompt.append("(y/n): ", style="app.primary")
-        console.print(prompt, end="")
-
-        updated_setting = input().strip().lower()
-
-        if updated_setting in ("y", "yes"):
-            updated_setting = "yes"
-        elif updated_setting in ("n", "no"):
-            updated_setting = "no"
-        else:
-            msg = Text('\nInput error: ', style="err")
-            msg.append('Please enter "y" or "n".\n', style="body.text")
-            console.print(msg)
-            return
-
-    except Exception as e:
-        console.print()
-        console.print(Text(str(e), style="err"))
+    updated_setting = _prompt_yes_no("Automatically set APOD as wallpaper?")
+    if updated_setting is None:
         return
 
-    current_automatically_redirect_dict = get_automatically_redirect_setting()
-    current_launch_count_dict = get_launch_count()
-    current_wallpaper_dict = {"automatically_set_wallpaper": updated_setting}
+    settings_dict = get_all_user_settings()
+    if not settings_dict:
+        return
+
+    settings_dict["automatically_set_wallpaper"] = updated_setting
 
     try:
-        with open(file=user_settings_path, mode="w", encoding="utf-8") as file:
-            file.write(json.dumps(current_automatically_redirect_dict, ensure_ascii=False) + "\n")
-            file.write(json.dumps(current_launch_count_dict, ensure_ascii=False) + "\n")
-            file.write(json.dumps(current_wallpaper_dict, ensure_ascii=False) + "\n")
-
+        _normalize_and_persist_settings(settings_dict)
     except PermissionError:
         msg = Text("\nPermission error: ", style="err")
         msg.append("Unable to read/write ", style="body.text")
@@ -303,16 +246,57 @@ def update_automatically_set_wallpaper():
     console.print()
 
 
+def update_automatically_save_apod_files_setting():
+    if not check_if_user_settings_exist():
+        msg = Text("Settings file not found: ", style="err")
+        msg.append(f"'{user_settings_name}'", style="app.primary")
+        msg.append(". Please create it first.", style="body.text")
+        console.print(msg)
+        return
+
+    updated_setting = _prompt_yes_no("Automatically save APOD media files?")
+    if updated_setting is None:
+        return
+
+    settings_dict = get_all_user_settings()
+    if not settings_dict:
+        return
+
+    settings_dict["automatically_save_apod_files"] = updated_setting
+
+    try:
+        _normalize_and_persist_settings(settings_dict)
+    except PermissionError:
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{user_settings_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{user_settings_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+        return
+    except Exception as e:
+        console.print()
+        console.print(Text(str(e), style="err"))
+        return
+
+    console.print()
+    msg = Text("Updated ", style="body.text")
+    msg.append("'auto-save-apod-files' ", style="app.primary")
+    msg.append("setting", style="body.text")
+    msg.append(" ✓", style="ok")
+    console.print(msg)
+    console.print()
+
+
 def stylize_settings_content(t: Text) -> None:
-    """
-    Adds settings-specific styles (labels, ON/OFF, launch_count value) on top of stylize_line().
-    """
     s = t.plain
     if not s or not s.startswith("│"):
         return
 
     def is_boundary(ch: str) -> bool:
         return ch == "" or (not ch.isalnum())
+
     def stylize_substring(substr: str, style: str) -> None:
         i = s.find(substr)
         if i != -1:
@@ -320,6 +304,7 @@ def stylize_settings_content(t: Text) -> None:
 
     stylize_substring("Auto-open in browser:", "app.secondary")
     stylize_substring("Auto-set-wallpaper:", "app.secondary")
+    stylize_substring("Auto-save APOD files:", "app.secondary")
     stylize_substring("Amount of times logged in:", "app.secondary")
 
     start = 0
@@ -360,11 +345,13 @@ def stylize_settings_content(t: Text) -> None:
 def print_settings_box(settings_dict: dict) -> None:
     auto_redirect = settings_dict.get("automatically_redirect", "no")
     auto_wallpaper = settings_dict.get("automatically_set_wallpaper", "no")
+    auto_save_apod_files = settings_dict.get("automatically_save_apod_files", "no")
     launch_count = settings_dict.get("launch_count", "0")
 
     lines = [
         f"Auto-open in browser:       {'✓ ON' if auto_redirect == 'yes' else 'X OFF'}",
         f"Auto-set-wallpaper:         {'✓ ON' if auto_wallpaper == 'yes' else 'X OFF'}",
+        f"Auto-save APOD files:       {'✓ ON' if auto_save_apod_files == 'yes' else 'X OFF'}",
         f"Amount of times logged in:  {launch_count}",
     ]
 
@@ -372,6 +359,6 @@ def print_settings_box(settings_dict: dict) -> None:
 
     for raw in box_lines:
         t = Text(raw, style="body.text")
-        stylize_line(t)  # borders, title, ✓, X
-        stylize_settings_content(t)  # labels + ON/OFF + count value
+        stylize_line(t)
+        stylize_settings_content(t)
         console.print(t)

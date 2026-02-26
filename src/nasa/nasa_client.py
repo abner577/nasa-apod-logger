@@ -13,6 +13,7 @@ from src.storage.csv_storage import *
 from src.storage.json_storage import *
 from src.utils.browser_utils import *
 from src.utils.data_utils import *
+from src.utils.apod_media_utils import maybe_download_apod_file
 from src.user_settings import *
 
 load_dotenv()
@@ -44,9 +45,13 @@ def get_todays_apod():
         msg.append("\n", style="body.text")
         console.print(msg)
         # print("[DEBUG]: HTTP Response = 200")
-        apod_data = response.json()
-        apod_data = format_apod_data(apod_data)
+        apod_raw_data = response.json()
 
+        save_setting = get_automatically_save_apod_files()
+        should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
+        local_file_path = maybe_download_apod_file(apod_raw_data, should_save_file)
+
+        apod_data = format_apod_data(apod_raw_data, local_file_path=local_file_path or "")
 
         if not check_if_data_exists():
             msg = Text("Data directory not found. Creating it...\n", style="body.text")
@@ -173,8 +178,13 @@ def get_apod_for_specific_day():
                     msg.append("\n", style="body.text")
                     console.print(msg)
                     # print("[DEBUG]: HTTP Response = 200")
-                    apod_data = response.json()
-                    apod_data = format_apod_data(apod_data)
+                    apod_raw_data = response.json()
+
+                    save_setting = get_automatically_save_apod_files()
+                    should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
+                    local_file_path = maybe_download_apod_file(apod_raw_data, should_save_file)
+
+                    apod_data = format_apod_data(apod_raw_data, local_file_path=local_file_path or "")
 
                     log_data_to_csv(apod_data)
                     log_data_to_json(apod_data)
@@ -275,8 +285,13 @@ def get_random_n_apods():
 
                         # print("[DEBUG]: HTTP Response = 200")
                         list_of_unformatted_apod_entries = response.json()
+
+                        save_setting = get_automatically_save_apod_files()
+                        should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
+
                         for apod in list_of_unformatted_apod_entries:
-                            apod = format_apod_data(apod)
+                            local_file_path = maybe_download_apod_file(apod, should_save_file)
+                            apod = format_apod_data(apod, local_file_path=local_file_path or "")
                             list_of_formatted_apod_entries.append(apod)
 
                         if not check_if_data_exists():

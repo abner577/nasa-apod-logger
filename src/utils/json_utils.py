@@ -206,6 +206,7 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
     url = formatted_jsonl_entry["url"]
     explanation = formatted_jsonl_entry["explanation"]
     logged_at = formatted_jsonl_entry["logged_at"]
+    local_file_path = formatted_jsonl_entry.get("local_file_path", "")
 
     header = Text(f"Entry #{entry_number} ({title}):\n", style="app.primary")
     console.print(header)
@@ -230,5 +231,9 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
     # Logged at
     line.append("Logged at: ", style="app.secondary")
     line.append(f"{logged_at}\n", style="body.text")
+
+    # Local file path
+    line.append("Local file path: ", style="app.secondary")
+    line.append(f"{local_file_path}\n", style="body.text")
 
     console.print(line)

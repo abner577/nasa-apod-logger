@@ -13,6 +13,7 @@ from src.storage.csv_storage import *
 from src.storage.json_storage import *
 from src.utils.browser_utils import *
 from src.utils.data_utils import *
+from src.utils.apod_media_utils import maybe_download_apod_file
 from src.user_settings import *
 
 load_dotenv()
@@ -44,9 +45,12 @@ def get_todays_apod():
         msg.append("\n", style="body.text")
         console.print(msg)
         # print("[DEBUG]: HTTP Response = 200")
-        apod_data = response.json()
-        apod_data = format_apod_data(apod_data)
+        apod_raw_data = response.json()
 
+        save_setting = get_automatically_save_apod_files()
+        should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
+
+        apod_data = format_apod_data(apod_raw_data, local_file_path="")
 
         if not check_if_data_exists():
             msg = Text("Data directory not found. Creating it...\n", style="body.text")
@@ -67,6 +71,13 @@ def get_todays_apod():
             link.append(redirect_url, style="app.url")
             link.append("\n", style="body.text")
             console.print(link)
+
+
+        if should_save_file:
+            local_file_path = maybe_download_apod_file(apod_raw_data, True)
+            if local_file_path:
+                update_local_file_path_in_csv(apod_data['date'], local_file_path)
+                update_local_file_path_in_json(apod_data['date'], local_file_path)
 
     elif response.status_code == 404 or response.status_code == 403:
         msg = Text("\nRequest error: ", style="err")
@@ -173,8 +184,12 @@ def get_apod_for_specific_day():
                     msg.append("\n", style="body.text")
                     console.print(msg)
                     # print("[DEBUG]: HTTP Response = 200")
-                    apod_data = response.json()
-                    apod_data = format_apod_data(apod_data)
+                    apod_raw_data = response.json()
+
+                    save_setting = get_automatically_save_apod_files()
+                    should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
+
+                    apod_data = format_apod_data(apod_raw_data, local_file_path="")
 
                     log_data_to_csv(apod_data)
                     log_data_to_json(apod_data)
@@ -188,6 +203,12 @@ def get_apod_for_specific_day():
                         link = Text("\nAPOD link: ", style="body.text")
                         link.append(redirect_url, style="app.url")
                         console.print(link)
+
+                    if should_save_file:
+                        local_file_path = maybe_download_apod_file(apod_raw_data, True)
+                        if local_file_path:
+                            update_local_file_path_in_csv(apod_data['date'], local_file_path)
+                            update_local_file_path_in_json(apod_data['date'], local_file_path)
 
                 elif response.status_code == 404 or response.status_code == 403:
                     msg = Text("\nRequest error: ", style="err")
@@ -275,8 +296,12 @@ def get_random_n_apods():
 
                         # print("[DEBUG]: HTTP Response = 200")
                         list_of_unformatted_apod_entries = response.json()
+
+                        save_setting = get_automatically_save_apod_files()
+                        should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
+
                         for apod in list_of_unformatted_apod_entries:
-                            apod = format_apod_data(apod)
+                            apod = format_apod_data(apod, local_file_path="")
                             list_of_formatted_apod_entries.append(apod)
 
                         if not check_if_data_exists():
@@ -300,6 +325,13 @@ def get_random_n_apods():
                                 link = Text("APOD link: ", style="body.text")
                                 link.append(apod["url"], style="app.url")
                                 console.print(link)
+
+                        if should_save_file:
+                            for apod_raw in list_of_unformatted_apod_entries:
+                                local_file_path = maybe_download_apod_file(apod_raw, True)
+                                if local_file_path:
+                                    update_local_file_path_in_csv(apod_raw['date'], local_file_path)
+                                    update_local_file_path_in_json(apod_raw['date'], local_file_path)
 
                     elif response.status_code == 404 or response.status_code == 403:
                         msg = Text("\nRequest error: ", style="err")

@@ -11,7 +11,13 @@ import os
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from src.user_settings import (update_automatically_redirect_setting, update_automatically_set_wallpaper, get_all_user_settings, print_settings_box)
+from src.user_settings import (
+    update_automatically_redirect_setting,
+    update_automatically_set_wallpaper,
+    update_automatically_save_apod_files_setting,
+    get_all_user_settings,
+    print_settings_box,
+)
 
 from src.utils.browser_utils import take_user_to_browser
 from src.config import README_URL
@@ -32,6 +38,7 @@ CMD_QUIT = "quit"
 CMD_AUTO_REDIRECT = "auto_redirect"
 CMD_AUTO_WALLPAPER = "auto_wallpaper"
 CMD_VIEW_SETTINGS = "settings"
+CMD_AUTO_SAVE = "auto_save"
 
 
 def clear_screen() -> None:
@@ -60,6 +67,7 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
       - --auto-redirect, --automatically-redirect, /auto-redirect, /automatically-redirect
       - --auto-wallpaper, --automatically-set-wallpaper, /auto-wallpaper, /automatically-set-wallpaper
       - --settings, /settings, -settings
+      - --auto-save, /auto-save, --automatically-save-apod-files
     """
     s = _normalize(raw)
     if not s:
@@ -99,6 +107,9 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
 
     if token == "settings":
         return CommandMatch(CMD_VIEW_SETTINGS)
+
+    if token in ("auto-save", "automatically-save-apod-files"):
+        return CommandMatch(CMD_AUTO_SAVE)
 
     return None
 
@@ -146,6 +157,19 @@ def handle_global_command(raw: str) -> bool:
         run_plain_modal(show_settings_modal)
         return True
 
+    if match.name == CMD_AUTO_SAVE:
+        def change_auto_save():
+            update_automatically_save_apod_files_setting()
+
+            settings_dict = get_all_user_settings()
+            if not settings_dict:
+                return
+
+            print_settings_box(settings_dict)
+
+        run_plain_modal(change_auto_save)
+        return True
+
     if match.name == CMD_QUIT:
         raise SystemExit
 
@@ -190,6 +214,7 @@ def print_help() -> None:
     cmd_row("--settings, /settings", "View settings configuration")
     cmd_row("--auto-redirect, /auto-redirect", "Change auto-redirect setting")
     cmd_row("--auto-wallpaper, /auto-wallpaper", "Change auto-wallpaper setting")
+    cmd_row("--auto-save, /auto-save", "Change auto-save APOD files setting")
 
     console.print()
 

@@ -422,3 +422,54 @@ def log_multiple_csv_entries(list_formatted_apod_data):
     """
     for entry in list_formatted_apod_data:
         log_data_to_csv(entry)
+
+
+def update_local_file_path_in_csv(target_date: str, local_file_path: str) -> bool:
+    if not check_if_csv_output_exists():
+        return False
+
+    rows = []
+    updated = False
+
+    try:
+        with open(file=csv_file_path, mode='r', encoding='utf-8', newline='') as csv_file:
+            reader = csv.DictReader(csv_file)
+            fieldnames = list(reader.fieldnames or [])
+
+            if "local_file_path" not in fieldnames:
+                fieldnames.append("local_file_path")
+
+            for row in reader:
+                if row.get("date") == target_date:
+                    row["local_file_path"] = local_file_path
+                    updated = True
+
+                if "local_file_path" not in row:
+                    row["local_file_path"] = ""
+
+                rows.append(row)
+
+        if not updated:
+            return False
+
+        with open(file=csv_file_path, mode='w', encoding='utf-8', newline='') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        return True
+
+    except PermissionError:
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{csv_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{csv_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
+    except Exception as e:
+        console.print()
+        console.print(Text(str(e), style="err"))
+
+    return False

@@ -98,7 +98,8 @@ TEST_DATA7 =  {
     "url": "https://apod.nasa.gov/apod/image/9701/galcen_msx.jpg"
   }
 
-def format_apod_data(apod_data, build_viewer: bool = True):
+def format_apod_data(apod_data, build_viewer: bool = True, local_file_path: str = ""):
+
     """
       Format raw APOD API data into a normalized snapshot structure.
 
@@ -139,6 +140,7 @@ def format_apod_data(apod_data, build_viewer: bool = True):
         'url': url_to_store,
         'explanation': explanation,
         'logged_at': cur_time,
+        'local_file_path': local_file_path,
     }
 
     return dict_to_return

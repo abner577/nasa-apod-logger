@@ -489,3 +489,57 @@ def log_multiple_json_entries(list_formatted_apod_data):
     """
     for entry in list_formatted_apod_data:
         log_data_to_json(entry)
+
+
+def update_local_file_path_in_json(target_date: str, local_file_path: str) -> bool:
+    if not check_if_json_output_exists():
+        return False
+
+    entries = []
+    updated = False
+
+    try:
+        with open(file=json_file_path, mode='r', encoding='utf-8') as json_file:
+            for line in json_file:
+                if line is None or len(line) == 0:
+                    continue
+
+                content = json.loads(line)
+                if content.get('date') == target_date:
+                    content['local_file_path'] = local_file_path
+                    updated = True
+                elif 'local_file_path' not in content:
+                    content['local_file_path'] = ''
+
+                entries.append(content)
+
+        if not updated:
+            return False
+
+        with open(file=json_file_path, mode='w', encoding='utf-8') as json_file:
+            for entry in entries:
+                json_file.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+        return True
+
+    except PermissionError:
+        msg = Text("\nPermission error: ", style="err")
+        msg.append("Unable to read/write ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(" at ", style="body.text")
+        msg.append(f"'{json_file_path}' ", style="app.primary")
+        msg.append("X", style="err")
+        console.print(msg)
+
+    except json.decoder.JSONDecodeError:
+        msg = Text("\nJSONL parse error: ", style="err")
+        msg.append("Could not decode JSON from file ", style="body.text")
+        msg.append(f"'{json_file_name}'", style="app.primary")
+        msg.append(". Check the file format.", style="body.text")
+        console.print(msg)
+
+    except Exception as e:
+        console.print()
+        console.print(Text(str(e), style="err"))
+
+    return False

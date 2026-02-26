@@ -21,6 +21,12 @@
 - Keep imports organized and use absolute imports from `src` (e.g., `from src.utils...`).
 - Avoid introducing new output encodings; stick to UTF-8 when writing files.
 
+## Applying color to application
+- Use the Rich library as is used throughout the application to apply colors to the application.
+- Use color of "ok" for check marks and color of "err" for X's.
+- Use "app.primary", "app.secondary", and "body.text" to color the main components of the application.
+- Always ask what color to apply to something before doing it. 
+
 ## Testing Guidelines
 - There are no automated tests in this repo yet.
 - Do not write any tests 

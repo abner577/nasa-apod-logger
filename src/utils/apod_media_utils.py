@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
 from rich.text import Text
 
-from src.config import DATA_DIR
 from src.startup.console import console
 
 
@@ -32,7 +32,16 @@ CONTENT_TYPE_TO_EXT = {
 
 
 def get_apod_download_dir() -> Path:
-    path = DATA_DIR / "downloads"
+    # Save to the user's system-level Downloads folder (not inside the app data dir).
+    if os.name == "nt":
+        user_profile = os.environ.get("USERPROFILE")
+        if user_profile:
+            path = Path(user_profile) / "Downloads"
+        else:
+            path = Path.home() / "Downloads"
+    else:
+        path = Path.home() / "Downloads"
+
     path.mkdir(parents=True, exist_ok=True)
     return path
 

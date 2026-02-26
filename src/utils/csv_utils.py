@@ -142,7 +142,7 @@ def check_for_duplicate_csv_entries(formatted_apod_data):
                   continue
 
               if row[0] == formatted_apod_data['date']:
-                   msg = Text("Skipped (duplicate): ", style="app.secondary")
+                   msg = Text("Skipped (duplicate entry): ", style="app.secondary")
                    msg.append(str(formatted_apod_data['date']), style="app.primary")
                    msg.append(" already exists in ", style="body.text")
                    msg.append(str(csv_file_name), style="app.primary")

@@ -142,7 +142,7 @@ def check_for_duplicate_json_entries(formatted_apod_data):
 
                 content = json.loads(line)
                 if content['date'] == formatted_apod_data['date']:
-                    msg = Text("Skipped (duplicate): ", style="app.secondary")
+                    msg = Text("Skipped (duplicate entry): ", style="app.secondary")
                     msg.append(str(content["date"]), style="app.primary")
                     msg.append(" already exists in ", style="body.text")
                     msg.append(str(json_file_name), style="app.primary")
@@ -234,6 +234,6 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
 
     # Local file path
     line.append("Local file path: ", style="app.secondary")
-    line.append(f"{local_file_path}\n", style="body.text")
+    line.append(f"{local_file_path}\n", style="app.url")
 
     console.print(line)

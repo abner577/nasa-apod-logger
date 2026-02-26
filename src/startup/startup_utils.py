@@ -216,14 +216,14 @@ def user_settings_menu():
 
         line1 = Text("[1] ", style="app.secondary")
         line1.append("View settings", style="app.primary")
-        line1.append("                  ", style="body.text")
+        line1.append("                     ", style="body.text")
         line1.append("[4] ", style="app.secondary")
         line1.append("Change auto-save-apod-files setting", style="app.primary")
         console.print(line1)
 
         line2 = Text("[2] ", style="app.secondary")
         line2.append("Change auto-redirect setting", style="app.primary")
-        line2.append("        ", style="body.text")
+        line2.append("      ", style="body.text")
         line2.append("[5] ", style="app.secondary")
         line2.append("Return to Main Menu", style="app.primary")
         console.print(line2)

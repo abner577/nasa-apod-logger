@@ -67,7 +67,7 @@ def get_todays_apod():
             console.print()
             take_user_to_browser(redirect_url)
         else:
-            link = Text("\nAPOD link: ", style="body.text")
+            link = Text("\nAPOD link: ", style="app.secondary")
             link.append(redirect_url, style="app.url")
             link.append("\n", style="body.text")
             console.print(link)
@@ -75,6 +75,7 @@ def get_todays_apod():
 
         if should_save_file:
             local_file_path = maybe_download_apod_file(apod_raw_data, True)
+            console.print()
             if local_file_path:
                 update_local_file_path_in_csv(apod_data['date'], local_file_path)
                 update_local_file_path_in_json(apod_data['date'], local_file_path)
@@ -200,9 +201,10 @@ def get_apod_for_specific_day():
                     if automatically_redirect_setting['automatically_redirect'] == 'yes':
                         take_user_to_browser(redirect_url)
                     else:
-                        link = Text("\nAPOD link: ", style="body.text")
+                        link = Text("\nAPOD link: ", style="app.secondary")
                         link.append(redirect_url, style="app.url")
                         console.print(link)
+                        console.print()
 
                     if should_save_file:
                         local_file_path = maybe_download_apod_file(apod_raw_data, True)
@@ -322,11 +324,12 @@ def get_random_n_apods():
                         else:
                             console.print()
                             for apod in list_of_formatted_apod_entries:
-                                link = Text("APOD link: ", style="body.text")
+                                link = Text("APOD link: ", style="app.secondary")
                                 link.append(apod["url"], style="app.url")
                                 console.print(link)
 
                         if should_save_file:
+                            console.print()
                             for apod_raw in list_of_unformatted_apod_entries:
                                 local_file_path = maybe_download_apod_file(apod_raw, True)
                                 if local_file_path:

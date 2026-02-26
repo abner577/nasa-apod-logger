@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -40,10 +41,49 @@ def get_apod_download_dir() -> Path:
         else:
             path = Path.home() / "Downloads"
     else:
-        path = Path.home() / "Downloads"
+        path = _resolve_non_windows_downloads_dir()
 
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def _is_wsl() -> bool:
+    try:
+        return "microsoft" in os.uname().release.lower() or "wsl" in os.uname().release.lower()
+    except AttributeError:
+        return False
+
+
+def _windows_profile_to_wsl_path(windows_path: str) -> Path | None:
+    cleaned = windows_path.strip().strip('"')
+    if not cleaned or ":" not in cleaned:
+        return None
+
+    drive, remainder = cleaned.split(":", 1)
+    drive = drive.lower()
+    remainder = remainder.replace("\\", "/").lstrip("/")
+    return Path("/mnt") / drive / remainder
+
+
+def _resolve_non_windows_downloads_dir() -> Path:
+    # If running under WSL, save directly to the Windows user's Downloads folder
+    # so files are visible in Explorer.
+    if _is_wsl():
+        try:
+            result = subprocess.run(
+                ["cmd.exe", "/c", "echo", "%USERPROFILE%"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            windows_profile = result.stdout.strip()
+            wsl_profile_path = _windows_profile_to_wsl_path(windows_profile)
+            if wsl_profile_path is not None:
+                return wsl_profile_path / "Downloads"
+        except Exception:
+            pass
+
+    return Path.home() / "Downloads"
 
 
 def _extract_extension_from_url(url: str) -> str:

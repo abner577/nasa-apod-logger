@@ -11,6 +11,7 @@ from pathlib import Path
 from src.config import json_file_path, json_file_name, DATA_DIR
 from rich.text import Text
 from src.startup.console import console
+from src.utils.viewer_utils import viewer_path_to_uri
 
 
 def create_json_output_file():
@@ -236,6 +237,10 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
 
     # Local file path
     line.append("Local file path: ", style="app.secondary")
-    line.append(f"{local_file_path}\n", style="app.url")
+    if not local_file_path:
+        line.append("Not saved yet\n", style="body.text")
+    else:
+        local_file_uri = viewer_path_to_uri(Path(local_file_path).expanduser().resolve())
+        line.append(f"{local_file_uri}\n", style="app.url")
 
     console.print(line)

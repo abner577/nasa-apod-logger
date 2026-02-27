@@ -13,7 +13,7 @@ Utilities for generating local HTML viewer pages for APOD entries.
 
 def _is_image_url(url: str) -> bool:
     lower = url.lower()
-    return lower.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp"))
+    return lower.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp")) # if the url ends with one of these extensions, it is an image
 
 
 def _is_wsl() -> bool:
@@ -23,6 +23,7 @@ def _is_wsl() -> bool:
         return False
 
 
+# This method just converts the wsl file path to the actual file path (not using the mnt prefix)
 def _wsl_file_uri_to_windows(uri: str) -> str:
     prefix = "file:///mnt/"
     if not uri.startswith(prefix) or len(uri) <= len(prefix):

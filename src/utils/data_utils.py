@@ -113,6 +113,9 @@ def format_apod_data(apod_data, build_viewer: bool = True, local_file_path: str 
        dict: Formatted APOD snapshot ready for persistence.
     """
 
+    if not local_file_path:
+        local_file_path = "Not saved yet"
+
     cur_time = datetime.datetime.now()
     cur_time = cur_time.strftime("Day: %m-%d-%Y | Time: %H:%M:%S")
 

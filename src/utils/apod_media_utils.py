@@ -182,7 +182,7 @@ def download_apod_file(apod_data: dict) -> str | None:
                 output_file.write(chunk)
 
         msg = Text("Saved file: ", style="app.secondary")
-        msg.append(str(file_path), style="app.url")
+        msg.append(file_path.name, style="app.url")
         msg.append(" ✓", style="ok")
         console.print(msg)
 

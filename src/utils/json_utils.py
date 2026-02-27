@@ -207,6 +207,8 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
     explanation = formatted_jsonl_entry["explanation"]
     logged_at = formatted_jsonl_entry["logged_at"]
     local_file_path = formatted_jsonl_entry.get("local_file_path", "")
+    if not local_file_path:
+        local_file_path = "Not saved yet"
 
     header = Text(f"Entry #{entry_number} ({title}):\n", style="app.primary")
     console.print(header)

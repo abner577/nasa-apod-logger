@@ -194,26 +194,48 @@ def format_raw_csv_entry(formatted_csv_entry, count):
     """
 
     console.print("─" * 60, style="app.secondary")
-    print(f"Entry #{count + 1} ({formatted_csv_entry[1]}):")
+
+    entry_number = count + 1
+    title = formatted_csv_entry["title"]
+    date = formatted_csv_entry["date"]
+    url = formatted_csv_entry["url"]
+    explanation = formatted_csv_entry["explanation"]
+    logged_at = formatted_csv_entry["logged_at"]
+    local_file_path = formatted_csv_entry.get("local_file_path", "Not saved yet")
+
+    header = Text(f"Entry #{entry_number} ({title}):\n", style="app.primary")
+    console.print(header)
+
+    # Date
     line = Text()
-    line.append(f"Entry #{count + 1} ({formatted_csv_entry[1]}):\n", style="app.primary")
-    line.append(f"Date: {formatted_csv_entry[0]}\n", style="body.text")
-    line.append(f"Title: {formatted_csv_entry[1]}\n", style="body.text")
+    line.append("Date: ", style="app.secondary")
+    line.append(f"{date}\n", style="body.text")
+
+    # Title
+    line.append("Title: ", style="app.secondary")
+    line.append(f"{title}\n", style="body.text")
+
+    # URL
     line.append("URL: ", style="app.secondary")
-    line.append(f"{formatted_csv_entry[2]}\n", style=f"app.url link {formatted_csv_entry[2]}")
-    line.append(f"Explanation: {formatted_csv_entry[3]}\n", style="body.text")
-    local_file_path = formatted_csv_entry[5] if len(formatted_csv_entry) > 5 else ""
-    if not local_file_path:
-        local_file_path = "Not saved yet"
-    line.append(f"Logged_At: {formatted_csv_entry[4]}\n", style="body.text")
+    line.append(f"{url}\n", style="app.url")
+
+    # Explanation
+    line.append("Explanation: ", style="app.secondary")
+    line.append(f"{explanation}\n", style="body.text")
+
+    # Logged at
+    line.append("Logged at: ", style="app.secondary")
+    line.append(f"{logged_at}\n", style="body.text")
+
+    # Local file path
     line.append("Local file path: ", style="app.secondary")
 
-    if not local_file_path:
-        line.append("Not saved yet", style="body.text")
+    if local_file_path == "Not saved yet":
+        line.append("Not saved yet\n", style="body.text")
     else:
         local_file_uri = viewer_path_to_uri(Path(local_file_path).expanduser().resolve())
-        line.append(local_file_uri, style="app.url")
-    console.print("â”€" * 60, style="app.secondary")
+        line.append(f"{local_file_uri}\n", style="app.url")
+
     console.print(line)
 
 

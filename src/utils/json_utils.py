@@ -239,6 +239,6 @@ def format_raw_jsonl_entry(formatted_jsonl_entry, count):
         line.append("Not saved yet\n", style="body.text")
     else:
         local_file_uri = viewer_path_to_uri(Path(local_file_path).expanduser().resolve())
-        line.append(f"{local_file_path}\n", style=f"app.url link {local_file_uri}")
+        line.append(f"{local_file_uri}\n", style="app.url")
 
     console.print(line)

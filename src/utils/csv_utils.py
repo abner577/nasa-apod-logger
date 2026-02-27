@@ -210,7 +210,7 @@ def format_raw_csv_entry(formatted_csv_entry, count):
         line.append("Not saved yet", style="body.text")
     else:
         local_file_uri = viewer_path_to_uri(Path(local_file_path).expanduser().resolve())
-        line.append(local_file_path, style=f"app.url link {local_file_uri}")
+        line.append(local_file_uri, style="app.url")
     console.print("â”€" * 60, style="app.secondary")
     console.print(line)
 

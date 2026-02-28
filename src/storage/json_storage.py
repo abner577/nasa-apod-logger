@@ -105,9 +105,9 @@ def show_first_n_json_log_entries() -> Any:
         return
 
     if entries_amount > line_count:
-        msg = Text("Only ", style="body.text")
+        msg = Text("\nOnly ", style="body.text")
         msg.append(str(line_count), style="app.primary")
-        msg.append(" entries available. Showing all.\n", style="body.text")
+        msg.append(" entries available. Showing all available entries.", style="body.text")
         console.print(msg)
 
         entries_amount = line_count
@@ -192,10 +192,11 @@ def show_last_n_json_log_entries() -> Any:
         return
 
     if entries_amount > line_count:
-        msg = Text("Only ", style="body.text")
+        msg = Text("\nOnly ", style="body.text")
         msg.append(str(line_count), style="app.primary")
-        msg.append(" entries available. Showing all.\n", style="body.text")
+        msg.append(" entries available. Showing all available entries.", style="body.text")
         console.print(msg)
+
         entries_amount = line_count
 
     count = 0

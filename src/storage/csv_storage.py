@@ -102,9 +102,9 @@ def show_first_n_csv_log_entries() -> Any:
         return
 
     if entries_amount > line_count:
-        msg = Text("Only ", style="body.text")
+        msg = Text("\nOnly ", style="body.text")
         msg.append(str(line_count), style="app.primary")
-        msg.append(" entries available. Showing all.\n", style="body.text")
+        msg.append(" entries available. Showing all available entries.\n", style="body.text")
         console.print(msg)
         entries_amount = line_count
 
@@ -175,10 +175,11 @@ def show_last_n_csv_log_entries() -> Any:
         return
 
     if entries_amount > line_count:
-        msg = Text("Only ", style="body.text")
+        msg = Text("\nOnly ", style="body.text")
         msg.append(str(line_count), style="app.primary")
-        msg.append(" entries available. Showing all.\n", style="body.text")
+        msg.append(" entries available. Showing all available entries.", style="body.text")
         console.print(msg)
+
         entries_amount = line_count
 
     entries_list = []
@@ -262,7 +263,7 @@ def show_all_csv_entries() -> Any:
         return
 
 
-def delete_one_csv_entry(target_date: Any) -> Any:
+def delete_one_csv_entry(target_date: Any) -> Any | bool:
     """
         Delete a single CSV entry by its APOD date.
 

@@ -1,3 +1,4 @@
+from typing import Any
 from src.nasa.nasa_client import get_todays_apod, get_apod_for_specific_day, get_random_n_apods
 from src.nasa.nasa_date import ask_user_for_date
 from src.user_settings import (
@@ -40,7 +41,7 @@ from src.utils.box_utils import build_box_lines, stylize_line
 from rich.text import Text
 
 
-def nasa_apods_menu():
+def nasa_apods_menu() -> Any:
     clear_screen()
     flag = True
     while flag:
@@ -108,7 +109,7 @@ def nasa_apods_menu():
                 console.print(msg)
 
 
-def output_files_menu():
+def output_files_menu() -> Any:
     clear_screen()
     flag = True
     while flag:
@@ -230,7 +231,7 @@ def output_files_menu():
                 console.print(msg)
 
 
-def user_settings_menu():
+def user_settings_menu() -> Any:
     clear_screen()
     flag = True
     while flag:
@@ -309,7 +310,7 @@ def user_settings_menu():
                 console.print(msg)
 
 
-def print_startup():
+def print_startup() -> Any:
     # Header
     startup_banner1()
     render_random_startup_art()
@@ -423,15 +424,7 @@ def run_startup_checks() -> list[str]:
     ]
 
 
-def print_startup_info_two_column_boxed_right(
-    checks_title: str,
-    checks_lines: list[str],
-    right_title: str,
-    version_str: str,
-    tips_lines: list[str],
-    gap: int = 6,
-    padding_x: int = 2,
-) -> None:
+def print_startup_info_two_column_boxed_right(checks_title: str, checks_lines: list[str], right_title: str, version_str: str, tips_lines: list[str], gap: int = 6, padding_x: int = 2) -> None:
     """
     Left: checks box.
     Right: boxed panel containing Version + Tips.

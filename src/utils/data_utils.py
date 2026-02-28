@@ -4,6 +4,7 @@ data_utils.py
 Utility helpers for formatting and preparing APOD data.
 Includes test payloads for when NASA APOD API is down.
 """
+from typing import Any
 
 import datetime
 
@@ -98,7 +99,7 @@ TEST_DATA7 =  {
     "url": "https://apod.nasa.gov/apod/image/9701/galcen_msx.jpg"
   }
 
-def format_apod_data(apod_data, build_viewer: bool = True, local_file_path: str = ""):
+def format_apod_data(apod_data: Any, build_viewer: bool = True, local_file_path: str = "") -> Any:
 
     """
       Format raw APOD API data into a normalized snapshot structure.

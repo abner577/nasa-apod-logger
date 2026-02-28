@@ -4,6 +4,7 @@ nasa_client.py
 Handles all interactions with NASA's APOD public API.
 Responsible for fetching APOD data and coordinating persistence actions.
 """
+from typing import Any
 
 import datetime
 import os
@@ -41,7 +42,7 @@ NASA_API_KEY = os.getenv('NASA_API_KEY')
 BASE_URL = os.getenv('BASE_URL')
 
 
-def get_todays_apod():
+def get_todays_apod() -> Any:
     """
        Fetch today's Astronomy Picture of the Day (APOD) from NASA's API.
 
@@ -117,7 +118,7 @@ def get_todays_apod():
         return
 
 
-def get_apod_for_specific_day():
+def get_apod_for_specific_day() -> Any:
     """
     Fetch the Astronomy Picture of the Day (APOD) for a user-specified date.
 
@@ -252,7 +253,7 @@ def get_apod_for_specific_day():
                 console.print()
 
 
-def get_random_n_apods():
+def get_random_n_apods() -> Any:
     """
     Fetch a user-defined number of random Astronomy Picture of the Day (APOD) entries.
 

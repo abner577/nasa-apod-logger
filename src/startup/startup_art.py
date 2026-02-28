@@ -1,3 +1,4 @@
+from typing import Any
 from rich.text import Text
 from src.startup.console import console
 from src.config import (
@@ -14,7 +15,7 @@ from src.config import (
 import random
 
 
-def startup_banner1():
+def startup_banner1() -> Any:
     banner = r"""
  __   __     ______     ______     ______        ______     ______   ______     _____          
 /\ "-.\ \   /\  __ \   /\  ___\   /\  __ \      /\  __ \   /\  == \ /\  __ \   /\  __-.      

@@ -4,6 +4,7 @@ json_storage.py
 JSONL persistence layer for APOD snapshots.
 Responsible for creating, writing, reading, and rewriting the JSONL log.
 """
+from typing import Any
 
 from src.utils.json_utils import (
     json,
@@ -17,7 +18,7 @@ from rich.text import Text
 from src.startup.console import console
 
 
-def log_data_to_json(formatted_apod_data):
+def log_data_to_json(formatted_apod_data: Any) -> Any:
     """
        Append a formatted APOD snapshot to the JSONL log.
 
@@ -64,7 +65,7 @@ def log_data_to_json(formatted_apod_data):
     return None
 
 
-def show_first_n_json_log_entries():
+def show_first_n_json_log_entries() -> Any:
     """
         Display the first N logged JSONL entries.
 
@@ -151,7 +152,7 @@ def show_first_n_json_log_entries():
         console.print(Text(str(e), style="err"))
 
 
-def show_last_n_json_log_entries():
+def show_last_n_json_log_entries() -> Any:
     """
     Display the last N logged JSONL entries.
 
@@ -247,7 +248,7 @@ def show_last_n_json_log_entries():
     console.print()
 
 
-def show_all_json_entries():
+def show_all_json_entries() -> Any:
     """
         Display all logged JSONL entries.
 
@@ -298,7 +299,7 @@ def show_all_json_entries():
     console.print()
 
 
-def delete_one_json_entry(target_date):
+def delete_one_json_entry(target_date: Any) -> Any:
     """
        Delete a single JSONL entry by its APOD date.
 
@@ -369,7 +370,7 @@ def delete_one_json_entry(target_date):
         console.print(Text(str(e), style="err"))
 
 
-def fetch_most_recent_json_apod():
+def fetch_most_recent_json_apod() -> Any:
     """
          Fetch the most recent APOD (by date) from the jsonl log.
          Doesn't matter in which order it was logged.
@@ -426,7 +427,7 @@ def fetch_most_recent_json_apod():
         console.print(Text(str(e), style="err"))
 
 
-def fetch_oldest_json_apod():
+def fetch_oldest_json_apod() -> Any:
     """
         Fetch the oldest APOD (by date) from the CSV log.
         Doesn't matter in which order it was logged.
@@ -484,7 +485,7 @@ def fetch_oldest_json_apod():
         console.print(Text(str(e), style="err"))
 
 
-def log_multiple_json_entries(list_formatted_apod_data):
+def log_multiple_json_entries(list_formatted_apod_data: Any) -> Any:
     """
        Log multiple APOD entries to jsonl.
 

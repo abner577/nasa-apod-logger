@@ -4,6 +4,7 @@ json_utils.py
 Helper functions for working with the JSONL APOD log.
 Includes file checks, duplicate detection, and display formatting.
 """
+from typing import Any
 
 import json
 
@@ -14,7 +15,7 @@ from src.startup.console import console
 from src.utils.viewer_utils import viewer_path_to_uri
 
 
-def create_json_output_file():
+def create_json_output_file() -> Any:
     """
      Create the JSONL output file if it does not already exist.
 
@@ -36,7 +37,7 @@ def create_json_output_file():
     console.print(msg)
 
 
-def clear_json_output_file():
+def clear_json_output_file() -> Any:
     """
        Clear (truncate) the JSONL output file contents.
 
@@ -70,7 +71,7 @@ def clear_json_output_file():
 
     return False
 
-def delete_json_output_file():
+def delete_json_output_file() -> Any:
     """
         Delete the JSONL output file from disk.
 
@@ -85,7 +86,7 @@ def delete_json_output_file():
     console.print(msg)
 
 
-def get_line_count(count):
+def get_line_count(count: Any) -> Any:
     """
       Count the number of lines in the JSONL log file.
 
@@ -124,7 +125,7 @@ def get_line_count(count):
     return count
 
 
-def check_for_duplicate_json_entries(formatted_apod_data):
+def check_for_duplicate_json_entries(formatted_apod_data: Any) -> Any:
     """
       Check whether a JSONL entry with the same APOD date already exists.
 
@@ -173,7 +174,7 @@ def check_for_duplicate_json_entries(formatted_apod_data):
     return False
 
 
-def check_if_json_output_exists():
+def check_if_json_output_exists() -> Any:
     """
        Check whether the JSONL output file exists on disk.
 
@@ -187,7 +188,7 @@ def check_if_json_output_exists():
     return False
 
 
-def format_raw_jsonl_entry(formatted_jsonl_entry, count):
+def format_raw_jsonl_entry(formatted_jsonl_entry: Any, count: Any) -> Any:
     """
        Print a single JSONL entry in a readable, numbered format.
 

@@ -4,6 +4,7 @@ csv_utils.py
 Helper functions for working with the CSV APOD log.
 Includes duplicate detection, file checks, and display formatting.
 """
+from typing import Any
 
 import csv
 
@@ -23,7 +24,7 @@ HEADERS = {
 }
 
 
-def create_csv_output_file():
+def create_csv_output_file() -> Any:
     """
      Create the CSV output file if it does not already exist.
 
@@ -46,7 +47,7 @@ def create_csv_output_file():
     console.print(msg)
 
 
-def clear_csv_output_file():
+def clear_csv_output_file() -> Any:
     """
        Clear (truncate) the CSV output file contents.
 
@@ -81,7 +82,7 @@ def clear_csv_output_file():
     return False
 
 
-def delete_csv_output_file():
+def delete_csv_output_file() -> Any:
     """
        Delete the CSV output file from disk.
 
@@ -96,7 +97,7 @@ def delete_csv_output_file():
     console.print(msg)
 
 
-def write_header_to_csv():
+def write_header_to_csv() -> Any:
     """
     Write the CSV header row to the output file.
 
@@ -123,7 +124,7 @@ def write_header_to_csv():
         console.print(Text(str(e), style="err"))
 
 
-def check_for_duplicate_csv_entries(formatted_apod_data):
+def check_for_duplicate_csv_entries(formatted_apod_data: Any) -> Any:
     """
        Check whether a CSV entry with the same APOD date already exists.
 
@@ -167,7 +168,7 @@ def check_for_duplicate_csv_entries(formatted_apod_data):
     return False
 
 
-def check_if_csv_output_exists():
+def check_if_csv_output_exists() -> Any:
     """
       Check whether the CSV output file exists on disk.
 
@@ -181,7 +182,7 @@ def check_if_csv_output_exists():
     return False
 
 
-def format_raw_csv_entry(formatted_csv_entry, count):
+def format_raw_csv_entry(formatted_csv_entry: Any, count: Any) -> Any:
     """
        Print a single CSV entry in a readable, numbered format.
 
@@ -239,7 +240,7 @@ def format_raw_csv_entry(formatted_csv_entry, count):
     console.print(line)
 
 
-def get_line_count(count):
+def get_line_count(count: Any) -> Any:
     """
        Count the number of data rows in the CSV file.
 

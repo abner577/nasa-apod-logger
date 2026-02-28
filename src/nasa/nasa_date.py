@@ -3,13 +3,14 @@ nasa_date.py
 
 Date validation helpers for NASA APOD constraints.
 """
+from typing import Any
 import datetime
 from rich.text import Text
 from src.startup.console import console
 
 from src.config import NASA_APOD_START_DATE, DATE_TODAY
 
-def check_valid_nasa_date(date_object):
+def check_valid_nasa_date(date_object: Any) -> Any:
     """
      Validate a date against NASA APOD availability constraints.
 
@@ -27,7 +28,7 @@ def check_valid_nasa_date(date_object):
 
     return None
 
-def ask_user_for_date():
+def ask_user_for_date() -> Any:
     try:
         console.print()
         console.print(Text("Year (YYYY): ", style="app.secondary"), end="")

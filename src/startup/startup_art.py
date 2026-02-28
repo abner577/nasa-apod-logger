@@ -1,6 +1,16 @@
 from rich.text import Text
 from src.startup.console import console
-from src.config import *
+from src.config import (
+    SPACE_STARTUP_ART_1,
+    SPACESHIP_STARTUP_ART_1,
+    SPACESHIP_STARTUP_ART_2,
+    MOON_STARTUP_ART_1,
+    ASTRONAUT_STARTUP_ART_1,
+    ASTRONAUT_STARTUP_ART_2,
+    ALIEN_STARTUP_ART_1,
+    ALIEN_STARTUP_ART_2,
+    SATELLITE_STARTUP_ART_1,
+)
 import random
 
 

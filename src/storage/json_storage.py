@@ -5,9 +5,13 @@ JSONL persistence layer for APOD snapshots.
 Responsible for creating, writing, reading, and rewriting the JSONL log.
 """
 
-from src.utils.json_utils import *
-from src.utils.data_utils import *
-from src.nasa.nasa_date import check_valid_nasa_date
+from src.utils.json_utils import (
+    json,
+    check_if_json_output_exists,
+    check_for_duplicate_json_entries,
+    get_line_count,
+    format_raw_jsonl_entry,
+)
 from src.config import json_file_path, json_file_name, NASA_APOD_START_DATE, DATE_TODAY, DATA_DIR
 from rich.text import Text
 from src.startup.console import console

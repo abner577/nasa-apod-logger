@@ -124,7 +124,7 @@ def format_apod_data(apod_data, build_viewer: bool = True, local_file_path: str 
 
     date = apod_data["date"].strip()
     title = apod_data["title"].strip()
-    url = apod_data["url"].strip()
+    url = apod_data["url"].strip() # Raw url of the actual Google link to the APOD
 
     if build_viewer:
         viewer_path = build_apod_viewer({
@@ -133,10 +133,13 @@ def format_apod_data(apod_data, build_viewer: bool = True, local_file_path: str 
             "url": url,
             "explanation": explanation,
         })
+        # This changes the url from the actual Google link to the link of the Local HTML Viewer page
+        # Because viewer_path is returned from build_apod_viewer and points to data/viewer directory
         url_to_store = viewer_path_to_uri(viewer_path)
     else:
         url_to_store = url
 
+# This makes sense because the dict we return which is the one that we store, we store url as url_to_store
     dict_to_return = {
         'date': date,
         'title': title,

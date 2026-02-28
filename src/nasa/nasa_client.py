@@ -5,16 +5,35 @@ Handles all interactions with NASA's APOD public API.
 Responsible for fetching APOD data and coordinating persistence actions.
 """
 
+import datetime
+import os
+
 import requests
 from dotenv import load_dotenv
+from rich.text import Text
 
-from src.storage.data_storage import *
-from src.storage.csv_storage import *
-from src.storage.json_storage import *
-from src.utils.browser_utils import *
-from src.utils.data_utils import *
+from src.startup.console import console
+from src.nasa.nasa_date import check_valid_nasa_date
+from src.storage.data_storage import check_if_data_exists, create_data_directory
+from src.storage.csv_storage import (
+    log_data_to_csv,
+    log_multiple_csv_entries,
+    update_local_file_path_in_csv,
+)
+from src.storage.json_storage import (
+    log_data_to_json,
+    log_multiple_json_entries,
+    update_local_file_path_in_json,
+)
+from src.utils.browser_utils import take_user_to_browser
+from src.utils.data_utils import format_apod_data
 from src.utils.apod_media_utils import maybe_download_apod_file
-from src.user_settings import *
+from src.user_settings import (
+    get_automatically_save_apod_files,
+    get_automatically_redirect_setting,
+)
+
+from src.config import NASA_APOD_START_DATE
 
 load_dotenv()
 
@@ -33,6 +52,11 @@ def get_todays_apod():
        Returns:
             None:
     """
+
+    if not check_if_data_exists():
+        msg = Text("Data directory not found. Creating it...\n", style="body.text")
+        console.print(msg)
+        create_data_directory()
 
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
     # print(f"[DEBUG] Full_url: {full_url}")
@@ -164,7 +188,7 @@ def get_apod_for_specific_day():
                 # If an invalid NASA APOD date is entered, try again
                 if check_result is not None:
                     msg = Text("\nInput error: ", style="err")
-                    msg.append(str(check_result).replace("\nInput error: ", ""), style="body.text")
+                    msg.append(f"Enter a date after {NASA_APOD_START_DATE}.", style="body.text")
                     console.print(msg)
                     continue
 
@@ -207,6 +231,7 @@ def get_apod_for_specific_day():
                         console.print()
 
                     if should_save_file:
+                        console.print()
                         local_file_path = maybe_download_apod_file(apod_raw_data, True)
                         if local_file_path:
                             update_local_file_path_in_csv(apod_data['date'], local_file_path)

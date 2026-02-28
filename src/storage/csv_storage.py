@@ -5,10 +5,14 @@ CSV persistence layer for APOD snapshots.
 Responsible for creating, writing, reading, and rewriting the CSV log.
 """
 
-from src.utils.csv_utils import *
-from src.utils.data_utils import *
+from src.utils.csv_utils import (
+    csv,
+    check_if_csv_output_exists,
+    check_for_duplicate_csv_entries,
+    format_raw_csv_entry,
+    get_line_count,
+)
 from src.config import csv_file_path, csv_file_name, NASA_APOD_START_DATE, DATE_TODAY, DATA_DIR
-from src.nasa.nasa_date import check_valid_nasa_date
 from rich.text import Text
 from src.startup.console import console
 

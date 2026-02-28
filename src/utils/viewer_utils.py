@@ -47,6 +47,7 @@ def viewer_path_to_uri(path: Path) -> str:
 def build_apod_viewer(apod: dict) -> Path:
     """
     Create a local HTML viewer for a formatted APOD entry.
+    Writes data/viewer/apod-<date>.html
 
     Args:
         apod: Formatted APOD dict with keys: date, title, url, explanation.

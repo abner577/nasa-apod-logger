@@ -6,7 +6,7 @@ from src.user_settings import (
     create_user_settings,
     update_automatically_redirect_setting,
     update_automatically_set_wallpaper,
-    update_automatically_save_apod_files_setting,
+    update_automatically_save_apod_files_setting, print_settings_box,
 )
 from src.utils.cli_commands import handle_global_command, clear_screen
 from src.startup.startup_art import (

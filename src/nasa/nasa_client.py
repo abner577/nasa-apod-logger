@@ -33,6 +33,8 @@ from src.user_settings import (
     get_automatically_redirect_setting,
 )
 
+from src.config import NASA_APOD_START_DATE
+
 load_dotenv()
 
 NASA_API_KEY = os.getenv('NASA_API_KEY')
@@ -50,6 +52,11 @@ def get_todays_apod():
        Returns:
             None:
     """
+
+    if not check_if_data_exists():
+        msg = Text("Data directory not found. Creating it...\n", style="body.text")
+        console.print(msg)
+        create_data_directory()
 
     full_url = f"{BASE_URL}?api_key={NASA_API_KEY}"
     # print(f"[DEBUG] Full_url: {full_url}")
@@ -181,7 +188,7 @@ def get_apod_for_specific_day():
                 # If an invalid NASA APOD date is entered, try again
                 if check_result is not None:
                     msg = Text("\nInput error: ", style="err")
-                    msg.append(str(check_result).replace("\nInput error: ", ""), style="body.text")
+                    msg.append(f"Enter a date after {NASA_APOD_START_DATE}.", style="body.text")
                     console.print(msg)
                     continue
 
@@ -224,6 +231,7 @@ def get_apod_for_specific_day():
                         console.print()
 
                     if should_save_file:
+                        console.print()
                         local_file_path = maybe_download_apod_file(apod_raw_data, True)
                         if local_file_path:
                             update_local_file_path_in_csv(apod_data['date'], local_file_path)

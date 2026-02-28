@@ -33,7 +33,7 @@ CONTENT_TYPE_TO_EXT = {
 
 
 def get_apod_download_dir() -> Path:
-    # Save to the user's system-level Downloads folder (not inside the app data dir).
+    # Save to the user's system-level Downloads folder.
     if os.name == "nt":
         user_profile = os.environ.get("USERPROFILE")
         if user_profile:
@@ -182,7 +182,7 @@ def download_apod_file(apod_data: dict) -> str | None:
                 output_file.write(chunk)
 
         msg = Text("Saved file: ", style="app.secondary")
-        msg.append(file_path.name, style="app.url")
+        msg.append(file_path.name, style="body.text")
         msg.append(" ✓", style="ok")
         console.print(msg)
 

@@ -1,3 +1,4 @@
+from typing import Any
 import json
 from pathlib import Path
 
@@ -42,11 +43,11 @@ def _normalize_and_persist_settings(settings_dict: dict) -> dict:
     return normalized_settings
 
 
-def check_if_user_settings_exist():
+def check_if_user_settings_exist() -> Any:
     return Path(user_settings_path).is_file()
 
 
-def create_user_settings():
+def create_user_settings() -> Any:
     if check_if_user_settings_exist():
         print(f"Settings file already exists: '{user_settings_name}'. Skipping creation.")
         return
@@ -68,7 +69,7 @@ def create_user_settings():
     print(f"Created settings file: '{user_settings_name}' ✓")
 
 
-def get_all_user_settings():
+def get_all_user_settings() -> Any:
     if not check_if_user_settings_exist():
         print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
         return None
@@ -116,7 +117,7 @@ def _prompt_yes_no(prompt_text: str) -> str | None:
         return None
 
 
-def update_automatically_redirect_setting():
+def update_automatically_redirect_setting() -> Any:
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
         msg.append(f"'{user_settings_name}'", style="app.primary")
@@ -158,14 +159,14 @@ def update_automatically_redirect_setting():
     console.print()
 
 
-def get_automatically_redirect_setting():
+def get_automatically_redirect_setting() -> Any:
     settings_dict = get_all_user_settings()
     if settings_dict is None:
         return None
     return {"automatically_redirect": settings_dict.get("automatically_redirect", "yes")}
 
 
-def increment_launch_count(current_launch_count):
+def increment_launch_count(current_launch_count: Any) -> Any:
     current_launch_count += 1
 
     settings_dict = get_all_user_settings()
@@ -182,28 +183,28 @@ def increment_launch_count(current_launch_count):
         print(e)
 
 
-def get_launch_count():
+def get_launch_count() -> Any:
     settings_dict = get_all_user_settings()
     if settings_dict is None:
         return None
     return {"launch_count": settings_dict.get("launch_count", "0")}
 
 
-def get_automatically_set_wallpaper():
+def get_automatically_set_wallpaper() -> Any:
     settings_dict = get_all_user_settings()
     if settings_dict is None:
         return None
     return {"automatically_set_wallpaper": settings_dict.get("automatically_set_wallpaper", "no")}
 
 
-def get_automatically_save_apod_files():
+def get_automatically_save_apod_files() -> Any:
     settings_dict = get_all_user_settings()
     if settings_dict is None:
         return None
     return {"automatically_save_apod_files": settings_dict.get("automatically_save_apod_files", "no")}
 
 
-def update_automatically_set_wallpaper():
+def update_automatically_set_wallpaper() -> Any:
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
         msg.append(f"'{user_settings_name}'", style="app.primary")
@@ -246,7 +247,7 @@ def update_automatically_set_wallpaper():
     console.print()
 
 
-def update_automatically_save_apod_files_setting():
+def update_automatically_save_apod_files_setting() -> Any:
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
         msg.append(f"'{user_settings_name}'", style="app.primary")

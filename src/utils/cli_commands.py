@@ -6,6 +6,7 @@ cli_commands.py
 """
 
 from __future__ import annotations
+from typing import Any
 import os
 
 from dataclasses import dataclass
@@ -128,7 +129,7 @@ def handle_global_command(raw: str) -> bool:
         return True
 
     if match.name == CMD_AUTO_REDIRECT:
-        def change_auto_redirect():
+        def change_auto_redirect() -> Any:
             update_automatically_redirect_setting()
 
             settings_dict = get_all_user_settings()
@@ -141,7 +142,7 @@ def handle_global_command(raw: str) -> bool:
         return True
 
     if match.name == CMD_AUTO_WALLPAPER:
-        def change_auto_wallpaper():
+        def change_auto_wallpaper() -> Any:
             update_automatically_set_wallpaper()
 
             settings_dict = get_all_user_settings()
@@ -158,7 +159,7 @@ def handle_global_command(raw: str) -> bool:
         return True
 
     if match.name == CMD_AUTO_SAVE:
-        def change_auto_save():
+        def change_auto_save() -> Any:
             update_automatically_save_apod_files_setting()
 
             settings_dict = get_all_user_settings()

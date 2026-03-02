@@ -20,6 +20,14 @@ _server_started = False
 
 
 def _safe_viewer_file(file_name: str) -> Path | None:
+    """Resolve a viewer HTML file only when the request stays inside the viewer folder.
+
+    In plain English, this function protects the local server from serving
+    random files on disk. It builds a path under ``data/viewer``, verifies the
+    final resolved path is still inside that folder, and confirms the target is
+    an existing file before returning it. If anything looks unsafe or missing,
+    it returns ``None``.
+    """
     viewer_dir = (DATA_DIR / "viewer").resolve()
     target_path = (viewer_dir / file_name).resolve()
     try:
@@ -34,6 +42,13 @@ def _safe_viewer_file(file_name: str) -> Path | None:
 
 class _ViewerRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
+        """Route each GET request to the correct local viewer endpoint.
+
+        Practically speaking, this is the traffic controller for the tiny local
+        HTTP server. It checks the incoming URL path and sends viewer-page
+        requests to the HTML-serving handler, download requests to the media
+        proxy handler, and returns a 404 for everything else.
+        """
         parsed_url = urlparse(self.path)
 
         if parsed_url.path.startswith("/viewer/"):
@@ -47,9 +62,21 @@ class _ViewerRequestHandler(BaseHTTPRequestHandler):
         self.send_error(404, "Not found")
 
     def log_message(self, _format: str, *_args) -> None:
+        """Silence default request logging from ``BaseHTTPRequestHandler``.
+
+        The built-in handler normally prints every HTTP request to stderr.
+        For this app, that extra noise is not useful for normal CLI use, so
+        this override intentionally does nothing.
+        """
         return
 
     def _serve_viewer(self, path: str) -> None:
+        """Serve a saved viewer HTML file for ``/viewer/<file_name>`` requests.
+
+        This extracts the file name from the request path, validates it through
+        the safe-path helper, and then sends the file contents back as UTF-8
+        HTML. If the file is missing or invalid, it returns a 404 response.
+        """
         file_name = unquote(path[len("/viewer/"):]).strip()
         viewer_file = _safe_viewer_file(file_name)
         if viewer_file is None:
@@ -64,6 +91,14 @@ class _ViewerRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def _serve_download(self, query: str) -> None:
+        """Fetch APOD media from NASA URLs and stream it as a browser download.
+
+        In practical terms, this endpoint acts like a controlled relay: it
+        validates the query parameters, rejects unsafe or malformed inputs,
+        downloads the remote media file, infers a reasonable file extension,
+        sets download-friendly headers, and streams bytes to the client in
+        chunks. If the remote fetch fails, it returns an HTTP error.
+        """
         params = parse_qs(query)
         media_url = params.get("media_url", [""])[0].strip()
         date_value = params.get("date", [""])[0].strip()
@@ -104,6 +139,12 @@ class _ViewerRequestHandler(BaseHTTPRequestHandler):
 
 
 def start_viewer_server() -> None:
+    """Start the local threaded viewer server once per process.
+
+    This uses a lock and a boolean guard so repeated calls do not create extra
+    server instances. On first call, it binds the configured host/port,
+    launches the server loop on a daemon thread, and marks startup complete.
+    """
     global _server_started
 
     with _server_lock:
@@ -118,4 +159,10 @@ def start_viewer_server() -> None:
 
 
 def viewer_http_url(file_name: str) -> str:
+    """Build the localhost URL that opens a saved viewer HTML file.
+
+    In other words, this is a convenience helper that turns a viewer file name
+    into the exact ``http://127.0.0.1:<port>/viewer/...`` link the browser can
+    open against the local server.
+    """
     return f"http://127.0.0.1:{_VIEWER_SERVER_PORT}/viewer/{file_name}"

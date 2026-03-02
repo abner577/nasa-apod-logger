@@ -9,24 +9,10 @@ from src.config import DATA_DIR
 
 
 def check_if_data_exists() -> Any:
-    """
-      Check whether the application's data directory exists.
-
-      Returns:
-          bool: True if the data directory exists, otherwise False.
-    """
-
     return DATA_DIR.is_dir()
 
 
 def create_data_directory() -> Any:
-    """
-      Create the application's data directory if it does not already exist.
-
-      Returns:
-        None:
-    """
-
     if check_if_data_exists():
         print("Data directory already exists. Skipping creation.")
         return

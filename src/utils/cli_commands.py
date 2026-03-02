@@ -116,6 +116,7 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
 
 
 def handle_global_command(raw: str) -> bool:
+    """Execute a recognized global command and report whether one was handled."""
     match = parse_global_command(raw)
     if match is None:
         return False
@@ -192,6 +193,7 @@ def show_settings_modal() -> None:
 
 
 def print_help() -> None:
+    """Print the global command help menu in a formatted layout."""
     title = Text("\n", style="body.text")
     title.append("───────────────────────────── ", style="app.secondary")
     title.append("HELP MENU", style="app.primary")

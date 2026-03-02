@@ -1,3 +1,5 @@
+"""Startup and menu flows for APOD requests, logs, and settings."""
+
 from typing import Any
 from src.nasa.nasa_client import get_todays_apod, get_apod_for_specific_day, get_random_n_apods
 from src.nasa.nasa_date import ask_user_for_date
@@ -42,6 +44,7 @@ from rich.text import Text
 
 
 def nasa_apods_menu() -> Any:
+    """Display and handle the NASA APOD request menu loop."""
     clear_screen()
     flag = True
     while flag:
@@ -110,6 +113,7 @@ def nasa_apods_menu() -> Any:
 
 
 def output_files_menu() -> Any:
+    """Display and handle the saved-log viewing and management menu."""
     clear_screen()
     flag = True
     while flag:
@@ -232,6 +236,7 @@ def output_files_menu() -> Any:
 
 
 def user_settings_menu() -> Any:
+    """Display and handle user settings actions and shortcuts."""
     clear_screen()
     flag = True
     while flag:
@@ -311,6 +316,7 @@ def user_settings_menu() -> Any:
 
 
 def print_startup() -> Any:
+    """Render startup banner/art, checks, and quick-info sections."""
     # Header
     startup_banner1()
     render_random_startup_art()
@@ -338,6 +344,7 @@ def print_startup() -> Any:
 
 
 def render_random_startup_art() -> None:
+    """Pick and render one startup art variant."""
     random_choice = random.randint(1, 9)
     match random_choice:
         case 1:

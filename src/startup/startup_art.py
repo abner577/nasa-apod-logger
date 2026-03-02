@@ -1,3 +1,5 @@
+"""ASCII startup banners and rendering helpers for themed splash screens."""
+
 from typing import Any
 from rich.text import Text
 from src.startup.console import console

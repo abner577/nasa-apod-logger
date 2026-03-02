@@ -1,3 +1,5 @@
+"""Helpers for drawing and styling boxed console output."""
+
 from rich.text import Text
 
 def build_box_lines(title: str, lines: list[str], padding_x: int = 2) -> list[str]:

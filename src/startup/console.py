@@ -1,3 +1,5 @@
+"""Rich console instance and theme definitions used across the CLI."""
+
 from __future__ import annotations
 
 from rich.console import Console

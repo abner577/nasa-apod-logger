@@ -1,3 +1,5 @@
+"""APOD media URL resolution and local download path/file helpers."""
+
 from __future__ import annotations
 
 import os

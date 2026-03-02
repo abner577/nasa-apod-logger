@@ -1,13 +1,9 @@
+"""Browser-launch utilities, including WSL URL/path handling."""
+
 import os
 import shutil
 import subprocess
 import webbrowser
-
-"""
-browser_utils.py
-
-Browser-related helper utilities for user navigation.
-"""
 
 def _is_wsl() -> bool:
     # WSL detection

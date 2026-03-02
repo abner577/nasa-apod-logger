@@ -43,7 +43,7 @@ def build_apod_viewer(apod: dict) -> Path:
     encoded_date = quote(str(date), safe="-")
     download_href = f"/download?date={encoded_date}&media_url={encoded_media_url}"
 
-    download_label = "Save this APOD media"
+    download_label = "Save This APOD"
     if not _is_image_url(url):
         download_label = "Open source media"
 
@@ -113,10 +113,31 @@ def build_apod_viewer(apod: dict) -> Path:
     .actions {{
       margin-bottom: 16px;
     }}
-    .actions a {{
-      color: var(--accent);
+    .save-apod-button {{
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(154, 208, 255, 0.7);
+      background: linear-gradient(180deg, rgba(154, 208, 255, 0.22) 0%, rgba(154, 208, 255, 0.14) 100%);
+      color: var(--text);
       text-decoration: none;
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.35);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    }}
+    .save-apod-button:hover {{
+      transform: translateY(-1px);
+      box-shadow: 0 7px 18px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(180deg, rgba(154, 208, 255, 0.3) 0%, rgba(154, 208, 255, 0.18) 100%);
+    }}
+    .save-apod-button:active {{
+      transform: translateY(0);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.32);
+    }}
+    .save-apod-button:focus-visible {{
+      outline: 2px solid rgba(154, 208, 255, 0.9);
+      outline-offset: 2px;
     }}
     .media-wrap {{
       display: inline-block;
@@ -176,7 +197,7 @@ def build_apod_viewer(apod: dict) -> Path:
     <div class="date">{html.escape(date)}</div>
     <div class="hint">Hover the image to see the explanation.</div>
     <div class="actions">
-      <a href="{download_href}" id="save-apod-media">{download_label}</a>
+      <a href="{download_href}" id="save-apod-media" class="save-apod-button">{download_label}</a>
       <div class="hint">If download does not start automatically, open the media and save manually.</div>
     </div>
     <div class="media-wrap">

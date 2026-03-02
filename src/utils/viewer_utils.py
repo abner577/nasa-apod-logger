@@ -115,13 +115,13 @@ def build_apod_viewer(apod: dict) -> Path:
     }}
     .save-apod-button {{
       display: inline-block;
-      padding: 10px 18px;
+      padding: 5px 12px;
       border-radius: 999px;
       border: 1px solid rgba(154, 208, 255, 0.7);
       background: linear-gradient(180deg, rgba(154, 208, 255, 0.22) 0%, rgba(154, 208, 255, 0.14) 100%);
       color: var(--text);
       text-decoration: none;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       box-shadow: 0 5px 14px rgba(0, 0, 0, 0.35);
       transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;

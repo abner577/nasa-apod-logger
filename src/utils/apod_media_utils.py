@@ -1,3 +1,5 @@
+"""APOD media URL resolution and local download path/file helpers."""
+
 from __future__ import annotations
 
 import os
@@ -33,6 +35,12 @@ CONTENT_TYPE_TO_EXT = {
 
 
 def get_apod_download_dir() -> Path:
+    """Return the folder where APOD media files should be saved on this machine.
+
+    In plain terms, this picks the user's Downloads folder in a way that works
+    across Windows, Linux/macOS, and WSL environments. It also makes sure the
+    folder exists before returning it, so callers can write files immediately.
+    """
     # Save to the user's system-level Downloads folder.
     if os.name == "nt":
         user_profile = os.environ.get("USERPROFILE")
@@ -48,6 +56,12 @@ def get_apod_download_dir() -> Path:
 
 
 def _is_wsl() -> bool:
+    """Check whether the app is currently running inside Windows Subsystem for Linux.
+
+    This helps other helpers decide whether they should map Linux paths to the
+    underlying Windows user folders so downloaded files appear where the user
+    expects them.
+    """
     try:
         return "microsoft" in os.uname().release.lower() or "wsl" in os.uname().release.lower()
     except AttributeError:
@@ -55,6 +69,12 @@ def _is_wsl() -> bool:
 
 
 def _windows_profile_to_wsl_path(windows_path: str) -> Path | None:
+    """Convert a Windows-style profile path into the equivalent WSL filesystem path.
+
+    For example, a profile path like ``C:\\Users\\name`` becomes
+    ``/mnt/c/Users/name``. If the incoming value does not look like a usable
+    Windows path, the function returns ``None`` so callers can fall back safely.
+    """
     cleaned = windows_path.strip().strip('"')
     if not cleaned or ":" not in cleaned:
         return None
@@ -66,6 +86,12 @@ def _windows_profile_to_wsl_path(windows_path: str) -> Path | None:
 
 
 def _resolve_non_windows_downloads_dir() -> Path:
+    """Resolve the best Downloads folder path for non-Windows operating systems.
+
+    On normal Linux/macOS, this returns the local home Downloads folder. When
+    running in WSL, it tries to find the linked Windows user profile and use the
+    Windows Downloads directory so saved APOD files are easy to find in Explorer.
+    """
     # If running under WSL, save directly to the Windows user's Downloads folder
     # so files are visible in Explorer.
     if _is_wsl():
@@ -87,6 +113,12 @@ def _resolve_non_windows_downloads_dir() -> Path:
 
 
 def _extract_extension_from_url(url: str) -> str:
+    """Read a media-style file extension from a URL when one is clearly present.
+
+    The function only returns known media extensions that this app supports. If
+    the URL does not clearly end in one of those types, it returns an empty
+    string so downstream logic can use other ways to infer file type.
+    """
     parsed = urlparse(url)
     suffix = Path(parsed.path).suffix.lower()
     if suffix in DIRECT_MEDIA_EXTENSIONS:
@@ -95,6 +127,13 @@ def _extract_extension_from_url(url: str) -> str:
 
 
 def resolve_direct_media_url(apod_data: dict) -> str | None:
+    """Choose the best downloadable media URL from an APOD API response.
+
+    This prefers URLs that look like direct media files, trying ``hdurl`` first
+    and then ``url``. If neither appears to be a direct media file, it still
+    falls back to valid HTTP links when possible. If no usable link exists, it
+    returns ``None``.
+    """
     hdurl = str(apod_data.get("hdurl", "")).strip()
     url = str(apod_data.get("url", "")).strip()
 
@@ -114,6 +153,13 @@ def resolve_direct_media_url(apod_data: dict) -> str | None:
 
 
 def infer_extension(response: requests.Response, url: str) -> str:
+    """Decide which file extension should be used for a downloaded APOD file.
+
+    First, this looks at the server's reported content type because that is
+    usually the most reliable signal. If that is missing or unfamiliar, it uses
+    the URL extension. If both are unclear, it returns a generic ``.bin``
+    extension so the download can still be saved.
+    """
     content_type = response.headers.get("content-type", "").split(";")[0].strip().lower()
     if content_type in CONTENT_TYPE_TO_EXT:
         return CONTENT_TYPE_TO_EXT[content_type]
@@ -126,6 +172,12 @@ def infer_extension(response: requests.Response, url: str) -> str:
 
 
 def build_download_path(date_value: str, extension: str) -> Path:
+    """Build a non-conflicting destination path for a media file download.
+
+    The base file name uses the APOD date. If a file with that name already
+    exists, the function appends a numeric suffix (like ``-1``, ``-2``) until it
+    finds an available filename.
+    """
     base_name = f"apod-{date_value}"
     download_dir = get_apod_download_dir()
     candidate = download_dir / f"{base_name}{extension}"
@@ -142,6 +194,12 @@ def build_download_path(date_value: str, extension: str) -> Path:
 
 
 def check_if_date_file_exists(date_value: str) -> bool:
+    """Check whether any previously downloaded file already exists for an APOD date.
+
+    This is used to avoid duplicate saves for the same day. It scans the target
+    Downloads directory for files that start with ``apod-<date>`` and returns
+    ``True`` as soon as one is found.
+    """
     download_dir = get_apod_download_dir()
     for existing_file in download_dir.glob(f"apod-{date_value}*"):
         if existing_file.is_file():
@@ -150,6 +208,13 @@ def check_if_date_file_exists(date_value: str) -> bool:
 
 
 def download_apod_file(apod_data: dict) -> str | None:
+    """Download APOD media to disk and return the saved file path when successful.
+
+    In plain English, this function validates the APOD date, skips duplicate
+    date downloads, chooses a media URL, downloads the content in chunks, saves
+    the file in Downloads, and prints a clear success or failure message.
+    If anything important is missing or fails, it returns ``None``.
+    """
     date_value = str(apod_data.get("date", "")).strip()
     if not date_value:
         return None
@@ -202,6 +267,12 @@ def download_apod_file(apod_data: dict) -> str | None:
 
 
 def maybe_download_apod_file(apod_data: dict, save_enabled: bool) -> str | None:
+    """Conditionally download APOD media based on the current save preference.
+
+    This acts as a small guard: when saving is disabled it immediately returns
+    ``None``; when enabled it delegates to ``download_apod_file`` and returns
+    that result unchanged.
+    """
     if not save_enabled:
         return None
     return download_apod_file(apod_data)

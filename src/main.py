@@ -1,15 +1,10 @@
+"""Program entry point for interactive NASA APOD logger menus."""
+
 from src.startup.startup_utils import print_startup, nasa_apods_menu, output_files_menu, user_settings_menu
 from src.startup.console import console
 from src.user_settings import increment_launch_count, get_launch_count
 from src.utils.cli_commands import handle_global_command, clear_screen
 from rich.text import Text
-
-"""
-main.py
-
-Program entry point.
-Responsible for the main menu loop and user interaction flow.
-"""
 
 entry_flag = True
 while entry_flag:

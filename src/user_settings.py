@@ -1,3 +1,5 @@
+"""User settings persistence, prompts, and settings display helpers."""
+
 from typing import Any
 import json
 from pathlib import Path
@@ -27,6 +29,7 @@ initial_automatically_save_apod_files_dict = {
 
 
 def _normalize_and_persist_settings(settings_dict: dict) -> dict:
+    """Normalize known settings keys and persist them to the settings JSONL file."""
     normalized_settings = {
         "automatically_redirect": settings_dict.get("automatically_redirect", "yes"),
         "launch_count": settings_dict.get("launch_count", "0"),
@@ -70,6 +73,7 @@ def create_user_settings() -> Any:
 
 
 def get_all_user_settings() -> Any:
+    """Load all settings from disk and persist a normalized schema."""
     if not check_if_user_settings_exist():
         print(f"Settings file not found: '{user_settings_name}'. Please create it first.")
         return None
@@ -95,6 +99,7 @@ def get_all_user_settings() -> Any:
 
 
 def _prompt_yes_no(prompt_text: str) -> str | None:
+    """Prompt the user for a yes/no response and return normalized values."""
     try:
         prompt = Text(f"\n{prompt_text} ", style="app.secondary")
         prompt.append("(y/n): ", style="app.primary")
@@ -291,6 +296,7 @@ def update_automatically_save_apod_files_setting() -> Any:
 
 
 def stylize_settings_content(t: Text) -> None:
+    """Apply semantic styling to settings box labels and ON/OFF/status values."""
     s = t.plain
     if not s or not s.startswith("│"):
         return
@@ -344,6 +350,7 @@ def stylize_settings_content(t: Text) -> None:
 
 
 def print_settings_box(settings_dict: dict) -> None:
+    """Render the current settings in a styled, boxed console layout."""
     auto_redirect = settings_dict.get("automatically_redirect", "no")
     auto_wallpaper = settings_dict.get("automatically_set_wallpaper", "no")
     auto_save_apod_files = settings_dict.get("automatically_save_apod_files", "no")

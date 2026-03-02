@@ -1,14 +1,10 @@
+"""Utilities for building local APOD HTML viewers and viewer links."""
+
 import html
 from pathlib import Path
 import os
 
 from src.config import DATA_DIR
-
-"""
-viewer_utils.py
-
-Utilities for generating local HTML viewer pages for APOD entries.
-"""
 
 
 def _is_image_url(url: str) -> bool:

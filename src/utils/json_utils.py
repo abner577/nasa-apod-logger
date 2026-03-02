@@ -175,13 +175,6 @@ def check_for_duplicate_json_entries(formatted_apod_data: Any) -> Any:
 
 
 def check_if_json_output_exists() -> Any:
-    """
-       Check whether the JSONL output file exists on disk.
-
-       Returns:
-        bool: True if the file exists, otherwise False.
-    """
-
     if Path(json_file_path).exists() and Path(json_file_path).is_file():
         return True
 

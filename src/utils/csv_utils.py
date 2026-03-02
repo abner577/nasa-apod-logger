@@ -169,13 +169,6 @@ def check_for_duplicate_csv_entries(formatted_apod_data: Any) -> Any:
 
 
 def check_if_csv_output_exists() -> Any:
-    """
-      Check whether the CSV output file exists on disk.
-
-      Returns:
-       bool: True if the file exists, otherwise False.
-    """
-
     if Path(csv_file_path).exists() and Path(csv_file_path).is_file():
         return True
 

@@ -18,7 +18,7 @@ from rich.text import Text
 from src.startup.console import console
 
 
-def log_data_to_csv(formatted_apod_data: Any) -> Any:
+def log_data_to_csv(formatted_apod_data: Any, show_success_message: bool = True) -> Any:
     """
        Append a formatted APOD snapshot to the CSV log.
 
@@ -42,13 +42,14 @@ def log_data_to_csv(formatted_apod_data: Any) -> Any:
             writer = csv.DictWriter(csv_file, fieldnames=formatted_apod_data.keys())
             writer.writerow(formatted_apod_data)
 
-            msg = Text("Saved: ", style="app.secondary")
-            msg.append("APOD ", style="body.text")
-            msg.append(f"'{formatted_apod_data['date']}'", style="app.primary")
-            msg.append(" -> ", style="body.text")
-            msg.append(f"{csv_file_name} ", style="app.primary")
-            msg.append("✓", style="ok")
-            console.print(msg)
+            if show_success_message:
+                msg = Text("Saved: ", style="app.secondary")
+                msg.append("APOD ", style="body.text")
+                msg.append(f"'{formatted_apod_data['date']}'", style="app.primary")
+                msg.append(" -> ", style="body.text")
+                msg.append(f"{csv_file_name} ", style="app.primary")
+                msg.append("✓", style="ok")
+                console.print(msg)
 
     except PermissionError:
         msg = Text("\nPermission error: ", style="err")
@@ -419,7 +420,7 @@ def fetch_oldest_csv_apod() -> Any:
         console.print(Text(str(e), style="err"))
 
 
-def log_multiple_csv_entries(list_formatted_apod_data: Any) -> Any:
+def log_multiple_csv_entries(list_formatted_apod_data: Any, show_success_messages: bool = True) -> Any:
     """
        Log multiple APOD entries to csv.
 
@@ -427,7 +428,7 @@ def log_multiple_csv_entries(list_formatted_apod_data: Any) -> Any:
            None:
     """
     for entry in list_formatted_apod_data:
-        log_data_to_csv(entry)
+        log_data_to_csv(entry, show_success_message=show_success_messages)
 
 
 def update_local_file_path_in_csv(target_date: str, local_file_path: str) -> bool:

@@ -229,7 +229,6 @@ def get_apod_for_specific_day() -> Any:
                         link = Text("\nAPOD link: ", style="app.secondary")
                         link.append(redirect_url, style="app.url")
                         console.print(link)
-                        console.print()
 
                     if should_save_file:
                         console.print()
@@ -319,7 +318,6 @@ def get_random_n_apods() -> Any:
                         msg.append(str(n), style="app.primary")
                         msg.append(" Random APODs were retrieved ", style="body.text")
                         msg.append("✓", style="ok")
-                        msg.append("\n", style="body.text")
                         console.print(msg)
 
                         # print("[DEBUG]: HTTP Response = 200")
@@ -341,7 +339,7 @@ def get_random_n_apods() -> Any:
                         log_multiple_json_entries(list_of_formatted_apod_entries, show_success_messages=False)
 
                         msg = Text("Success: ", style="ok")
-                        msg.append("All APODs have been saved successfully ", style="body.text")
+                        msg.append("All APODs have been logged successfully ", style="body.text")
                         msg.append("✓", style="ok")
                         console.print(msg)
 
@@ -359,19 +357,12 @@ def get_random_n_apods() -> Any:
                                 console.print(link)
 
                         if should_save_file:
-                            successful_file_saves = 0
+                            console.print()
                             for apod_raw in list_of_unformatted_apod_entries:
                                 local_file_path = maybe_download_apod_file(apod_raw, True)
                                 if local_file_path:
                                     update_local_file_path_in_csv(apod_raw['date'], local_file_path)
                                     update_local_file_path_in_json(apod_raw['date'], local_file_path)
-                                    successful_file_saves += 1
-
-                            if successful_file_saves == len(list_of_unformatted_apod_entries):
-                                msg = Text("Success: ", style="ok")
-                                msg.append("All files have been successfully saved ", style="body.text")
-                                msg.append("✓", style="ok")
-                                console.print(msg)
 
                     elif response.status_code == 404 or response.status_code == 403:
                         msg = Text("\nRequest error: ", style="err")

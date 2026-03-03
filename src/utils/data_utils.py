@@ -8,7 +8,8 @@ from typing import Any
 
 import datetime
 
-from src.utils.viewer_utils import build_apod_viewer, viewer_path_to_uri
+from src.utils.viewer_server_utils import start_viewer_server, viewer_http_url
+from src.utils.viewer_utils import build_apod_viewer
 
 TEST_DATA = {'resource': {
         'image_set': "apod"
@@ -134,9 +135,10 @@ def format_apod_data(apod_data: Any, build_viewer: bool = True, local_file_path:
             "url": url,
             "explanation": explanation,
         })
-        # This changes the url from the actual Google link to the link of the Local HTML Viewer page
-        # Because viewer_path is returned from build_apod_viewer and points to data/viewer directory
-        url_to_store = viewer_path_to_uri(viewer_path)
+        # Ensure viewer links are immediately reachable via the local HTTP server.
+        start_viewer_server()
+        # Store the same local HTTP URL used by the viewer server flow.
+        url_to_store = viewer_http_url(viewer_path.name)
     else:
         url_to_store = url
 

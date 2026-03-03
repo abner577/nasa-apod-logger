@@ -112,6 +112,22 @@ def _resolve_non_windows_downloads_dir() -> Path:
     return Path.home() / "Downloads"
 
 
+
+
+def _wsl_path_to_windows_path(path: Path) -> str:
+    """Convert a WSL ``/mnt/<drive>/...`` path into a Windows-style path string."""
+    path_str = str(path)
+    if not _is_wsl() or not path_str.startswith('/mnt/'):
+        return path_str
+
+    parts = path.parts
+    if len(parts) < 4:
+        return path_str
+
+    drive_letter = parts[2].upper()
+    remainder = "\\".join(parts[3:])
+    return f"{drive_letter}:\\{remainder}" if remainder else f"{drive_letter}:\\"
+
 def _extract_extension_from_url(url: str) -> str:
     """Read a media-style file extension from a URL when one is clearly present.
 
@@ -241,7 +257,7 @@ def download_apod_file(apod_data: dict) -> str | None:
         msg.append(" ✓", style="ok")
         console.print(msg)
 
-        return str(file_path)
+        return _wsl_path_to_windows_path(file_path)
 
     except requests.RequestException as e:
         msg = Text("Media save failed: ", style="err")

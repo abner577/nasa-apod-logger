@@ -12,7 +12,6 @@ from pathlib import Path
 from src.config import csv_file_path, csv_file_name, DATA_DIR
 from rich.text import Text
 from src.startup.console import console
-from src.utils.viewer_utils import viewer_path_to_uri
 
 HEADERS = {
     "date": "",
@@ -227,8 +226,7 @@ def format_raw_csv_entry(formatted_csv_entry: Any, count: Any) -> Any:
     if local_file_path == "Not saved yet":
         line.append("Not saved yet\n", style="body.text")
     else:
-        local_file_uri = viewer_path_to_uri(Path(local_file_path).expanduser().resolve())
-        line.append(f"{local_file_uri}\n", style="app.url")
+        line.append(f"{local_file_path}\n", style="app.url")
 
     console.print(line)
 

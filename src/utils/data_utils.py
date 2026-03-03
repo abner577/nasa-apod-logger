@@ -135,10 +135,14 @@ def format_apod_data(apod_data: Any, build_viewer: bool = True, local_file_path:
             "url": url,
             "explanation": explanation,
         })
-        # Ensure viewer links are immediately reachable via the local HTTP server.
-        start_viewer_server()
-        # Store the same local HTTP URL used by the viewer server flow.
-        url_to_store = viewer_http_url(viewer_path.name)
+
+        viewer_server_started = start_viewer_server()
+        if viewer_server_started:
+            # Use HTTP viewer links while the local viewer server is available.
+            url_to_store = viewer_http_url(viewer_path.name)
+        else:
+            # Persist a file URI so the stored link still works across process restarts.
+            url_to_store = viewer_path.as_uri()
     else:
         url_to_store = url
 

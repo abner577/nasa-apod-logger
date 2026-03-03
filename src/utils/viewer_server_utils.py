@@ -136,7 +136,7 @@ class _ViewerRequestHandler(BaseHTTPRequestHandler):
             response.close()
 
 
-def start_viewer_server() -> None:
+def start_viewer_server() -> bool:
     """Start the local threaded viewer server once per process.
 
     This uses a lock and a boolean guard so repeated calls do not create extra
@@ -146,13 +146,17 @@ def start_viewer_server() -> None:
 
     with _server_lock:
         if _server_started:
-            return
+            return True
 
-        server = ThreadingHTTPServer((_VIEWER_SERVER_HOST, _VIEWER_SERVER_PORT), _ViewerRequestHandler)
+        try:
+            server = ThreadingHTTPServer((_VIEWER_SERVER_HOST, _VIEWER_SERVER_PORT), _ViewerRequestHandler)
+        except OSError:
+            return False
 
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         _server_started = True
+        return True
 
 
 def viewer_http_url(file_name: str) -> str:

@@ -229,7 +229,6 @@ def get_apod_for_specific_day() -> Any:
                         link = Text("\nAPOD link: ", style="app.secondary")
                         link.append(redirect_url, style="app.url")
                         console.print(link)
-                        console.print()
 
                     if should_save_file:
                         console.print()

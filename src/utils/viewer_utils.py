@@ -195,7 +195,6 @@ def build_apod_viewer(apod: dict) -> Path:
     <div class="date">{html.escape(date)}</div>
     <div class="hint">Hover the image to see the explanation.</div>
     <div class="actions">
-      <a href="{safe_url}" target="_blank" rel="noreferrer" download="apod-{html.escape(date)}">{download_label}</a>
       <div class="hint">If download does not start automatically, open the media and save manually.</div>
     </div>
     <div class="media-wrap">

@@ -318,7 +318,6 @@ def get_random_n_apods() -> Any:
                         msg.append(str(n), style="app.primary")
                         msg.append(" Random APODs were retrieved ", style="body.text")
                         msg.append("✓", style="ok")
-                        msg.append("\n", style="body.text")
                         console.print(msg)
 
                         # print("[DEBUG]: HTTP Response = 200")
@@ -336,10 +335,13 @@ def get_random_n_apods() -> Any:
                             console.print(msg)
                             create_data_directory()
 
-                        log_multiple_csv_entries(list_of_formatted_apod_entries)
-                        console.print()
-                        log_multiple_json_entries(list_of_formatted_apod_entries)
+                        log_multiple_csv_entries(list_of_formatted_apod_entries, show_individual_success_messages=False)
+                        log_multiple_json_entries(list_of_formatted_apod_entries, show_individual_success_messages=False)
 
+                        msg = Text("Success: ", style="ok")
+                        msg.append("All APODs have been saved successfully ", style="body.text")
+                        msg.append("✓", style="ok")
+                        console.print(msg)
                         automatically_redirect_setting = get_automatically_redirect_setting()
 
                         if automatically_redirect_setting['automatically_redirect'] == 'yes':

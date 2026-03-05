@@ -103,6 +103,8 @@ def build_apod_viewer(apod: dict) -> Path:
       font-family: "Segoe UI", Tahoma, sans-serif;
       background: var(--bg);
       color: var(--text);
+      font-size: 16px;
+      line-height: 1.55;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -116,26 +118,29 @@ def build_apod_viewer(apod: dict) -> Path:
       text-align: center;
     }}
     .title {{
-      font-size: 24px;
-      margin-bottom: 8px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      margin-bottom: 10px;
     }}
     .date {{
-      font-size: 14px;
+      font-size: 17px;
+      font-style: italic;
       color: var(--muted);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }}
     .hint {{
-      font-size: 13px;
+      font-size: 16px;
       color: var(--muted);
-      margin: 10px 0 8px;
+      margin: 10px 0 10px;
     }}
     .actions {{
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }}
     .actions a {{
       color: var(--accent);
       text-decoration: none;
-      font-size: 14px;
+      font-size: 15px;
     }}
     .media-wrap {{
       display: inline-block;
@@ -160,13 +165,14 @@ def build_apod_viewer(apod: dict) -> Path:
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }}
     .apod-placeholder-title {{
-      font-size: 18px;
-      margin-bottom: 8px;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
     }}
     .apod-placeholder-link a {{
       color: var(--accent);
       text-decoration: none;
-      font-size: 14px;
+      font-size: 15px;
     }}
     .apod-explanation {{
       position: absolute;
@@ -174,11 +180,14 @@ def build_apod_viewer(apod: dict) -> Path:
       transform: translateX(-50%) translateY(6px);
       bottom: 12px;
       width: min(720px, 88vw);
-      padding: 14px 16px;
+      padding: 16px 18px;
       background: var(--panel);
       color: var(--text);
       border-radius: 8px;
       text-align: left;
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 500;
       opacity: 0;
       pointer-events: none;
       transition: opacity 120ms ease, transform 120ms ease;

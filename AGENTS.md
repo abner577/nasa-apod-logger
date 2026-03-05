@@ -21,6 +21,10 @@
 - Keep imports organized and use absolute imports from `src` (e.g., `from src.utils...`).
 - Avoid introducing new output encodings; stick to UTF-8 when writing files.
 
+## Comments
+- Generate python docstring comments at the method-level where you see fit.
+- Always generate python docstring comment at the top of a file explaining what that file is used for.
+
 ## Applying color to application
 - Use the Rich library as is used throughout the application to apply colors to the application.
 - Use color of "ok" for check marks and color of "err" for X's.
@@ -28,8 +32,8 @@
 - Always ask what color to apply to something before doing it. 
 
 ## Testing Guidelines
-- There are no automated tests in this repo yet.
-- Do not write any tests 
+- There are no automated tests in this repo yet. Simply check that the app compiles for testing.
+- Do not write any tests.
 
 ## Commit and Pull Request Guidelines
 - Commit messages in this repo use short, imperative, sentence-case summaries (e.g., "Fix bug with commands", "Refactor startup_utils").

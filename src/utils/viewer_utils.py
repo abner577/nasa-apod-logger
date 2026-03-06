@@ -217,6 +217,32 @@ def build_apod_viewer(apod: dict) -> Path:
       position: relative;
       max-width: 100%;
     }}
+    .media-wrap > a {{
+      display: inline-block;
+      position: relative;
+      text-decoration: none;
+    }}
+    .media-wrap > a::after {{
+      content: "Open source media";
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(126, 168, 205, 0.95);
+      background: linear-gradient(180deg, rgba(79, 98, 120, 0.95), rgba(52, 67, 84, 0.95));
+      color: #d7e8fb;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 10px rgba(0, 0, 0, 0.35);
+      pointer-events: none;
+      transition: transform 120ms ease, filter 120ms ease;
+    }}
+    .media-wrap > a:hover::after {{
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }}
     .apod-image {{
       max-width: 100%;
       height: auto;

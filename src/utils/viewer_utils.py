@@ -58,6 +58,8 @@ def build_apod_viewer(apod: dict) -> Path:
     title = apod.get("title", "NASA APOD")
     url = apod.get("url", "")
     explanation = apod.get("explanation", "")
+    media_type = str(apod.get("media_type", "")).strip().lower()
+    is_video = media_type == "video"
 
     safe_title = html.escape(title)
     safe_url = html.escape(url)
@@ -77,6 +79,15 @@ def build_apod_viewer(apod: dict) -> Path:
             '<div id="apod-media" class="apod-placeholder">'
             "<div class=\"apod-placeholder-title\">Media Preview</div>"
             f'<div class="apod-placeholder-link"><a href="{safe_url}" target="_blank" rel="noreferrer">Open APOD media</a></div>'
+            "</div>"
+        )
+
+    video_notice_html = ""
+    if is_video:
+        video_notice_html = (
+            '<div class="video-download-notice">'
+            "This APOD is a video source, and cannot be automatically downloaded. "
+            "Click Open APOD media to view the APOD and save manually."
             "</div>"
         )
 
@@ -129,6 +140,13 @@ def build_apod_viewer(apod: dict) -> Path:
       font-size: 16px;
       color: var(--muted);
       margin: 10px 0 10px;
+    }}
+    .video-download-notice {{
+      margin: 0 auto 12px;
+      max-width: 760px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.5;
     }}
     .actions {{
       margin-bottom: 18px;
@@ -199,6 +217,7 @@ def build_apod_viewer(apod: dict) -> Path:
     <div class="title">{safe_title}</div>
     <div class="date">{html.escape(date)}</div>
     <div class="hint">Hover the image to see the explanation.</div>
+    {video_notice_html}
     <div class="actions">
     </div>
     <div class="media-wrap">

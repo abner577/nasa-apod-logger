@@ -126,6 +126,7 @@ def format_apod_data(apod_data: Any, build_viewer: bool = True, local_file_path:
     date = apod_data["date"].strip()
     title = apod_data["title"].strip()
     url = apod_data["url"].strip() # Raw url of the actual Google link to the APOD
+    media_type = apod_data.get("media_type", "").strip().lower()
 
     if build_viewer:
         viewer_path = build_apod_viewer({
@@ -133,6 +134,7 @@ def format_apod_data(apod_data: Any, build_viewer: bool = True, local_file_path:
             "title": title,
             "url": url,
             "explanation": explanation,
+            "media_type": media_type,
         })
         # This changes the url from the actual Google link to the link of the Local HTML Viewer page
         # Because viewer_path is returned from build_apod_viewer and points to data/viewer directory

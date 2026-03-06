@@ -63,10 +63,6 @@ def build_apod_viewer(apod: dict) -> Path:
     safe_url = html.escape(url)
     safe_explanation = html.escape(explanation)
 
-    download_label = "Save this APOD media"
-    if not _is_image_url(url):
-        download_label = "Open source media"
-
     filename = f"apod-{date}.html"
     file_path = viewer_dir / filename
 
@@ -204,7 +200,6 @@ def build_apod_viewer(apod: dict) -> Path:
     <div class="date">{html.escape(date)}</div>
     <div class="hint">Hover the image to see the explanation.</div>
     <div class="actions">
-      <div class="hint">If download does not start automatically, open the media and save manually.</div>
     </div>
     <div class="media-wrap">
       {image_html}

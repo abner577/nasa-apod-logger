@@ -239,8 +239,9 @@ def _get_content_type(response: requests.Response) -> str:
 
 
 def _debug_video(message: str) -> None:
-    """Emit debug logs for APOD video download troubleshooting."""
-    print(f"[DEBUG_VIDEO] {message}")
+    """Emit debug logs for APOD video download troubleshooting.
+       Uncomment this to enable debugging."""
+    # print(f"[DEBUG_VIDEO] {message}")
 
 
 def build_download_path(date_value: str, extension: str) -> Path:
@@ -282,7 +283,7 @@ def check_if_date_file_exists(date_value: str) -> bool:
 def download_apod_file(apod_data: dict) -> str | None:
     """Download APOD media to disk and return the saved file path when successful.
 
-    In plain English, this function validates the APOD date, skips duplicate
+    This function validates the APOD date, skips duplicate
     date downloads, chooses a media URL, downloads the content in chunks, saves
     the file in Downloads, and prints a clear success or failure message.
     If anything important is missing or fails, it returns ``None``.
@@ -351,12 +352,14 @@ def download_apod_file(apod_data: dict) -> str | None:
                     "Skipping save because response is not a direct video stream: "
                     f"content-type={content_type or '<empty>'}, final_url={response.url}"
                 )
-                msg = Text("Video save skipped: ", style="err")
+                msg = Text("Skipped (video APOD): ", style="app.secondary")
                 msg.append(
-                    "APOD video source is an embed/web page, not a direct downloadable video stream. "
-                    "Open APOD media in browser and save manually.",
+                    "This APOD is a video source, and cannot be automatically downloaded. "
+                    "Click ",
                     style="body.text",
                 )
+                msg.append("'Open APOD media' ", style="app.primary")
+                msg.append("in browser and save manually.", style="body.text")
                 console.print(msg)
                 return None
 

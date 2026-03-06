@@ -233,6 +233,11 @@ def _extract_video_url_from_page(page_url: str) -> str | None:
     return None
 
 
+def _get_content_type(response: requests.Response) -> str:
+    """Return a normalized content-type value without parameters."""
+    return response.headers.get("content-type", "").split(";")[0].strip().lower()
+
+
 def _debug_video(message: str) -> None:
     """Emit debug logs for APOD video download troubleshooting."""
     print(f"[DEBUG_VIDEO] {message}")
@@ -338,6 +343,26 @@ def download_apod_file(apod_data: dict) -> str | None:
                 )
             else:
                 _debug_video("Fallback URL extraction returned no candidate URL.")
+
+        if media_type == "video":
+            content_type = _get_content_type(response)
+            if not content_type.startswith("video/"):
+                _debug_video(
+                    "Skipping save because response is not a direct video stream: "
+                    f"content-type={content_type or '<empty>'}, final_url={response.url}"
+                )
+                msg = Text("Video save skipped: ", style="err")
+                msg.append(
+                    "APOD video source is an embed/web page, not a direct downloadable video stream. "
+                    "Open APOD media in browser and save manually.",
+                    style="body.text",
+                )
+                console.print(msg)
+                return None
+
+            if extension == ".bin":
+                _debug_video("Video stream detected with ambiguous extension; defaulting to .mp4")
+                extension = ".mp4"
 
         file_path = build_download_path(date_value, extension)
 

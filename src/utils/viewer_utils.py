@@ -3,6 +3,8 @@
 import html
 from pathlib import Path
 import os
+import re
+from urllib.parse import parse_qs, urlparse
 
 from src.config import DATA_DIR
 
@@ -10,6 +12,42 @@ from src.config import DATA_DIR
 def _is_image_url(url: str) -> bool:
     lower = url.lower()
     return lower.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp")) # if the url ends with one of these extensions, it is an image
+
+
+def _extract_youtube_video_id(url: str) -> str:
+    """Extract a YouTube video ID from common APOD YouTube URL formats."""
+    parsed = urlparse(url)
+    host = parsed.netloc.lower().replace("www.", "")
+    path_parts = [part for part in parsed.path.split("/") if part]
+
+    if host == "youtu.be" and path_parts:
+        candidate = path_parts[0]
+    elif path_parts and path_parts[0] == "embed" and len(path_parts) > 1:
+        candidate = path_parts[1]
+    elif path_parts and path_parts[0] == "shorts" and len(path_parts) > 1:
+        candidate = path_parts[1]
+    else:
+        query_params = parse_qs(parsed.query)
+        candidate = query_params.get("v", [""])[0]
+
+    match = re.match(r"^[A-Za-z0-9_-]{6,}$", candidate)
+    return match.group(0) if match else ""
+
+
+def _youtube_thumbnail_url(url: str) -> str:
+    """Return an hq thumbnail URL for a YouTube video URL, if detectable."""
+    video_id = _extract_youtube_video_id(url)
+    if not video_id:
+        return ""
+    return f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+
+
+def _youtube_watch_url(url: str) -> str:
+    """Return canonical YouTube watch URL when a video ID can be extracted."""
+    video_id = _extract_youtube_video_id(url)
+    if not video_id:
+        return url
+    return f"https://www.youtube.com/watch?v={video_id}"
 
 
 def _is_wsl() -> bool:
@@ -62,20 +100,38 @@ def build_apod_viewer(apod: dict) -> Path:
     is_video = media_type == "video"
 
     safe_title = html.escape(title)
-    safe_url = html.escape(url)
+    effective_url = _youtube_watch_url(url) if is_video else url
+    safe_url = html.escape(effective_url)
     safe_explanation = html.escape(explanation)
 
     filename = f"apod-{date}.html"
     file_path = viewer_dir / filename
 
-    image_html = ""
+    media_html = ""
     if _is_image_url(url):
-        image_html = (
+        media_html = (
             f'<img id="apod-media" class="apod-image" src="{safe_url}" '
             f'alt="{safe_title}" />'
         )
+    elif is_video:
+        thumbnail_url = _youtube_thumbnail_url(url)
+
+        if thumbnail_url:
+            safe_thumbnail_url = html.escape(thumbnail_url)
+            media_html = (
+                f'<a href="{safe_url}" target="_blank" rel="noreferrer">'
+                f'<img id="apod-media" class="apod-image" src="{safe_thumbnail_url}" alt="{safe_title}" />'
+                "</a>"
+            )
+        else:
+            media_html = (
+                '<div id="apod-media" class="apod-placeholder">'
+                "<div class=\"apod-placeholder-title\">Media Preview</div>"
+                f'<div class="apod-placeholder-link"><a href="{safe_url}" target="_blank" rel="noreferrer">Open APOD media</a></div>'
+                "</div>"
+            )
     else:
-        image_html = (
+        media_html = (
             '<div id="apod-media" class="apod-placeholder">'
             "<div class=\"apod-placeholder-title\">Media Preview</div>"
             f'<div class="apod-placeholder-link"><a href="{safe_url}" target="_blank" rel="noreferrer">Open APOD media</a></div>'
@@ -167,6 +223,14 @@ def build_apod_viewer(apod: dict) -> Path:
       border-radius: 8px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }}
+    .apod-video-link {{
+      margin-top: 10px;
+      font-size: 15px;
+    }}
+    .apod-video-link a {{
+      color: var(--accent);
+      text-decoration: none;
+    }}
     .apod-placeholder {{
       width: min(640px, 90vw);
       height: 360px;
@@ -221,7 +285,7 @@ def build_apod_viewer(apod: dict) -> Path:
     <div class="actions">
     </div>
     <div class="media-wrap">
-      {image_html}
+      {media_html}
       <div id="apod-explanation" class="apod-explanation">{safe_explanation}</div>
     </div>
   </div>

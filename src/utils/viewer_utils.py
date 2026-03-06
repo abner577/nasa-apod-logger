@@ -118,8 +118,6 @@ def build_apod_viewer(apod: dict) -> Path:
     url = apod.get("url", "")
     explanation = apod.get("explanation", "")
     media_type = str(apod.get("media_type", "")).strip().lower()
-    print(f"Media type: {media_type}")
-    print(f"Raw url: {url}")
     is_video = media_type == "video"
     is_youtube_video = _is_youtube_video_url(url)
 
@@ -128,8 +126,10 @@ def build_apod_viewer(apod: dict) -> Path:
     safe_url = html.escape(effective_url)
     safe_explanation = html.escape(explanation)
 
-    print(f"Safe url: {safe_url}")
-    print(f"Effective url: {effective_url}")
+    # print(f"Media type: {media_type}")
+    # print(f"Raw url: {url}")
+    # print(f"Safe url: {safe_url}")
+    # print(f"Effective url: {effective_url}")
 
     filename = f"apod-{date}.html"
     file_path = viewer_dir / filename
@@ -173,13 +173,18 @@ def build_apod_viewer(apod: dict) -> Path:
         )
 
     video_notice_html = ""
+    youtube_action_html = ""
 
     if is_youtube_video:
         video_notice_html = (
             '<div class="video-download-notice">'
-            "This APOD is a youtube video, and cannot be automatically downloaded. "
-            "Click Open APOD media to view the APOD and save manually."
+            "This APOD is hosted on YouTube, so automatic download is not available. "
+            "Click the preview image or use the button below to watch it on YouTube."
             "</div>"
+        )
+        youtube_action_html = (
+            '<a class="youtube-watch-button" '
+            f'href="{safe_url}" target="_blank" rel="noreferrer">Watch on YouTube</a>'
         )
 
     html_content = f"""<!doctype html>
@@ -246,6 +251,23 @@ def build_apod_viewer(apod: dict) -> Path:
       color: var(--accent);
       text-decoration: none;
       font-size: 15px;
+    }}
+    .youtube-watch-button {{
+      display: inline-block;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid #8a8a8a;
+      background: #6f6f6f;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-decoration: none;
+      transition: background 120ms ease, border-color 120ms ease;
+    }}
+    .youtube-watch-button:hover {{
+      background: #7d7d7d;
+      border-color: #9a9a9a;
     }}
     .media-wrap {{
       display: inline-block;
@@ -318,6 +340,7 @@ def build_apod_viewer(apod: dict) -> Path:
     <div class="hint">Hover the image to see the explanation.</div>
     {video_notice_html}
     <div class="actions">
+      {youtube_action_html}
     </div>
     <div class="media-wrap">
       {media_html}

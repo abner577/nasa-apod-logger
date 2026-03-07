@@ -280,6 +280,36 @@ def check_if_date_file_exists(date_value: str) -> bool:
     return False
 
 
+def get_existing_date_file_path(date_value: str) -> str | None:
+    """Return an existing APOD file path for a date when one is already saved.
+
+    The lookup scans the configured global Downloads directory for files that
+    start with ``apod-<date>``. When one or more matches are found, it returns
+    the first path in sorted order so the result is deterministic.
+    """
+    download_dir = get_apod_download_dir()
+    matches = sorted(
+        existing_file for existing_file in download_dir.glob(f"apod-{date_value}*")
+        if existing_file.is_file()
+    )
+    if not matches:
+        return None
+    return str(matches[0])
+
+
+def _get_existing_local_file_path(apod_data: dict[str, Any]) -> str:
+    """Resolve a previously saved local Downloads path for an APOD entry."""
+    date_value = str(apod_data.get("date", "")).strip()
+    if not date_value:
+        return ""
+
+    existing_path = get_existing_date_file_path(date_value)
+    if existing_path is None:
+        return ""
+
+    return existing_path
+
+
 def download_apod_file(apod_data: dict) -> str | None:
     """Download APOD media to disk and return the saved file path when successful.
 
@@ -352,14 +382,10 @@ def download_apod_file(apod_data: dict) -> str | None:
                     "Skipping save because response is not a direct video stream: "
                     f"content-type={content_type or '<empty>'}, final_url={response.url}"
                 )
+
                 msg = Text("Skipped (video APOD): ", style="app.secondary")
                 msg.append(
-                    "This APOD is a video source, and cannot be automatically downloaded. "
-                    "Click ",
-                    style="body.text",
-                )
-                msg.append("'Open APOD media' ", style="app.primary")
-                msg.append("in browser and save manually.", style="body.text")
+                    "This APOD is hosted on YouTube, so automatic download is not available.", style="body.text")
                 console.print(msg)
                 return None
 

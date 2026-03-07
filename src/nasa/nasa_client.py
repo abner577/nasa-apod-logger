@@ -28,7 +28,7 @@ from src.storage.json_storage import (
 )
 from src.utils.browser_utils import take_user_to_browser
 from src.utils.data_utils import format_apod_data
-from src.utils.apod_media_utils import maybe_download_apod_file
+from src.utils.apod_media_utils import maybe_download_apod_file, _get_existing_local_file_path
 from src.user_settings import (
     get_automatically_save_apod_files,
     get_automatically_redirect_setting,
@@ -37,6 +37,7 @@ from src.user_settings import (
 from src.config import NASA_APOD_START_DATE
 
 load_dotenv()
+
 
 NASA_API_KEY = os.getenv('NASA_API_KEY')
 BASE_URL = os.getenv('BASE_URL')
@@ -75,7 +76,8 @@ def get_todays_apod() -> Any:
         save_setting = get_automatically_save_apod_files()
         should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
 
-        apod_data = format_apod_data(apod_raw_data, local_file_path="")
+        existing_local_file_path = _get_existing_local_file_path(apod_raw_data)
+        apod_data = format_apod_data(apod_raw_data, local_file_path=existing_local_file_path)
 
         if not check_if_data_exists():
             msg = Text("Data directory not found. Creating it...\n", style="body.text")
@@ -215,7 +217,8 @@ def get_apod_for_specific_day() -> Any:
                     save_setting = get_automatically_save_apod_files()
                     should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
 
-                    apod_data = format_apod_data(apod_raw_data, local_file_path="")
+                    existing_local_file_path = _get_existing_local_file_path(apod_raw_data)
+                    apod_data = format_apod_data(apod_raw_data, local_file_path=existing_local_file_path)
 
                     log_data_to_csv(apod_data)
                     log_data_to_json(apod_data)
@@ -327,7 +330,8 @@ def get_random_n_apods() -> Any:
                         should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
 
                         for apod in list_of_unformatted_apod_entries:
-                            apod = format_apod_data(apod, local_file_path="")
+                            existing_local_file_path = _get_existing_local_file_path(apod)
+                            apod = format_apod_data(apod, local_file_path=existing_local_file_path)
                             list_of_formatted_apod_entries.append(apod)
 
                         if not check_if_data_exists():

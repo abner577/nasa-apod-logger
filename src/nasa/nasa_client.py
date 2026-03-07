@@ -29,9 +29,11 @@ from src.storage.json_storage import (
 from src.utils.browser_utils import take_user_to_browser
 from src.utils.data_utils import format_apod_data
 from src.utils.apod_media_utils import maybe_download_apod_file, _get_existing_local_file_path
+from src.utils.wallpaper_utils import maybe_set_apod_wallpaper
 from src.user_settings import (
     get_automatically_save_apod_files,
     get_automatically_redirect_setting,
+    get_automatically_set_wallpaper,
 )
 
 from src.config import NASA_APOD_START_DATE
@@ -41,6 +43,31 @@ load_dotenv()
 
 NASA_API_KEY = os.getenv('NASA_API_KEY')
 BASE_URL = os.getenv('BASE_URL')
+
+
+def _handle_single_apod_media_actions(apod_raw_data: dict[str, Any], apod_date: str) -> None:
+    """Run optional save and wallpaper actions for single APOD fetch flows."""
+    save_setting = get_automatically_save_apod_files()
+    wallpaper_setting = get_automatically_set_wallpaper()
+
+    should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
+    should_set_wallpaper = wallpaper_setting and wallpaper_setting.get("automatically_set_wallpaper") == "yes"
+
+    if should_save_file:
+        local_file_path = maybe_download_apod_file(apod_raw_data, True)
+        console.print()
+        if local_file_path:
+            update_local_file_path_in_csv(apod_date, local_file_path)
+            update_local_file_path_in_json(apod_date, local_file_path)
+
+    wallpaper_file_path = maybe_set_apod_wallpaper(
+        apod_raw_data,
+        auto_save_enabled=bool(should_save_file),
+        auto_wallpaper_enabled=bool(should_set_wallpaper),
+    )
+    if wallpaper_file_path:
+        update_local_file_path_in_csv(apod_date, wallpaper_file_path)
+        update_local_file_path_in_json(apod_date, wallpaper_file_path)
 
 
 def get_todays_apod() -> Any:
@@ -73,9 +100,6 @@ def get_todays_apod() -> Any:
         # print("[DEBUG]: HTTP Response = 200")
         apod_raw_data = response.json()
 
-        save_setting = get_automatically_save_apod_files()
-        should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
-
         existing_local_file_path = _get_existing_local_file_path(apod_raw_data)
         apod_data = format_apod_data(apod_raw_data, local_file_path=existing_local_file_path)
 
@@ -99,13 +123,7 @@ def get_todays_apod() -> Any:
             link.append("\n", style="body.text")
             console.print(link)
 
-
-        if should_save_file:
-            local_file_path = maybe_download_apod_file(apod_raw_data, True)
-            console.print()
-            if local_file_path:
-                update_local_file_path_in_csv(apod_data['date'], local_file_path)
-                update_local_file_path_in_json(apod_data['date'], local_file_path)
+        _handle_single_apod_media_actions(apod_raw_data, apod_data['date'])
 
     elif response.status_code == 404 or response.status_code == 403:
         msg = Text("\nRequest error: ", style="err")
@@ -214,9 +232,6 @@ def get_apod_for_specific_day() -> Any:
                     # print("[DEBUG]: HTTP Response = 200")
                     apod_raw_data = response.json()
 
-                    save_setting = get_automatically_save_apod_files()
-                    should_save_file = save_setting and save_setting.get("automatically_save_apod_files") == "yes"
-
                     existing_local_file_path = _get_existing_local_file_path(apod_raw_data)
                     apod_data = format_apod_data(apod_raw_data, local_file_path=existing_local_file_path)
 
@@ -233,12 +248,7 @@ def get_apod_for_specific_day() -> Any:
                         link.append(redirect_url, style="app.url")
                         console.print(link)
 
-                    if should_save_file:
-                        console.print()
-                        local_file_path = maybe_download_apod_file(apod_raw_data, True)
-                        if local_file_path:
-                            update_local_file_path_in_csv(apod_data['date'], local_file_path)
-                            update_local_file_path_in_json(apod_data['date'], local_file_path)
+                    _handle_single_apod_media_actions(apod_raw_data, apod_data['date'])
 
                 elif response.status_code == 404 or response.status_code == 403:
                     msg = Text("\nRequest error: ", style="err")

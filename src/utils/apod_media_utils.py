@@ -280,6 +280,23 @@ def check_if_date_file_exists(date_value: str) -> bool:
     return False
 
 
+def get_existing_date_file_path(date_value: str) -> str | None:
+    """Return an existing APOD file path for a date when one is already saved.
+
+    The lookup scans the configured global Downloads directory for files that
+    start with ``apod-<date>``. When one or more matches are found, it returns
+    the first path in sorted order so the result is deterministic.
+    """
+    download_dir = get_apod_download_dir()
+    matches = sorted(
+        existing_file for existing_file in download_dir.glob(f"apod-{date_value}*")
+        if existing_file.is_file()
+    )
+    if not matches:
+        return None
+    return str(matches[0])
+
+
 def download_apod_file(apod_data: dict) -> str | None:
     """Download APOD media to disk and return the saved file path when successful.
 

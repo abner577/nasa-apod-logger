@@ -369,14 +369,10 @@ def download_apod_file(apod_data: dict) -> str | None:
                     "Skipping save because response is not a direct video stream: "
                     f"content-type={content_type or '<empty>'}, final_url={response.url}"
                 )
+
                 msg = Text("Skipped (video APOD): ", style="app.secondary")
                 msg.append(
-                    "This APOD is a video source, and cannot be automatically downloaded. "
-                    "Click ",
-                    style="body.text",
-                )
-                msg.append("'Open APOD media' ", style="app.primary")
-                msg.append("in browser and save manually.", style="body.text")
+                    "This APOD is hosted on YouTube, so automatic download is not available.", style="body.text")
                 console.print(msg)
                 return None
 

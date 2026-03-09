@@ -29,9 +29,11 @@ from src.storage.json_storage import (
 from src.utils.browser_utils import take_user_to_browser
 from src.utils.data_utils import format_apod_data
 from src.utils.apod_media_utils import maybe_download_apod_file, _get_existing_local_file_path
+from src.utils.wallpaper_utils import apply_auto_wallpaper_for_single_apod
 from src.user_settings import (
     get_automatically_save_apod_files,
     get_automatically_redirect_setting,
+    get_automatically_set_wallpaper,
 )
 
 from src.config import NASA_APOD_START_DATE
@@ -106,6 +108,11 @@ def get_todays_apod() -> Any:
             if local_file_path:
                 update_local_file_path_in_csv(apod_data['date'], local_file_path)
                 update_local_file_path_in_json(apod_data['date'], local_file_path)
+
+        wallpaper_setting = get_automatically_set_wallpaper()
+        should_set_wallpaper = wallpaper_setting and wallpaper_setting.get("automatically_set_wallpaper") == "yes"
+        if should_set_wallpaper:
+            apply_auto_wallpaper_for_single_apod(apod_raw_data)
 
     elif response.status_code == 404 or response.status_code == 403:
         msg = Text("\nRequest error: ", style="err")
@@ -239,6 +246,11 @@ def get_apod_for_specific_day() -> Any:
                         if local_file_path:
                             update_local_file_path_in_csv(apod_data['date'], local_file_path)
                             update_local_file_path_in_json(apod_data['date'], local_file_path)
+
+                    wallpaper_setting = get_automatically_set_wallpaper()
+                    should_set_wallpaper = wallpaper_setting and wallpaper_setting.get("automatically_set_wallpaper") == "yes"
+                    if should_set_wallpaper:
+                        apply_auto_wallpaper_for_single_apod(apod_raw_data)
 
                 elif response.status_code == 404 or response.status_code == 403:
                     msg = Text("\nRequest error: ", style="err")

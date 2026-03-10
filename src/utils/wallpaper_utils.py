@@ -53,6 +53,12 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     if local_image_path is None:
         return
 
+    desktop_resolution = _get_desktop_resolution(is_windows=is_windows)
+    image_resolution = _get_image_resolution(local_image_path, is_wsl=is_wsl)
+
+    # Uncomment this if you want 'debug' mode for setting image as wallpaper
+    # _print_wallpaper_diagnostics(local_image_path, image_resolution, desktop_resolution)
+
     if is_windows:
         success = _set_wallpaper_windows_native(local_image_path)
     else:
@@ -129,7 +135,7 @@ def _resolve_or_download_image_for_date(apod_data: dict[str, Any], date_value: s
 
 def _apply_wallpaper_style_preferences() -> None:
     """Apply wallpaper scaling style based on environment configuration values."""
-    resolution_type = os.getenv("RESOLUTION_TYPE", "largest").strip().lower()
+    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower()
     resolution_x = os.getenv("RESOLUTION_X", "").strip()
     resolution_y = os.getenv("RESOLUTION_Y", "").strip()
 
@@ -144,7 +150,7 @@ def _apply_wallpaper_style_preferences() -> None:
         "span": ("22", "0"),
     }
 
-    wallpaper_style, tile_value = style_map.get(resolution_type, style_map["largest"])
+    wallpaper_style, tile_value = style_map.get(resolution_type, style_map["fit"])
 
     try:
         import winreg
@@ -153,6 +159,7 @@ def _apply_wallpaper_style_preferences() -> None:
         with key:
             winreg.SetValueEx(key, "WallpaperStyle", 0, winreg.REG_SZ, wallpaper_style)
             winreg.SetValueEx(key, "TileWallpaper", 0, winreg.REG_SZ, tile_value)
+            winreg.SetValueEx(key, "JPEGImportQuality", 0, winreg.REG_DWORD, 100)
 
     except OSError as error:
         msg = Text("Wallpaper style warning: ", style="err")
@@ -246,7 +253,7 @@ def _to_windows_path(local_image_path: Path) -> str | None:
 
 def _get_wallpaper_style_values() -> tuple[str, str]:
     """Resolve wallpaper style values from RESOLUTION_TYPE preferences."""
-    resolution_type = os.getenv("RESOLUTION_TYPE", "largest").strip().lower()
+    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower()
 
     style_map = {
         "default": ("6", "0"),
@@ -258,7 +265,7 @@ def _get_wallpaper_style_values() -> tuple[str, str]:
         "tile": ("0", "1"),
         "span": ("22", "0"),
     }
-    return style_map.get(resolution_type, style_map["largest"])
+    return style_map.get(resolution_type, style_map["fit"])
 
 
 def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> bool:
@@ -268,6 +275,7 @@ def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> boo
         "$path = 'HKCU:\\Control Panel\\Desktop';"
         f"Set-ItemProperty -Path $path -Name WallpaperStyle -Value '{wallpaper_style}';"
         f"Set-ItemProperty -Path $path -Name TileWallpaper -Value '{tile_value}';"
+        "Set-ItemProperty -Path $path -Name JPEGImportQuality -Type DWord -Value 100;"
     )
     result = subprocess.run(
         ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
@@ -290,3 +298,130 @@ def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> boo
         console.print(msg)
 
     return True
+
+
+def _get_desktop_resolution(*, is_windows: bool) -> tuple[int, int] | None:
+    """Return the primary desktop resolution as ``(width, height)``."""
+    if is_windows:
+        return _get_desktop_resolution_windows()
+
+    return _get_desktop_resolution_wsl()
+
+
+def _get_desktop_resolution_windows() -> tuple[int, int] | None:
+    """Return the desktop resolution when running on Windows natively."""
+    try:
+        width = ctypes.windll.user32.GetSystemMetrics(0)
+        height = ctypes.windll.user32.GetSystemMetrics(1)
+    except OSError:
+        return None
+
+    if width <= 0 or height <= 0:
+        return None
+
+    return width, height
+
+
+def _get_desktop_resolution_wsl() -> tuple[int, int] | None:
+    """Return desktop resolution from WSL through PowerShell and user32 APIs."""
+    script = (
+        "$code = @'\n"
+        "using System.Runtime.InteropServices;\n"
+        "public static class User32 {\n"
+        "  [DllImport(\"user32.dll\")] public static extern int GetSystemMetrics(int nIndex);\n"
+        "}\n"
+        "'@;\n"
+        "Add-Type -TypeDefinition $code;\n"
+        "$w = [User32]::GetSystemMetrics(0);\n"
+        "$h = [User32]::GetSystemMetrics(1);\n"
+        "Write-Output \"$w,$h\";"
+    )
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+
+    return _parse_resolution(result.stdout)
+
+
+def _get_image_resolution(local_image_path: Path, *, is_wsl: bool) -> tuple[int, int] | None:
+    """Return image dimensions using PowerShell image metadata on Windows/WSL."""
+    image_path = str(local_image_path)
+    if is_wsl:
+        windows_path = _to_windows_path(local_image_path)
+        if windows_path is None:
+            return None
+        image_path = windows_path
+
+    escaped_path = image_path.replace("'", "''")
+    script = (
+        "Add-Type -AssemblyName System.Drawing;"
+        f"$img = [System.Drawing.Image]::FromFile('{escaped_path}');"
+        "Write-Output \"$($img.Width),$($img.Height)\";"
+        "$img.Dispose();"
+    )
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+
+    return _parse_resolution(result.stdout)
+
+
+def _parse_resolution(value: str) -> tuple[int, int] | None:
+    """Parse resolution text formatted as ``width,height``."""
+    cleaned = value.strip()
+    if not cleaned:
+        return None
+
+    parts = cleaned.split(",", maxsplit=1)
+    if len(parts) != 2:
+        return None
+
+    try:
+        width = int(parts[0])
+        height = int(parts[1])
+    except ValueError:
+        return None
+
+    if width <= 0 or height <= 0:
+        return None
+
+    return width, height
+
+
+def _print_wallpaper_diagnostics(
+    local_image_path: Path,
+    image_resolution: tuple[int, int] | None,
+    desktop_resolution: tuple[int, int] | None,
+) -> None:
+    """Print wallpaper sizing diagnostics to help trace scaling and quality decisions."""
+    msg = Text("Wallpaper source image: ", style="app.secondary")
+    msg.append(local_image_path.name, style="body.text")
+    console.print(msg)
+
+    if image_resolution is not None:
+        msg = Text("Wallpaper source resolution: ", style="app.secondary")
+        msg.append(f"{image_resolution[0]}x{image_resolution[1]}", style="body.text")
+        console.print(msg)
+
+    if desktop_resolution is not None:
+        msg = Text("Detected desktop resolution: ", style="app.secondary")
+        msg.append(f"{desktop_resolution[0]}x{desktop_resolution[1]}", style="body.text")
+        console.print(msg)
+
+    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower() or "fit"
+    msg = Text("Wallpaper scaling mode: ", style="app.secondary")
+    msg.append(
+        f"{resolution_type} (default now favors full-image visibility)",
+        style="body.text",
+    )
+    console.print(msg)

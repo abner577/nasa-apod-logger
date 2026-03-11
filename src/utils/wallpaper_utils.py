@@ -59,10 +59,18 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     # Uncomment this if you want 'debug' mode for setting image as wallpaper
     # _print_wallpaper_diagnostics(local_image_path, image_resolution, desktop_resolution)
 
+    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower() or "fit"
+    wallpaper_image_path = _resolve_option_b_wallpaper_image(
+        local_image_path,
+        resolution_type=resolution_type,
+        desktop_resolution=desktop_resolution,
+        is_wsl=is_wsl,
+    )
+
     if is_windows:
-        success = _set_wallpaper_windows_native(local_image_path, image_resolution, desktop_resolution)
+        success = _set_wallpaper_windows_native(wallpaper_image_path, image_resolution, desktop_resolution)
     else:
-        success = _set_wallpaper_through_wsl(local_image_path, image_resolution, desktop_resolution)
+        success = _set_wallpaper_through_wsl(wallpaper_image_path, image_resolution, desktop_resolution)
 
     if success:
         msg = Text("Success: ", style="ok")
@@ -263,6 +271,122 @@ def _to_windows_path(local_image_path: Path) -> str | None:
         return None
 
     return converted
+
+
+def _resolve_option_b_wallpaper_image(
+    local_image_path: Path,
+    *,
+    resolution_type: str,
+    desktop_resolution: tuple[int, int] | None,
+    is_wsl: bool,
+) -> Path:
+    """Build and return Option B composite wallpaper when mode requests mostly-fill behavior."""
+    if resolution_type not in {"option_b", "mostly_fill", "mostly-fill", "letterbox_blur"}:
+        return local_image_path
+
+    if desktop_resolution is None:
+        msg = Text("Wallpaper mode warning: ", style="err")
+        msg.append("Option B requires desktop resolution; falling back to original image.", style="body.text")
+        console.print(msg)
+        return local_image_path
+
+    desktop_width, desktop_height = desktop_resolution
+    target_path = local_image_path.with_name(
+        f"{local_image_path.stem}-option-b-{desktop_width}x{desktop_height}.jpg"
+    )
+
+    if target_path.exists():
+        msg = Text("Using Option B wallpaper: ", style="app.secondary")
+        msg.append(target_path.name, style="body.text")
+        console.print(msg)
+        return target_path
+
+    source_windows_path = str(local_image_path)
+    target_windows_path = str(target_path)
+    if is_wsl:
+        source_windows_path = _to_windows_path(local_image_path)
+        target_windows_path = _to_windows_path(target_path)
+        if source_windows_path is None or target_windows_path is None:
+            msg = Text("Wallpaper mode warning: ", style="err")
+            msg.append("Could not prepare Windows paths for Option B; using original image.", style="body.text")
+            console.print(msg)
+            return local_image_path
+
+    if not _create_mostly_fill_wallpaper_windows(
+        source_windows_path,
+        target_windows_path,
+        desktop_width,
+        desktop_height,
+    ):
+        msg = Text("Wallpaper mode warning: ", style="err")
+        msg.append("Option B render failed; using original image.", style="body.text")
+        console.print(msg)
+        return local_image_path
+
+    msg = Text("Created Option B wallpaper: ", style="ok")
+    msg.append(target_path.name, style="body.text")
+    msg.append(" ✓", style="ok")
+    console.print(msg)
+    return target_path
+
+
+def _create_mostly_fill_wallpaper_windows(
+    source_windows_path: str,
+    target_windows_path: str,
+    desktop_width: int,
+    desktop_height: int,
+) -> bool:
+    """Render a desktop-sized composite wallpaper that preserves the full APOD in the foreground."""
+    escaped_source = source_windows_path.replace("'", "''")
+    escaped_target = target_windows_path.replace("'", "''")
+    script = (
+        "Add-Type -AssemblyName System.Drawing;"
+        "$sourcePath='" + escaped_source + "';"
+        "$targetPath='" + escaped_target + "';"
+        f"$desktopWidth={desktop_width};"
+        f"$desktopHeight={desktop_height};"
+        "$img=[System.Drawing.Image]::FromFile($sourcePath);"
+        "$bmp=New-Object System.Drawing.Bitmap($desktopWidth,$desktopHeight);"
+        "$g=[System.Drawing.Graphics]::FromImage($bmp);"
+        "$g.InterpolationMode=[System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic;"
+        "$g.SmoothingMode=[System.Drawing.Drawing2D.SmoothingMode]::HighQuality;"
+        "$g.PixelOffsetMode=[System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality;"
+        "$g.CompositingQuality=[System.Drawing.Drawing2D.CompositingQuality]::HighQuality;"
+        "$fillScale=[Math]::Max($desktopWidth/$img.Width,$desktopHeight/$img.Height);"
+        "$bgWidth=[int]([Math]::Round($img.Width*$fillScale));"
+        "$bgHeight=[int]([Math]::Round($img.Height*$fillScale));"
+        "$bgX=[int](($desktopWidth-$bgWidth)/2);"
+        "$bgY=[int](($desktopHeight-$bgHeight)/2);"
+        "$bgRect=New-Object System.Drawing.Rectangle($bgX,$bgY,$bgWidth,$bgHeight);"
+        "$g.DrawImage($img,$bgRect);"
+        "$overlay=New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(105,0,0,0));"
+        "$g.FillRectangle($overlay,0,0,$desktopWidth,$desktopHeight);"
+        "$overlay.Dispose();"
+        "$fitScale=[Math]::Min($desktopWidth/$img.Width,$desktopHeight/$img.Height);"
+        "$fgWidth=[int]([Math]::Round($img.Width*$fitScale));"
+        "$fgHeight=[int]([Math]::Round($img.Height*$fitScale));"
+        "$fgX=[int](($desktopWidth-$fgWidth)/2);"
+        "$fgY=[int](($desktopHeight-$fgHeight)/2);"
+        "$fgRect=New-Object System.Drawing.Rectangle($fgX,$fgY,$fgWidth,$fgHeight);"
+        "$g.DrawImage($img,$fgRect);"
+        "$jpgEncoder=[System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | "
+        "Where-Object { $_.MimeType -eq 'image/jpeg' } | Select-Object -First 1;"
+        "$encoderParams=New-Object System.Drawing.Imaging.EncoderParameters(1);"
+        "$qualityEncoder=[System.Drawing.Imaging.Encoder]::Quality;"
+        "$encoderParams.Param[0]=New-Object System.Drawing.Imaging.EncoderParameter($qualityEncoder,100L);"
+        "$bmp.Save($targetPath,$jpgEncoder,$encoderParams);"
+        "$encoderParams.Dispose();"
+        "$g.Dispose();"
+        "$bmp.Dispose();"
+        "$img.Dispose();"
+    )
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.returncode == 0
 
 
 def _resolve_adaptive_wallpaper_mode(

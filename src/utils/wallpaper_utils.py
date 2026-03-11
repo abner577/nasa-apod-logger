@@ -60,9 +60,9 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     # _print_wallpaper_diagnostics(local_image_path, image_resolution, desktop_resolution)
 
     if is_windows:
-        success = _set_wallpaper_windows_native(local_image_path)
+        success = _set_wallpaper_windows_native(local_image_path, image_resolution, desktop_resolution)
     else:
-        success = _set_wallpaper_through_wsl(local_image_path)
+        success = _set_wallpaper_through_wsl(local_image_path, image_resolution, desktop_resolution)
 
     if success:
         msg = Text("Success: ", style="ok")
@@ -133,24 +133,20 @@ def _resolve_or_download_image_for_date(apod_data: dict[str, Any], date_value: s
     return file_path
 
 
-def _apply_wallpaper_style_preferences() -> None:
+def _apply_wallpaper_style_preferences(
+    image_resolution: tuple[int, int] | None,
+    desktop_resolution: tuple[int, int] | None,
+) -> None:
     """Apply wallpaper scaling style based on environment configuration values."""
-    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower()
+    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower() or "fit"
     resolution_x = os.getenv("RESOLUTION_X", "").strip()
     resolution_y = os.getenv("RESOLUTION_Y", "").strip()
 
-    style_map = {
-        "default": ("6", "0"),
-        "fit": ("6", "0"),
-        "largest": ("10", "0"),
-        "fill": ("10", "0"),
-        "stretch": ("2", "0"),
-        "center": ("0", "0"),
-        "tile": ("0", "1"),
-        "span": ("22", "0"),
-    }
-
-    wallpaper_style, tile_value = style_map.get(resolution_type, style_map["fit"])
+    wallpaper_style, tile_value, resolved_mode = _get_wallpaper_style_values(
+        resolution_type,
+        image_resolution=image_resolution,
+        desktop_resolution=desktop_resolution,
+    )
 
     try:
         import winreg
@@ -173,6 +169,11 @@ def _apply_wallpaper_style_preferences() -> None:
         msg.append(" (style applied via RESOLUTION_TYPE).", style="body.text")
         console.print(msg)
 
+    if resolved_mode != resolution_type:
+        msg = Text("Wallpaper scaling mode: ", style="app.secondary")
+        msg.append(f"{resolution_type} resolved to {resolved_mode}.", style="body.text")
+        console.print(msg)
+
 
 def _is_wsl_environment() -> bool:
     """Return ``True`` when running inside Windows Subsystem for Linux."""
@@ -183,9 +184,13 @@ def _is_wsl_environment() -> bool:
         return False
 
 
-def _set_wallpaper_windows_native(local_image_path: Path) -> bool:
+def _set_wallpaper_windows_native(
+    local_image_path: Path,
+    image_resolution: tuple[int, int] | None,
+    desktop_resolution: tuple[int, int] | None,
+) -> bool:
     """Apply wallpaper directly through Win32 APIs when running on Windows."""
-    _apply_wallpaper_style_preferences()
+    _apply_wallpaper_style_preferences(image_resolution, desktop_resolution)
     success = ctypes.windll.user32.SystemParametersInfoW(20, 0, str(local_image_path), 3)
     if not success:
         error_code = ctypes.GetLastError()
@@ -197,7 +202,11 @@ def _set_wallpaper_windows_native(local_image_path: Path) -> bool:
     return True
 
 
-def _set_wallpaper_through_wsl(local_image_path: Path) -> bool:
+def _set_wallpaper_through_wsl(
+    local_image_path: Path,
+    image_resolution: tuple[int, int] | None,
+    desktop_resolution: tuple[int, int] | None,
+) -> bool:
     """Apply wallpaper from WSL by invoking Windows PowerShell commands."""
     windows_path = _to_windows_path(local_image_path)
     if windows_path is None:
@@ -206,8 +215,13 @@ def _set_wallpaper_through_wsl(local_image_path: Path) -> bool:
         console.print(msg)
         return False
 
-    style_values = _get_wallpaper_style_values()
-    if not _apply_wallpaper_style_preferences_wsl(style_values):
+    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower() or "fit"
+    style_values = _get_wallpaper_style_values(
+        resolution_type,
+        image_resolution=image_resolution,
+        desktop_resolution=desktop_resolution,
+    )
+    if not _apply_wallpaper_style_preferences_wsl(style_values, requested_mode=resolution_type):
         return False
 
     escaped_path = windows_path.replace("'", "''")
@@ -251,9 +265,39 @@ def _to_windows_path(local_image_path: Path) -> str | None:
     return converted
 
 
-def _get_wallpaper_style_values() -> tuple[str, str]:
-    """Resolve wallpaper style values from RESOLUTION_TYPE preferences."""
-    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower()
+def _resolve_adaptive_wallpaper_mode(
+    image_resolution: tuple[int, int] | None,
+    desktop_resolution: tuple[int, int] | None,
+) -> str:
+    """Choose fit/fill adaptively based on crop amount and upscaling pressure."""
+    if image_resolution is None or desktop_resolution is None:
+        return "fit"
+
+    image_width, image_height = image_resolution
+    desktop_width, desktop_height = desktop_resolution
+
+    image_ratio = image_width / image_height
+    desktop_ratio = desktop_width / desktop_height
+
+    crop_fraction = abs(image_ratio - desktop_ratio) / max(image_ratio, desktop_ratio)
+    fill_scale = max(desktop_width / image_width, desktop_height / image_height)
+
+    if fill_scale > 1.0:
+        return "fit"
+
+    if crop_fraction <= 0.10:
+        return "fill"
+
+    return "fit"
+
+
+def _get_wallpaper_style_values(
+    resolution_type: str,
+    *,
+    image_resolution: tuple[int, int] | None,
+    desktop_resolution: tuple[int, int] | None,
+) -> tuple[str, str, str]:
+    """Resolve wallpaper style values from configured or adaptive mode preferences."""
 
     style_map = {
         "default": ("6", "0"),
@@ -265,12 +309,21 @@ def _get_wallpaper_style_values() -> tuple[str, str]:
         "tile": ("0", "1"),
         "span": ("22", "0"),
     }
-    return style_map.get(resolution_type, style_map["fit"])
+    resolved_mode = resolution_type
+    if resolution_type in {"adaptive", "auto", "balanced", "option_a"}:
+        resolved_mode = _resolve_adaptive_wallpaper_mode(image_resolution, desktop_resolution)
+
+    wallpaper_style, tile_value = style_map.get(resolved_mode, style_map["fit"])
+    return wallpaper_style, tile_value, resolved_mode
 
 
-def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> bool:
+def _apply_wallpaper_style_preferences_wsl(
+    style_values: tuple[str, str, str],
+    *,
+    requested_mode: str,
+) -> bool:
     """Set wallpaper style registry values through PowerShell when in WSL."""
-    wallpaper_style, tile_value = style_values
+    wallpaper_style, tile_value, resolved_mode = style_values
     script = (
         "$path = 'HKCU:\\Control Panel\\Desktop';"
         f"Set-ItemProperty -Path $path -Name WallpaperStyle -Value '{wallpaper_style}';"
@@ -295,6 +348,11 @@ def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> boo
         msg = Text("Wallpaper scaling target: ", style="app.secondary")
         msg.append(f"{resolution_x}x{resolution_y}", style="body.text")
         msg.append(" (style applied via RESOLUTION_TYPE).", style="body.text")
+        console.print(msg)
+
+    if resolved_mode != requested_mode:
+        msg = Text("Wallpaper scaling mode: ", style="app.secondary")
+        msg.append(f"{requested_mode} resolved to {resolved_mode}.", style="body.text")
         console.print(msg)
 
     return True

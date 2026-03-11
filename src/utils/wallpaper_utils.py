@@ -55,14 +55,21 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
 
     desktop_resolution = _get_desktop_resolution(is_windows=is_windows)
     image_resolution = _get_image_resolution(local_image_path, is_wsl=is_wsl)
+    prepared_wallpaper_path = _prepare_wallpaper_image_for_desktop(
+        local_image_path=local_image_path,
+        date_value=date_value,
+        desktop_resolution=desktop_resolution,
+        image_resolution=image_resolution,
+        is_wsl=is_wsl,
+    )
 
     # Uncomment this if you want 'debug' mode for setting image as wallpaper
-    # _print_wallpaper_diagnostics(local_image_path, image_resolution, desktop_resolution)
+    # _print_wallpaper_diagnostics(prepared_wallpaper_path, image_resolution, desktop_resolution)
 
     if is_windows:
-        success = _set_wallpaper_windows_native(local_image_path)
+        success = _set_wallpaper_windows_native(prepared_wallpaper_path)
     else:
-        success = _set_wallpaper_through_wsl(local_image_path)
+        success = _set_wallpaper_through_wsl(prepared_wallpaper_path)
 
     if success:
         msg = Text("Success: ", style="ok")
@@ -231,6 +238,135 @@ def _set_wallpaper_through_wsl(local_image_path: Path) -> bool:
         check=False,
     )
     return result.returncode == 0
+
+
+def _prepare_wallpaper_image_for_desktop(
+    *,
+    local_image_path: Path,
+    date_value: str,
+    desktop_resolution: tuple[int, int] | None,
+    image_resolution: tuple[int, int] | None,
+    is_wsl: bool,
+) -> Path:
+    """Prepare an APOD image for desktop wallpaper with quality-focused scaling rules."""
+    if desktop_resolution is None or image_resolution is None:
+        return local_image_path
+
+    desktop_width, desktop_height = desktop_resolution
+    image_width, image_height = image_resolution
+
+    if desktop_width <= 0 or desktop_height <= 0 or image_width <= 0 or image_height <= 0:
+        return local_image_path
+
+    scale_x = desktop_width / image_width
+    scale_y = desktop_height / image_height
+    max_upscale_factor = 1.5
+
+    if image_width >= desktop_width and image_height >= desktop_height:
+        strategy = "crop_and_downscale"
+    else:
+        strategy = "capped_upscale"
+
+    output_path = get_apod_download_dir() / f"apod-{date_value}.prepared.jpg"
+    if output_path.exists():
+        return output_path
+
+    if strategy == "crop_and_downscale":
+        target_scale = max(scale_x, scale_y)
+    else:
+        target_scale = min(max(scale_x, scale_y), max_upscale_factor)
+
+    if not _prepare_wallpaper_with_powershell(
+        source_path=local_image_path,
+        output_path=output_path,
+        desktop_width=desktop_width,
+        desktop_height=desktop_height,
+        target_scale=target_scale,
+        is_wsl=is_wsl,
+    ):
+        return local_image_path
+
+    msg = Text("Prepared wallpaper image: ", style="ok")
+    msg.append(output_path.name, style="body.text")
+    msg.append(" ✓", style="ok")
+    console.print(msg)
+    return output_path
+
+
+def _prepare_wallpaper_with_powershell(
+    *,
+    source_path: Path,
+    output_path: Path,
+    desktop_width: int,
+    desktop_height: int,
+    target_scale: float,
+    is_wsl: bool,
+) -> bool:
+    """Create a desktop-sized wallpaper image via System.Drawing for better quality control."""
+    source_str = str(source_path)
+    output_str = str(output_path)
+
+    if is_wsl:
+        source_windows = _to_windows_path(source_path)
+        output_windows = _to_windows_path(output_path)
+        if source_windows is None or output_windows is None:
+            return False
+        source_str = source_windows
+        output_str = output_windows
+
+    escaped_source = source_str.replace("'", "''")
+    escaped_output = output_str.replace("'", "''")
+    script = (
+        "Add-Type -AssemblyName System.Drawing;"
+        f"$srcPath = '{escaped_source}';"
+        f"$dstPath = '{escaped_output}';"
+        f"$targetWidth = {desktop_width};"
+        f"$targetHeight = {desktop_height};"
+        f"$scale = [double]{target_scale};"
+        "$src = [System.Drawing.Image]::FromFile($srcPath);"
+        "$resizedW = [Math]::Max(1, [int]([Math]::Round($src.Width * $scale)));"
+        "$resizedH = [Math]::Max(1, [int]([Math]::Round($src.Height * $scale)));"
+        "$resized = New-Object System.Drawing.Bitmap($resizedW, $resizedH);"
+        "$g = [System.Drawing.Graphics]::FromImage($resized);"
+        "$g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic;"
+        "$g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality;"
+        "$g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality;"
+        "$g.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality;"
+        "$g.DrawImage($src, 0, 0, $resizedW, $resizedH);"
+        "$g.Dispose();"
+        "$canvas = New-Object System.Drawing.Bitmap($targetWidth, $targetHeight);"
+        "$canvasGraphics = [System.Drawing.Graphics]::FromImage($canvas);"
+        "$canvasGraphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic;"
+        "$canvasGraphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality;"
+        "$canvasGraphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality;"
+        "$canvasGraphics.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality;"
+        "$canvasGraphics.Clear([System.Drawing.Color]::Black);"
+        "$offsetX = [int](($targetWidth - $resizedW) / 2);"
+        "$offsetY = [int](($targetHeight - $resizedH) / 2);"
+        "$canvasGraphics.DrawImage($resized, $offsetX, $offsetY, $resizedW, $resizedH);"
+        "$canvasGraphics.Dispose();"
+        "$encoder = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' } | Select-Object -First 1;"
+        "$encoderParams = New-Object System.Drawing.Imaging.EncoderParameters(1);"
+        "$encoderParams.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter([System.Drawing.Imaging.Encoder]::Quality, [long]100);"
+        "$canvas.Save($dstPath, $encoder, $encoderParams);"
+        "$canvas.Dispose();"
+        "$resized.Dispose();"
+        "$src.Dispose();"
+    )
+
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode == 0:
+        return True
+
+    msg = Text("Wallpaper preparation warning: ", style="err")
+    msg.append("Unable to prepare a desktop-sized image, using original file.", style="body.text")
+    console.print(msg)
+    return False
 
 
 def _to_windows_path(local_image_path: Path) -> str | None:

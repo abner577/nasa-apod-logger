@@ -117,13 +117,13 @@ def get_todays_apod() -> Any:
 
     elif response.status_code == 404 or response.status_code == 403:
         msg = Text("\nRequest error: ", style="err")
-        msg.append("Verify your API key and try again.", style="body.text")
+        msg.append("Verify your API key and try again.\n", style="body.text")
         console.print(msg)
         return
 
     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
         msg = Text("\nNASA API error: ", style="err")
-        msg.append("Please try again later.", style="body.text")
+        msg.append("Please try again later.\n", style="body.text")
         console.print(msg)
         return
 
@@ -249,12 +249,12 @@ def get_apod_for_specific_day() -> Any:
 
                 elif response.status_code == 404 or response.status_code == 403:
                     msg = Text("\nRequest error: ", style="err")
-                    msg.append("Verify your API key and try again.", style="body.text")
+                    msg.append("Verify your API key and try again.\n", style="body.text")
                     console.print(msg)
 
                 elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
                     msg = Text("\nNASA API error: ", style="err")
-                    msg.append("Please try again later.", style="body.text")
+                    msg.append("Please try again later.\n", style="body.text")
                     console.print(msg)
 
             case 2:
@@ -376,13 +376,13 @@ def get_random_n_apods() -> Any:
 
                     elif response.status_code == 404 or response.status_code == 403:
                         msg = Text("\nRequest error: ", style="err")
-                        msg.append("Verify your API key and try again.", style="body.text")
+                        msg.append("Verify your API key and try again.\n", style="body.text")
                         console.print(msg)
                         continue
 
                     elif response.status_code == 500 or response.status_code == 503 or response.status_code == 504:
                         msg = Text("\nNASA API error: ", style="err")
-                        msg.append("Please try again later.", style="body.text")
+                        msg.append("Please try again later.\n", style="body.text")
                         console.print(msg)
                         continue
 

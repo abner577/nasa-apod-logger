@@ -244,9 +244,9 @@ def _set_wallpaper_through_wsl(local_image_path: Path) -> bool:
 
 def _set_wallpaper_macos(local_image_path: Path) -> bool:
     """Apply wallpaper on macOS with NSWorkspace and map Windows-style modes."""
-    mode = _get_resolution_type()
-    scaling_mode = _get_macos_scaling_mode(mode)
-    allow_clipping = "true" if mode in {"fill", "largest", "stretch", "span"} else "false"
+    # Keep Windows/WSL behavior unchanged; macOS should always use a fill effect.
+    scaling_mode = _get_macos_scaling_mode("fill")
+    allow_clipping = "true"
     escaped_path = str(local_image_path).replace("\\", "\\\\").replace('"', '\\"')
 
     script = f"""

@@ -1,10 +1,11 @@
-"""Windows wallpaper helpers for applying single APOD image entries automatically."""
+"""Cross-platform wallpaper helpers for applying single APOD image entries automatically."""
 
 from __future__ import annotations
 
 import ctypes
 import os
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +22,7 @@ from src.utils.apod_media_utils import (
 
 
 def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
-    """Download/reuse an APOD image in Downloads and set it as wallpaper on Windows.
+    """Download/reuse an APOD image in Downloads and set it as wallpaper.
 
     This helper is intended for *single APOD fetch flows* only. It skips video
     APODs, reuses previously downloaded files named with ``apod-YYYY-MM-DD``,
@@ -35,10 +36,11 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
         return
 
     is_windows = os.name == "nt"
+    is_macos = sys.platform == "darwin"
     is_wsl = _is_wsl_environment()
-    if not is_windows and not is_wsl:
+    if not is_windows and not is_wsl and not is_macos:
         msg = Text("Auto-wallpaper skipped: ", style="app.secondary")
-        msg.append("Wallpaper updates are currently supported on Windows/WSL only.", style="body.text")
+        msg.append("Wallpaper updates are currently supported on Windows/WSL/macOS.", style="body.text")
         console.print(msg)
         return
 
@@ -53,14 +55,16 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     if local_image_path is None:
         return
 
-    desktop_resolution = _get_desktop_resolution(is_windows=is_windows)
-    image_resolution = _get_image_resolution(local_image_path, is_wsl=is_wsl)
+    desktop_resolution = _get_desktop_resolution(is_windows=is_windows, is_macos=is_macos)
+    image_resolution = _get_image_resolution(local_image_path, is_wsl=is_wsl, is_macos=is_macos)
 
     # Uncomment this if you want 'debug' mode for setting image as wallpaper
     # _print_wallpaper_diagnostics(local_image_path, image_resolution, desktop_resolution)
 
     if is_windows:
         success = _set_wallpaper_windows_native(local_image_path)
+    elif is_macos:
+        success = _set_wallpaper_macos(local_image_path)
     else:
         success = _set_wallpaper_through_wsl(local_image_path)
 
@@ -71,7 +75,7 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
         console.print(msg)
     else:
         msg = Text("Wallpaper update failed: ", style="err")
-        msg.append("Unable to apply wallpaper through Windows APIs.", style="body.text")
+        msg.append("Unable to apply wallpaper through OS-specific APIs.", style="body.text")
         console.print(msg)
 
 
@@ -174,6 +178,11 @@ def _apply_wallpaper_style_preferences() -> None:
         console.print(msg)
 
 
+def _get_resolution_type() -> str:
+    """Return normalized wallpaper mode derived from ``RESOLUTION_TYPE``."""
+    return os.getenv("RESOLUTION_TYPE", "fit").strip().lower() or "fit"
+
+
 def _is_wsl_environment() -> bool:
     """Return ``True`` when running inside Windows Subsystem for Linux."""
     try:
@@ -233,6 +242,74 @@ def _set_wallpaper_through_wsl(local_image_path: Path) -> bool:
     return result.returncode == 0
 
 
+def _set_wallpaper_macos(local_image_path: Path) -> bool:
+    """Apply wallpaper on macOS with NSWorkspace and map Windows-style modes."""
+    # Keep Windows/WSL behavior unchanged; macOS should always use a fill effect.
+    scaling_mode = _get_macos_scaling_mode("fill")
+    allow_clipping = "true"
+    escaped_path = str(local_image_path).replace("\\", "\\\\").replace('"', '\\"')
+
+    script = f"""
+ObjC.import('AppKit');
+ObjC.import('Foundation');
+
+const wallpaperPath = \"{escaped_path}\";
+const wallpaperURL = $.NSURL.fileURLWithPath(wallpaperPath);
+const screens = $.NSScreen.screens;
+const ws = $.NSWorkspace.sharedWorkspace;
+
+const options = $.NSMutableDictionary.dictionary;
+options.setObjectForKey($({scaling_mode}), $.NSWorkspaceDesktopImageScalingKey);
+options.setObjectForKey($({allow_clipping}), $.NSWorkspaceDesktopImageAllowClippingKey);
+
+for (let i = 0; i < screens.count; i += 1) {{
+    const screen = screens.objectAtIndex(i);
+    const errorRef = Ref();
+    const ok = ws.setDesktopImageURLForScreenOptionsError(wallpaperURL, screen, options, errorRef);
+    if (!ok) {{
+        $.NSFileHandle.fileHandleWithStandardError.writeData(
+            $(\"Failed to set wallpaper for one or more screens.\").dataUsingEncoding($.NSUTF8StringEncoding),
+        );
+        $.exit(1);
+    }}
+}}
+"""
+
+    result = subprocess.run(
+        ["osascript", "-l", "JavaScript", "-e", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return False
+
+    resolution_x = os.getenv("RESOLUTION_X", "").strip()
+    resolution_y = os.getenv("RESOLUTION_Y", "").strip()
+    if resolution_x and resolution_y:
+        msg = Text("Wallpaper scaling target: ", style="app.secondary")
+        msg.append(f"{resolution_x}x{resolution_y}", style="body.text")
+        msg.append(" (style applied via RESOLUTION_TYPE).", style="body.text")
+        console.print(msg)
+
+    return True
+
+
+def _get_macos_scaling_mode(mode: str) -> int:
+    """Map Windows-compatible wallpaper modes to macOS scaling constants."""
+    mode_map = {
+        "default": 3,
+        "fit": 3,
+        "largest": 3,
+        "fill": 3,
+        "stretch": 1,
+        "center": 2,
+        "tile": 2,
+        "span": 3,
+    }
+    return mode_map.get(mode, 3)
+
+
 def _to_windows_path(local_image_path: Path) -> str | None:
     """Convert a WSL file path to a Windows path string."""
     result = subprocess.run(
@@ -253,7 +330,7 @@ def _to_windows_path(local_image_path: Path) -> str | None:
 
 def _get_wallpaper_style_values() -> tuple[str, str]:
     """Resolve wallpaper style values from RESOLUTION_TYPE preferences."""
-    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower()
+    resolution_type = _get_resolution_type()
 
     style_map = {
         "default": ("6", "0"),
@@ -300,10 +377,13 @@ def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> boo
     return True
 
 
-def _get_desktop_resolution(*, is_windows: bool) -> tuple[int, int] | None:
+def _get_desktop_resolution(*, is_windows: bool, is_macos: bool) -> tuple[int, int] | None:
     """Return the primary desktop resolution as ``(width, height)``."""
     if is_windows:
         return _get_desktop_resolution_windows()
+
+    if is_macos:
+        return _get_desktop_resolution_macos()
 
     return _get_desktop_resolution_wsl()
 
@@ -348,8 +428,30 @@ def _get_desktop_resolution_wsl() -> tuple[int, int] | None:
     return _parse_resolution(result.stdout)
 
 
-def _get_image_resolution(local_image_path: Path, *, is_wsl: bool) -> tuple[int, int] | None:
-    """Return image dimensions using PowerShell image metadata on Windows/WSL."""
+def _get_desktop_resolution_macos() -> tuple[int, int] | None:
+    """Return desktop resolution on macOS via AppKit/NSScreen."""
+    script = (
+        "ObjC.import('AppKit');"
+        "const frame = $.NSScreen.mainScreen.frame;"
+        "console.log(`${Math.round(frame.size.width)},${Math.round(frame.size.height)}`);"
+    )
+    result = subprocess.run(
+        ["osascript", "-l", "JavaScript", "-e", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+
+    return _parse_resolution(result.stdout)
+
+
+def _get_image_resolution(local_image_path: Path, *, is_wsl: bool, is_macos: bool) -> tuple[int, int] | None:
+    """Return image dimensions using native OS metadata commands."""
+    if is_macos:
+        return _get_image_resolution_macos(local_image_path)
+
     image_path = str(local_image_path)
     if is_wsl:
         windows_path = _to_windows_path(local_image_path)
@@ -366,6 +468,28 @@ def _get_image_resolution(local_image_path: Path, *, is_wsl: bool) -> tuple[int,
     )
     result = subprocess.run(
         ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+
+    return _parse_resolution(result.stdout)
+
+
+def _get_image_resolution_macos(local_image_path: Path) -> tuple[int, int] | None:
+    """Return image dimensions on macOS via NSImage."""
+    escaped_path = str(local_image_path).replace("\\", "\\\\").replace('"', '\\"')
+    script = (
+        "ObjC.import('AppKit');"
+        f"const image = $.NSImage.alloc.initWithContentsOfFile(\"{escaped_path}\");"
+        "if (!image) { $.exit(1); }"
+        "const size = image.size;"
+        "console.log(`${Math.round(size.width)},${Math.round(size.height)}`);"
+    )
+    result = subprocess.run(
+        ["osascript", "-l", "JavaScript", "-e", script],
         capture_output=True,
         text=True,
         check=False,
@@ -418,7 +542,7 @@ def _print_wallpaper_diagnostics(
         msg.append(f"{desktop_resolution[0]}x{desktop_resolution[1]}", style="body.text")
         console.print(msg)
 
-    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower() or "fit"
+    resolution_type = _get_resolution_type()
     msg = Text("Wallpaper scaling mode: ", style="app.secondary")
     msg.append(
         f"{resolution_type} (default now favors full-image visibility)",

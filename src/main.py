@@ -28,7 +28,7 @@ while entry_flag:
                 print_startup()
                 continue
         except SystemExit:
-            print("\nGoodbye 👋")
+            console.print("\nGoodbye 👋", style="app.secondary")
             raise
 
         if raw == "1":
@@ -36,7 +36,7 @@ while entry_flag:
             break
 
         if raw.lower() == "q":
-            print("\nGoodbye 👋")
+            console.print("\nGoodbye 👋", style="app.secondary")
             raise SystemExit
 
         msg = Text("\nInput error: ", style="err")
@@ -84,7 +84,7 @@ while flag:
         if handle_global_command(raw):
             continue
     except SystemExit:
-        print("\nGoodbye 👋")
+        console.print("\nGoodbye 👋", style="app.secondary")
         raise
 
     try:
@@ -117,7 +117,7 @@ while flag:
             user_settings_menu()
             clear_screen()
         case 4:
-            print("\nGoodbye 👋")
+            console.print("\nGoodbye 👋", style="app.secondary")
             flag = False
         case _:
             msg = Text("\nInput error: ", style="err")

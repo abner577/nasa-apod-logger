@@ -64,7 +64,7 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
     Accepts multiple syntaxes:
       - --help, -help, /help
       - --readme, -readme, /readme
-      - --quit, -quit, /quit, q
+      - --quit, -quit, /quit, quit, q
       - --auto-redirect, --automatically-redirect, /auto-redirect, /automatically-redirect
       - --auto-wallpaper, --automatically-set-wallpaper, /auto-wallpaper, /automatically-set-wallpaper
       - --settings, /settings, -settings
@@ -84,6 +84,8 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
         token = s[1:]
     elif s.startswith("/"):
         token = s[1:]
+    elif s.startswith("q"):
+        token = s[0:]
     else:
         return None
 

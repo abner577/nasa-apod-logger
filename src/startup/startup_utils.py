@@ -80,7 +80,7 @@ def nasa_apods_menu() -> Any:
             if handle_global_command(raw):
                 continue
         except SystemExit:
-            print("\nGoodbye 👋")
+            console.print("\nGoodbye 👋", style="app.secondary")
             raise
 
         try:
@@ -167,7 +167,7 @@ def output_files_menu() -> Any:
             if handle_global_command(raw):
                 continue
         except SystemExit:
-            print("\nGoodbye 👋")
+            console.print("\nGoodbye 👋", style="app.secondary")
             raise
 
         try:
@@ -277,7 +277,7 @@ def user_settings_menu() -> Any:
             if handle_global_command(raw):
                 continue
         except SystemExit:
-            print("\nGoodbye 👋")
+            console.print("\nGoodbye 👋", style="app.secondary")
             raise
 
         try:

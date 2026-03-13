@@ -350,7 +350,8 @@ def get_random_n_apods() -> Any:
                         log_multiple_json_entries(list_of_formatted_apod_entries, show_individual_success_messages=False)
 
                         msg = Text("Success: ", style="ok")
-                        msg.append("All APODs have been saved successfully ", style="body.text")
+                        msg.append(str(n), style="app.primary")
+                        msg.append(" Random APODs have been saved to log files ", style="body.text")
                         msg.append("✓", style="ok")
                         console.print(msg)
                         automatically_redirect_setting = get_automatically_redirect_setting()

@@ -76,6 +76,8 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
 
     if lowered == "q":
         return CommandMatch(CMD_QUIT)
+    elif lowered == "quit":
+        return CommandMatch(CMD_QUIT)
 
     # Allow: --cmd, -cmd, /cmd plus optional argument text.
     if lowered.startswith("--"):
@@ -229,7 +231,7 @@ def print_help() -> None:
     cmd_row("--settings, /settings", "View settings configuration")
     cmd_row("--auto-redirect, /auto-redirect", "Change auto-redirect setting")
     cmd_row("--auto-wallpaper, /auto-wallpaper", "Change auto-wallpaper setting")
-    cmd_row("--auto-wallpaper <filepath>, /auto-wallpaper <filepath>", "Set wallpaper immediately from a local image path")
+    cmd_row("--auto-wallpaper <filepath>", "Set wallpaper from a global image path")
     cmd_row("--auto-save, /auto-save", "Change auto-save APOD files setting")
 
     console.print()

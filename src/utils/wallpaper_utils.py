@@ -30,11 +30,8 @@ def apply_auto_wallpaper_from_file_path(raw_file_path: str) -> None:
         console.print(msg)
         return
 
-    local_image_path = Path(cleaned_path).expanduser()
-    if not local_image_path.is_absolute():
-        local_image_path = local_image_path.resolve()
-
-    if not local_image_path.exists() or not local_image_path.is_file():
+    local_image_path = _resolve_local_image_path(cleaned_path)
+    if local_image_path is None:
         msg = Text("Auto-wallpaper skipped: ", style="err")
         msg.append("Provided file path does not exist.", style="body.text")
         console.print(msg)
@@ -62,6 +59,29 @@ def apply_auto_wallpaper_from_file_path(raw_file_path: str) -> None:
         is_wsl=is_wsl,
     )
 
+
+
+def _resolve_local_image_path(raw_path: str) -> Path | None:
+    """Resolve a user-provided image path for the current runtime OS."""
+    candidate_path = Path(raw_path).expanduser()
+    if candidate_path.exists() and candidate_path.is_file():
+        return candidate_path
+
+    if candidate_path.is_absolute() and candidate_path.exists() and candidate_path.is_file():
+        return candidate_path
+
+    is_wsl = _is_wsl_environment()
+    if is_wsl:
+        wsl_converted_path = _windows_path_to_wsl_path(raw_path)
+        if wsl_converted_path is not None and wsl_converted_path.exists() and wsl_converted_path.is_file():
+            return wsl_converted_path
+
+    if not candidate_path.is_absolute():
+        resolved_path = candidate_path.resolve()
+        if resolved_path.exists() and resolved_path.is_file():
+            return resolved_path
+
+    return None
 
 def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     """Download/reuse an APOD image in Downloads and set it as wallpaper.
@@ -366,6 +386,24 @@ def _get_macos_scaling_mode(mode: str) -> int:
         "span": 3,
     }
     return mode_map.get(mode, 3)
+
+
+def _windows_path_to_wsl_path(raw_windows_path: str) -> Path | None:
+    """Convert a Windows path string to a WSL path when available."""
+    result = subprocess.run(
+        ["wslpath", "-u", raw_windows_path],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+
+    converted = result.stdout.strip()
+    if not converted:
+        return None
+
+    return Path(converted)
 
 
 def _to_windows_path(local_image_path: Path) -> str | None:

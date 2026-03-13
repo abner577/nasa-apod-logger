@@ -237,7 +237,6 @@ def get_apod_for_specific_day() -> Any:
                     if should_save_file:
                         console.print()
                         local_file_path = maybe_download_apod_file(apod_raw_data, True)
-                        console.print()
                         if local_file_path:
                             update_local_file_path_in_csv(apod_data['date'], local_file_path)
                             update_local_file_path_in_json(apod_data['date'], local_file_path)
@@ -245,6 +244,7 @@ def get_apod_for_specific_day() -> Any:
                     wallpaper_setting = get_automatically_set_wallpaper()
                     should_set_wallpaper = wallpaper_setting and wallpaper_setting.get("automatically_set_wallpaper") == "yes"
                     if should_set_wallpaper:
+                        console.print()
                         apply_auto_wallpaper_for_single_apod(apod_raw_data)
 
                 elif response.status_code == 404 or response.status_code == 403:

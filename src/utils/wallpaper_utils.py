@@ -129,12 +129,21 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     if local_image_path is None:
         return
 
-    _apply_local_image_as_wallpaper(
+    success = _apply_local_image_as_wallpaper_with_progress(
         local_image_path,
         is_windows=is_windows,
         is_macos=is_macos,
         is_wsl=is_wsl,
     )
+    if success:
+        msg = Text("Success: ", style="ok")
+        msg.append("Wallpaper was updated", style="body.text")
+        msg.append(" ✓", style="ok")
+        console.print(msg)
+    else:
+        msg = Text("Wallpaper update failed: ", style="err")
+        msg.append("Unable to apply wallpaper through OS-specific APIs.", style="body.text")
+        console.print(msg)
 
 
 def _apply_local_image_as_wallpaper(

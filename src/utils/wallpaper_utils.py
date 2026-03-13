@@ -21,6 +21,68 @@ from src.utils.apod_media_utils import (
 )
 
 
+def apply_auto_wallpaper_from_file_path(raw_file_path: str) -> None:
+    """Set wallpaper immediately from a user-provided local image file path."""
+    cleaned_path = raw_file_path.strip().strip('"').strip("'")
+    if not cleaned_path:
+        msg = Text("Auto-wallpaper skipped: ", style="err")
+        msg.append("No file path was provided.", style="body.text")
+        console.print(msg)
+        return
+
+    local_image_path = _resolve_local_image_path(cleaned_path)
+    if local_image_path is None:
+        msg = Text("Auto-wallpaper skipped: ", style="err")
+        msg.append("Provided file path does not exist.", style="body.text")
+        console.print(msg)
+        return
+
+    if local_image_path.suffix.lower() not in {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tif", ".tiff"}:
+        msg = Text("Auto-wallpaper skipped: ", style="err")
+        msg.append("Provided file is not a supported image type.", style="body.text")
+        console.print(msg)
+        return
+
+    is_windows = os.name == "nt"
+    is_macos = sys.platform == "darwin"
+    is_wsl = _is_wsl_environment()
+    if not is_windows and not is_wsl and not is_macos:
+        msg = Text("Auto-wallpaper skipped: ", style="app.secondary")
+        msg.append("Wallpaper updates are currently supported on Windows/WSL/macOS.", style="body.text")
+        console.print(msg)
+        return
+
+    _apply_local_image_as_wallpaper(
+        local_image_path,
+        is_windows=is_windows,
+        is_macos=is_macos,
+        is_wsl=is_wsl,
+    )
+
+
+
+def _resolve_local_image_path(raw_path: str) -> Path | None:
+    """Resolve a user-provided image path for the current runtime OS."""
+    candidate_path = Path(raw_path).expanduser()
+    if candidate_path.exists() and candidate_path.is_file():
+        return candidate_path
+
+    if candidate_path.is_absolute() and candidate_path.exists() and candidate_path.is_file():
+        return candidate_path
+
+    is_wsl = _is_wsl_environment()
+    if is_wsl:
+        wsl_converted_path = _windows_path_to_wsl_path(raw_path)
+        if wsl_converted_path is not None and wsl_converted_path.exists() and wsl_converted_path.is_file():
+            return wsl_converted_path
+
+    if not candidate_path.is_absolute():
+        resolved_path = candidate_path.resolve()
+        if resolved_path.exists() and resolved_path.is_file():
+            return resolved_path
+
+    return None
+
 def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     """Download/reuse an APOD image in Downloads and set it as wallpaper.
 
@@ -55,6 +117,22 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     if local_image_path is None:
         return
 
+    _apply_local_image_as_wallpaper(
+        local_image_path,
+        is_windows=is_windows,
+        is_macos=is_macos,
+        is_wsl=is_wsl,
+    )
+
+
+def _apply_local_image_as_wallpaper(
+    local_image_path: Path,
+    *,
+    is_windows: bool,
+    is_macos: bool,
+    is_wsl: bool,
+) -> None:
+    """Apply a local image path as wallpaper with existing platform-specific logic."""
     desktop_resolution = _get_desktop_resolution(is_windows=is_windows, is_macos=is_macos)
     image_resolution = _get_image_resolution(local_image_path, is_wsl=is_wsl, is_macos=is_macos)
 
@@ -308,6 +386,24 @@ def _get_macos_scaling_mode(mode: str) -> int:
         "span": 3,
     }
     return mode_map.get(mode, 3)
+
+
+def _windows_path_to_wsl_path(raw_windows_path: str) -> Path | None:
+    """Convert a Windows path string to a WSL path when available."""
+    result = subprocess.run(
+        ["wslpath", "-u", raw_windows_path],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+
+    converted = result.stdout.strip()
+    if not converted:
+        return None
+
+    return Path(converted)
 
 
 def _to_windows_path(local_image_path: Path) -> str | None:

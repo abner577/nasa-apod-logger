@@ -19,6 +19,7 @@ from src.user_settings import (
     get_all_user_settings,
     print_settings_box,
 )
+from src.utils.wallpaper_utils import apply_auto_wallpaper_from_file_path
 
 from src.utils.browser_utils import take_user_to_browser
 from src.config import README_URL
@@ -32,6 +33,7 @@ class CommandMatch:
     Represents a normalized command and whether it is recognized as a command.
     """
     name: str
+    argument: str | None = None
 
 CMD_HELP = "help"
 CMD_README = "readme"
@@ -54,10 +56,6 @@ def clear_screen() -> None:
         print("\n" * 80)
 
 
-def _normalize(raw: str) -> str:
-    return raw.strip().lower()
-
-
 def parse_global_command(raw: str) -> Optional[CommandMatch]:
     """
     If raw input matches a global command, return CommandMatch; else None.
@@ -70,48 +68,56 @@ def parse_global_command(raw: str) -> Optional[CommandMatch]:
       - --settings, /settings, -settings
       - --auto-save, /auto-save, --automatically-save-apod-files
     """
-    s = _normalize(raw)
-    if not s:
+    original = raw.strip()
+    if not original:
         return None
 
-    if s == "q":
+    lowered = original.lower()
+
+    if lowered == "q":
+        return CommandMatch(CMD_QUIT)
+    elif lowered == "quit":
         return CommandMatch(CMD_QUIT)
 
-    # Allow: --cmd, -cmd, /cmd
-    if s.startswith("--"):
-        token = s[2:]
-    elif s.startswith("-"):
-        token = s[1:]
-    elif s.startswith("/"):
-        token = s[1:]
-    elif s.startswith("q"):
-        token = s[0:]
+    # Allow: --cmd, -cmd, /cmd plus optional argument text.
+    if lowered.startswith("--"):
+        remainder = original[2:]
+    elif lowered.startswith("-"):
+        remainder = original[1:]
+    elif lowered.startswith("/"):
+        remainder = original[1:]
     else:
         return None
 
-    token = token.strip()
+    remainder = remainder.strip()
+    if not remainder:
+        return None
 
-    token = token.replace(" ", "-").replace("_", "-")
+    parts = remainder.split(maxsplit=1)
+    token = parts[0].lower().replace("_", "-")
+    argument = parts[1].strip() if len(parts) > 1 else None
 
-    if token == "help":
+    token = token.replace(" ", "-")
+
+    if token == "help" and not argument:
         return CommandMatch(CMD_HELP)
 
-    if token == "readme":
+    if token == "readme" and not argument:
         return CommandMatch(CMD_README)
 
-    if token in ("quit", "q", "exit"):
+    if token in ("quit", "q", "exit") and not argument:
         return CommandMatch(CMD_QUIT)
 
-    if token in ("auto-redirect", "automatically-redirect"):
+    if token in ("auto-redirect", "automatically-redirect") and not argument:
         return CommandMatch(CMD_AUTO_REDIRECT)
 
     if token in ("auto-wallpaper", "automatically-set-wallpaper"):
-        return CommandMatch(CMD_AUTO_WALLPAPER)
+        return CommandMatch(CMD_AUTO_WALLPAPER, argument=argument)
 
-    if token == "settings":
+    if token == "settings" and not argument:
         return CommandMatch(CMD_VIEW_SETTINGS)
 
-    if token in ("auto-save", "automatically-save-apod-files"):
+    if token in ("auto-save", "automatically-save-apod-files") and not argument:
         return CommandMatch(CMD_AUTO_SAVE)
 
     return None
@@ -145,16 +151,22 @@ def handle_global_command(raw: str) -> bool:
         return True
 
     if match.name == CMD_AUTO_WALLPAPER:
-        def change_auto_wallpaper() -> Any:
-            update_automatically_set_wallpaper()
+        if match.argument:
+            def set_wallpaper_from_path() -> Any:
+                apply_auto_wallpaper_from_file_path(match.argument or "")
 
-            settings_dict = get_all_user_settings()
-            if not settings_dict:
-                return
+            run_plain_modal(set_wallpaper_from_path)
+        else:
+            def change_auto_wallpaper() -> Any:
+                update_automatically_set_wallpaper()
 
-            print_settings_box(settings_dict)
+                settings_dict = get_all_user_settings()
+                if not settings_dict:
+                    return
 
-        run_plain_modal(change_auto_wallpaper)
+                print_settings_box(settings_dict)
+
+            run_plain_modal(change_auto_wallpaper)
         return True
 
     if match.name == CMD_VIEW_SETTINGS:
@@ -219,6 +231,7 @@ def print_help() -> None:
     cmd_row("--settings, /settings", "View settings configuration")
     cmd_row("--auto-redirect, /auto-redirect", "Change auto-redirect setting")
     cmd_row("--auto-wallpaper, /auto-wallpaper", "Change auto-wallpaper setting")
+    cmd_row("--auto-wallpaper <filepath>", "Set wallpaper from a global image path")
     cmd_row("--auto-save, /auto-save", "Change auto-save APOD files setting")
 
     console.print()

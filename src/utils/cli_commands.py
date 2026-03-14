@@ -19,7 +19,7 @@ from src.user_settings import (
     get_all_user_settings,
     print_settings_box,
 )
-from src.utils.wallpaper_utils import apply_auto_wallpaper_from_file_path
+from src.wallpaper import apply_auto_wallpaper_from_file_path
 
 from src.utils.browser_utils import take_user_to_browser
 from src.config import README_URL

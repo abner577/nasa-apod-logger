@@ -30,7 +30,7 @@ from src.storage.json_storage import (
 from src.utils.browser_utils import take_user_to_browser
 from src.utils.data_utils import format_apod_data
 from src.utils.apod_media_utils import maybe_download_apod_file, _get_existing_local_file_path
-from src.utils.wallpaper_utils import apply_auto_wallpaper_for_single_apod
+from src.wallpaper import apply_auto_wallpaper_for_single_apod
 from src.user_settings import (
     get_automatically_save_apod_files,
     get_automatically_redirect_setting,

@@ -250,7 +250,7 @@ def _set_local_image_as_wallpaper(
     is_wsl: bool,
 ) -> bool:
     """Run the existing wallpaper-setting flow and return whether it succeeded."""
-    desktop_resolution = _get_desktop_resolution(is_windows=is_windows, is_macos=is_macos)
+    desktop_resolution = _get_desktop_resolution(is_windows=is_windows, is_macos=is_macos, is_wsl=is_wsl)
     image_resolution = _get_image_resolution(local_image_path, is_wsl=is_wsl, is_macos=is_macos)
 
     # Uncomment this if you want 'debug' mode for setting image as wallpaper
@@ -809,13 +809,16 @@ def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> boo
     return True
 
 
-def _get_desktop_resolution(*, is_windows: bool, is_macos: bool) -> tuple[int, int] | None:
+def _get_desktop_resolution(*, is_windows: bool, is_macos: bool, is_wsl: bool) -> tuple[int, int] | None:
     """Return the primary desktop resolution as ``(width, height)``."""
     if is_windows:
         return _get_desktop_resolution_windows()
 
     if is_macos:
         return _get_desktop_resolution_macos()
+
+    if not is_wsl:
+        return None
 
     return _get_desktop_resolution_wsl()
 
@@ -884,12 +887,14 @@ def _get_image_resolution(local_image_path: Path, *, is_wsl: bool, is_macos: boo
     if is_macos:
         return _get_image_resolution_macos(local_image_path)
 
+    if not is_wsl:
+        return None
+
     image_path = str(local_image_path)
-    if is_wsl:
-        windows_path = _to_windows_path(local_image_path)
-        if windows_path is None:
-            return None
-        image_path = windows_path
+    windows_path = _to_windows_path(local_image_path)
+    if windows_path is None:
+        return None
+    image_path = windows_path
 
     escaped_path = image_path.replace("'", "''")
     script = (

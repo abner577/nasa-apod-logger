@@ -392,9 +392,9 @@ def download_apod_file(apod_data: dict, *, show_progress: bool = True) -> str | 
                     f"content-type={content_type or '<empty>'}, final_url={response.url}"
                 )
 
-                msg = Text("Skipped file download (video APOD): ", style="app.secondary")
-                msg.append(
-                    "This APOD is hosted on YouTube, so automatic download is not available.", style="body.text")
+                msg = Text("Skipped file download: ", style="app.secondary")
+                msg.append(f"apod-{date_value} ", style="app.primary")
+                msg.append(" is hosted on YouTube, so automatic download is not available.", style="body.text")
                 console.print(msg)
                 return None
 
@@ -468,9 +468,9 @@ def download_apod_file(apod_data: dict, *, show_progress: bool = True) -> str | 
         return str(file_path)
 
     except requests.RequestException as e:
-        msg = Text("Skipped file download (video APOD): ", style="app.secondary")
-        msg.append(
-            "This APOD is hosted on a streaming website, so automatic download is not available.", style="body.text")
+        msg = Text("Skipped file download: ", style="app.secondary")
+        msg.append(f"apod-{date_value} ", style="app.primary")
+        msg.append(" is hosted on YouTube, so automatic download is not available.", style="body.text")
         console.print(msg)
 
     except OSError as e:

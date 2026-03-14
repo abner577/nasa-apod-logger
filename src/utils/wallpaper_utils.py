@@ -16,6 +16,23 @@ from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 
 from src.startup.console import console
+from src.wallpaper.linux import (
+    detect_linux_desktop_environment as _linux_detect_linux_desktop_environment,
+    run_linux_wallpaper_command as _linux_run_linux_wallpaper_command,
+    set_wallpaper_linux as _linux_set_wallpaper_linux,
+)
+from src.wallpaper.macos import set_wallpaper_macos as _macos_set_wallpaper_macos
+from src.wallpaper.windows import (
+    apply_wallpaper_style_preferences as _windows_apply_wallpaper_style_preferences,
+    set_wallpaper_windows_native as _windows_set_wallpaper_windows_native,
+)
+from src.wallpaper.wsl import (
+    apply_wallpaper_style_preferences_wsl as _wsl_apply_wallpaper_style_preferences_wsl,
+    get_wallpaper_style_values as _wsl_get_wallpaper_style_values,
+    set_wallpaper_through_wsl as _wsl_set_wallpaper_through_wsl,
+    to_windows_path as _wsl_to_windows_path,
+    windows_path_to_wsl_path as _wsl_windows_path_to_wsl_path,
+)
 from src.utils.apod_media_utils import (
     get_apod_download_dir,
     get_existing_date_file_path,
@@ -47,11 +64,6 @@ def apply_auto_wallpaper_from_file_path(raw_file_path: str) -> None:
     is_windows = os.name == "nt"
     is_macos = sys.platform == "darwin"
     is_wsl = _is_wsl_environment()
-    if not is_windows and not is_wsl and not is_macos:
-        msg = Text("Auto-wallpaper skipped: ", style="app.secondary")
-        msg.append("Wallpaper updates are currently supported on Windows/WSL/macOS.", style="body.text")
-        console.print(msg)
-        return
 
     success = _apply_local_image_as_wallpaper_with_progress(
         local_image_path,
@@ -112,11 +124,6 @@ def apply_auto_wallpaper_for_single_apod(apod_data: dict[str, Any]) -> None:
     is_windows = os.name == "nt"
     is_macos = sys.platform == "darwin"
     is_wsl = _is_wsl_environment()
-    if not is_windows and not is_wsl and not is_macos:
-        msg = Text("Auto-wallpaper skipped: ", style="app.secondary")
-        msg.append("Wallpaper updates are currently supported on Windows/WSL/macOS.", style="body.text")
-        console.print(msg)
-        return
 
     date_value = str(apod_data.get("date", "")).strip()
     if not date_value:
@@ -182,8 +189,10 @@ def _apply_local_image_as_wallpaper(
         success = _set_wallpaper_windows_native(local_image_path)
     elif is_macos:
         success = _set_wallpaper_macos(local_image_path)
-    else:
+    elif is_wsl:
         success = _set_wallpaper_through_wsl(local_image_path)
+    else:
+        success = _set_wallpaper_linux(local_image_path)
 
     if success:
         msg = Text("Success: ", style="ok")
@@ -267,8 +276,10 @@ def _set_local_image_as_wallpaper(
         success = _set_wallpaper_windows_native(local_image_path)
     elif is_macos:
         success = _set_wallpaper_macos(local_image_path)
-    else:
+    elif is_wsl:
         success = _set_wallpaper_through_wsl(local_image_path)
+    else:
+        success = _set_wallpaper_linux(local_image_path)
 
     return success
 
@@ -333,43 +344,7 @@ def _resolve_or_download_image_for_date(apod_data: dict[str, Any], date_value: s
 
 def _apply_wallpaper_style_preferences() -> None:
     """Apply wallpaper scaling style based on environment configuration values."""
-    resolution_type = os.getenv("RESOLUTION_TYPE", "fit").strip().lower()
-    resolution_x = os.getenv("RESOLUTION_X", "").strip()
-    resolution_y = os.getenv("RESOLUTION_Y", "").strip()
-
-    style_map = {
-        "default": ("6", "0"),
-        "fit": ("6", "0"),
-        "largest": ("10", "0"),
-        "fill": ("10", "0"),
-        "stretch": ("2", "0"),
-        "center": ("0", "0"),
-        "tile": ("0", "1"),
-        "span": ("22", "0"),
-    }
-
-    wallpaper_style, tile_value = style_map.get(resolution_type, style_map["fit"])
-
-    try:
-        import winreg
-
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Control Panel\Desktop", 0, winreg.KEY_SET_VALUE)
-        with key:
-            winreg.SetValueEx(key, "WallpaperStyle", 0, winreg.REG_SZ, wallpaper_style)
-            winreg.SetValueEx(key, "TileWallpaper", 0, winreg.REG_SZ, tile_value)
-            winreg.SetValueEx(key, "JPEGImportQuality", 0, winreg.REG_DWORD, 100)
-
-    except OSError as error:
-        msg = Text("Wallpaper style warning: ", style="err")
-        msg.append(str(error), style="body.text")
-        console.print(msg)
-        return
-
-    if resolution_x and resolution_y:
-        msg = Text("Wallpaper scaling target: ", style="app.secondary")
-        msg.append(f"{resolution_x}x{resolution_y}", style="body.text")
-        msg.append(" (style applied via RESOLUTION_TYPE).", style="body.text")
-        console.print(msg)
+    _windows_apply_wallpaper_style_preferences()
 
 
 def _get_resolution_type() -> str:
@@ -377,217 +352,54 @@ def _get_resolution_type() -> str:
     return os.getenv("RESOLUTION_TYPE", "fit").strip().lower() or "fit"
 
 
-def _is_wsl_environment() -> bool:
-    """Return ``True`` when running inside Windows Subsystem for Linux."""
-    try:
-        release = os.uname().release.lower()
-        return "microsoft" in release or "wsl" in release
-    except AttributeError:
-        return False
+def _detect_linux_desktop_environment() -> str:
+    """Detect Linux desktop environment and normalize it to a canonical value."""
+    return _linux_detect_linux_desktop_environment()
+
+
+def _set_wallpaper_linux(local_image_path: Path) -> bool:
+    """Apply wallpaper on Linux desktop environments with DE-specific commands."""
+    return _linux_set_wallpaper_linux(local_image_path)
+
+
+def _run_linux_wallpaper_command(command: list[str], *, command_name: str) -> bool:
+    """Run Linux wallpaper command and return ``True`` when exit code is zero."""
+    return _linux_run_linux_wallpaper_command(command, command_name=command_name)
 
 
 def _set_wallpaper_windows_native(local_image_path: Path) -> bool:
     """Apply wallpaper directly through Win32 APIs when running on Windows."""
-    _apply_wallpaper_style_preferences()
-    success = ctypes.windll.user32.SystemParametersInfoW(20, 0, str(local_image_path), 3)
-    if not success:
-        error_code = ctypes.GetLastError()
-        msg = Text("Wallpaper update failed: ", style="err")
-        msg.append(f"Windows error {error_code}.", style="body.text")
-        console.print(msg)
-        return False
-
-    return True
+    return _windows_set_wallpaper_windows_native(local_image_path)
 
 
 def _set_wallpaper_through_wsl(local_image_path: Path) -> bool:
     """Apply wallpaper from WSL by invoking Windows PowerShell commands."""
-    windows_path = _to_windows_path(local_image_path)
-    if windows_path is None:
-        msg = Text("Wallpaper update failed: ", style="err")
-        msg.append("Unable to convert Linux path to Windows path in WSL.", style="body.text")
-        console.print(msg)
-        return False
-
-    style_values = _get_wallpaper_style_values()
-    if not _apply_wallpaper_style_preferences_wsl(style_values):
-        return False
-
-    escaped_path = windows_path.replace("'", "''")
-    powershell_script = (
-        "$code = @'\n"
-        "using System.Runtime.InteropServices;\n"
-        "public class WinAPI {\n"
-        "  [DllImport(\"user32.dll\", SetLastError=true)]\n"
-        "  public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);\n"
-        "}\n"
-        "'@;\n"
-        "Add-Type -TypeDefinition $code;\n"
-        f"$ok = [WinAPI]::SystemParametersInfo(20, 0, '{escaped_path}', 3);\n"
-        "if (-not $ok) { exit 1 }"
-    )
-
-    result = subprocess.run(
-        ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", powershell_script],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    return result.returncode == 0
+    return _wsl_set_wallpaper_through_wsl(local_image_path)
 
 
 def _set_wallpaper_macos(local_image_path: Path) -> bool:
     """Apply wallpaper on macOS with NSWorkspace and map Windows-style modes."""
-    # Keep Windows/WSL behavior unchanged; macOS should always use a fill effect.
-    scaling_mode = _get_macos_scaling_mode("fill")
-    allow_clipping = "true"
-    escaped_path = str(local_image_path).replace("\\", "\\\\").replace('"', '\\"')
-
-    script = f"""
-ObjC.import('AppKit');
-ObjC.import('Foundation');
-
-const wallpaperPath = \"{escaped_path}\";
-const wallpaperURL = $.NSURL.fileURLWithPath(wallpaperPath);
-const screens = $.NSScreen.screens;
-const ws = $.NSWorkspace.sharedWorkspace;
-
-const options = $.NSMutableDictionary.dictionary;
-options.setObjectForKey($({scaling_mode}), $.NSWorkspaceDesktopImageScalingKey);
-options.setObjectForKey($({allow_clipping}), $.NSWorkspaceDesktopImageAllowClippingKey);
-
-for (let i = 0; i < screens.count; i += 1) {{
-    const screen = screens.objectAtIndex(i);
-    const errorRef = Ref();
-    const ok = ws.setDesktopImageURLForScreenOptionsError(wallpaperURL, screen, options, errorRef);
-    if (!ok) {{
-        $.NSFileHandle.fileHandleWithStandardError.writeData(
-            $(\"Failed to set wallpaper for one or more screens.\").dataUsingEncoding($.NSUTF8StringEncoding),
-        );
-        $.exit(1);
-    }}
-}}
-"""
-
-    result = subprocess.run(
-        ["osascript", "-l", "JavaScript", "-e", script],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return False
-
-    resolution_x = os.getenv("RESOLUTION_X", "").strip()
-    resolution_y = os.getenv("RESOLUTION_Y", "").strip()
-    if resolution_x and resolution_y:
-        msg = Text("Wallpaper scaling target: ", style="app.secondary")
-        msg.append(f"{resolution_x}x{resolution_y}", style="body.text")
-        msg.append(" (style applied via RESOLUTION_TYPE).", style="body.text")
-        console.print(msg)
-
-    return True
-
-
-def _get_macos_scaling_mode(mode: str) -> int:
-    """Map Windows-compatible wallpaper modes to macOS scaling constants."""
-    mode_map = {
-        "default": 3,
-        "fit": 3,
-        "largest": 3,
-        "fill": 3,
-        "stretch": 1,
-        "center": 2,
-        "tile": 2,
-        "span": 3,
-    }
-    return mode_map.get(mode, 3)
+    return _macos_set_wallpaper_macos(local_image_path)
 
 
 def _windows_path_to_wsl_path(raw_windows_path: str) -> Path | None:
     """Convert a Windows path string to a WSL path when available."""
-    result = subprocess.run(
-        ["wslpath", "-u", raw_windows_path],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return None
-
-    converted = result.stdout.strip()
-    if not converted:
-        return None
-
-    return Path(converted)
+    return _wsl_windows_path_to_wsl_path(raw_windows_path)
 
 
 def _to_windows_path(local_image_path: Path) -> str | None:
     """Convert a WSL file path to a Windows path string."""
-    result = subprocess.run(
-        ["wslpath", "-w", str(local_image_path)],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return None
-
-    converted = result.stdout.strip()
-    if not converted:
-        return None
-
-    return converted
+    return _wsl_to_windows_path(local_image_path)
 
 
 def _get_wallpaper_style_values() -> tuple[str, str]:
     """Resolve wallpaper style values from RESOLUTION_TYPE preferences."""
-    resolution_type = _get_resolution_type()
-
-    style_map = {
-        "default": ("6", "0"),
-        "fit": ("6", "0"),
-        "largest": ("10", "0"),
-        "fill": ("10", "0"),
-        "stretch": ("2", "0"),
-        "center": ("0", "0"),
-        "tile": ("0", "1"),
-        "span": ("22", "0"),
-    }
-    return style_map.get(resolution_type, style_map["fit"])
+    return _wsl_get_wallpaper_style_values()
 
 
 def _apply_wallpaper_style_preferences_wsl(style_values: tuple[str, str]) -> bool:
     """Set wallpaper style registry values through PowerShell when in WSL."""
-    wallpaper_style, tile_value = style_values
-    script = (
-        "$path = 'HKCU:\\Control Panel\\Desktop';"
-        f"Set-ItemProperty -Path $path -Name WallpaperStyle -Value '{wallpaper_style}';"
-        f"Set-ItemProperty -Path $path -Name TileWallpaper -Value '{tile_value}';"
-        "Set-ItemProperty -Path $path -Name JPEGImportQuality -Type DWord -Value 100;"
-    )
-    result = subprocess.run(
-        ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        msg = Text("Wallpaper style warning: ", style="err")
-        msg.append("Unable to apply style preferences through PowerShell.", style="body.text")
-        console.print(msg)
-        return False
-
-    resolution_x = os.getenv("RESOLUTION_X", "").strip()
-    resolution_y = os.getenv("RESOLUTION_Y", "").strip()
-    if resolution_x and resolution_y:
-        msg = Text("Wallpaper scaling target: ", style="app.secondary")
-        msg.append(f"{resolution_x}x{resolution_y}", style="body.text")
-        msg.append(" (style applied via RESOLUTION_TYPE).", style="body.text")
-        console.print(msg)
-
-    return True
-
+    return _wsl_apply_wallpaper_style_preferences_wsl(style_values)
 
 def _get_desktop_resolution(*, is_windows: bool, is_macos: bool) -> tuple[int, int] | None:
     """Return the primary desktop resolution as ``(width, height)``."""

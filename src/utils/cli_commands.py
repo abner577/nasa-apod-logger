@@ -224,7 +224,7 @@ def print_help() -> None:
     def cmd_row(left: str, right: str) -> None:
         row = Text("", style="body.text")
         row.append(left, style="app.primary")
-        padding = max(1, 35 - len(left))
+        padding = max(1, 31 - len(left))
         row.append(" " * padding, style="body.text")
         row.append(right, style="body.text")
         console.print(row)

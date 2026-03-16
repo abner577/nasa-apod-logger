@@ -12,11 +12,11 @@ A CLI application that wraps the [NASA Astronomy Picture of the Day (APOD) API](
 
 ## Table of Contents
 
-- [Project Overview](#project-overview)
+- [Project Overview 🌌](#project-overview-)
 - [Feature Summary](#feature-summary)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
-- [Setup](#setup)
+- [Setup 🚀](#setup-)
   - [1) Verify Python is installed](#1-verify-python-is-installed)
   - [2) Verify pip is installed](#2-verify-pip-is-installed)
   - [3) Verify Git is installed](#3-verify-git-is-installed)
@@ -25,23 +25,23 @@ A CLI application that wraps the [NASA Astronomy Picture of the Day (APOD) API](
   - [6) Install dependencies](#6-install-dependencies)
   - [7) Configure environment variables](#7-configure-environment-variables)
   - [8) Run the CLI](#8-run-the-cli)
-- [Configuration](#configuration)
+- [Configuration 🛰️](#configuration-)
   - [Environment Variables (`.env`)](#environment-variables-env)
   - [Runtime User Settings (`data/settings.jsonl`)](#runtime-user-settings-datasettingsjsonl)
-  - [How Auto-Save Works](#how-auto-save-works)
-  - [How Auto-Wallpaper Works](#how-auto-wallpaper-works)
+  - [How Auto-Save Works 💾](#how-auto-save-works)
+  - [How Auto-Wallpaper Works 🌠](#how-auto-wallpaper-works-)
 - [How to Use the CLI](#how-to-use-the-cli)
   - [Startup and Main Menu](#startup-and-main-menu)
-  - [NASA APOD Requests](#nasa-apod-requests)
+  - [NASA APOD Requests 🔭](#nasa-apod-requests-)
   - [Log & File Tools](#log--file-tools)
   - [Preferences](#preferences)
-  - [Global Commands](#global-commands)
+  - [Global Commands 🛠️](#global-commands-)
 - [Output Files and Data](#output-files-and-data)
 - [Troubleshooting](#troubleshooting)
 
 ---
 
-## Project Overview
+## Project Overview 🌌
 
 This project is a terminal application that sits on top of NASA's APOD API and provides a complete local workflow instead of just raw API calls.
 
@@ -109,7 +109,7 @@ When you request APOD data, the CLI:
 
 ---
 
-## Setup
+## Setup 🚀
 
 ### 1) Verify Python is installed
 
@@ -215,7 +215,7 @@ On first run, startup checks create missing runtime files under `data/` automati
 
 ---
 
-## Configuration
+## Configuration 🛰️
 
 ### Environment Variables (`.env`)
 
@@ -247,7 +247,7 @@ You can change settings from:
    - `--settings`
 
 
-### How Auto-Save Works
+### How Auto-Save Works 💾
 
 When `automatically_save_apod_files` is ON:
 
@@ -257,7 +257,7 @@ When `automatically_save_apod_files` is ON:
 
 For APOD videos hosted on YouTube or other sites, automatic file download is skipped.
 
-### How Auto-Wallpaper Works
+### How Auto-Wallpaper Works 🌠
 
 When `automatically_set_wallpaper` is ON:
 
@@ -297,7 +297,7 @@ Main menu options:
 3. **Change Setting**
 4. **Goodbye**
 
-### NASA APOD Requests
+### NASA APOD Requests 🔭
 
 Inside **NASA APOD Requests**:
 
@@ -338,7 +338,7 @@ Inside **Preferences**:
 4. Change auto-save-apod-files setting
 5. Return to Main Menu
 
-### Global Commands
+### Global Commands 🛠️
 
 These can be entered from menu prompts:
 

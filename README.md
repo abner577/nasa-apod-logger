@@ -1,6 +1,6 @@
 # NASA APOD CLI
 
-A developer-facing, interactive command-line application that wraps the [NASA Astronomy Picture of the Day (APOD) API](https://api.nasa.gov/) and adds local tooling for:
+A CLI application that wraps the [NASA Astronomy Picture of the Day (APOD) API](https://api.nasa.gov/) and adds local tooling for:
 
 - requesting APOD data (today, date-based, or random batch),
 - logging APOD metadata to JSONL and CSV,
@@ -198,7 +198,7 @@ BASE_URL="https://api.nasa.gov/planetary/apod"
 Notes:
 
 - You can use `DEMO_KEY` for light usage, but a personal NASA key is recommended.
-- `BASE_URL` should remain the APOD endpoint unless you intentionally proxy it.
+
 
 ### 8) Run the CLI
 
@@ -226,11 +226,10 @@ The app loads `.env` during NASA client initialization.
 |---|---|---|
 | `NASA_API_KEY` | Yes | NASA APOD API key used in each request. |
 | `BASE_URL` | Yes | APOD endpoint base URL (default: `https://api.nasa.gov/planetary/apod`). |
-| `RESOLUTION_TYPE` | Optional | Wallpaper mode hint used by WSL wallpaper tooling (`fit` default). |
 
 ### Runtime User Settings (`data/settings.jsonl`)
 
-The app stores user behavior flags in `data/settings.jsonl` and auto-creates this file at startup.
+The app stores user behavior in `data/settings.jsonl` and auto-creates this file at startup.
 
 Default values:
 
@@ -242,13 +241,12 @@ Default values:
 You can change settings from:
 
 1. **Main Menu → Change Setting**, or
-2. **Global commands** from any prompt:
+2. **Global commands**:
    - `--auto-redirect`
    - `--auto-wallpaper`
    - `--auto-save`
    - `--settings`
 
-Accepted command prefixes: `--`, `-`, and `/`.
 
 ### How Auto-Save Works
 
@@ -257,10 +255,8 @@ When `automatically_save_apod_files` is ON:
 - the app attempts to download APOD media after a successful fetch,
 - files are saved into your **global Downloads directory**,
 - naming convention is `apod-YYYY-MM-DD.<ext>` (with `-1`, `-2`, etc. suffixes if needed),
-- `local_file_path` is updated in both CSV and JSONL logs,
-- existing date-matching files are reused/skipped to avoid duplicates.
 
-For APOD videos hosted on YouTube, automatic file download is skipped gracefully.
+For APOD videos hosted on YouTube or other sites, automatic file download is skipped.
 
 ### How Auto-Wallpaper Works
 
@@ -277,7 +273,7 @@ When `automatically_set_wallpaper` is ON:
 You can also set wallpaper manually from a local path:
 
 ```text
---auto-wallpaper <absolute-or-resolvable-image-path>
+--auto-wallpaper <absolute-image-path>
 ```
 
 Supported manual image types include: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.gif`, `.webp`, `.tif`, `.tiff`.
@@ -290,7 +286,7 @@ Supported manual image types include: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.gif`, `
 
 At startup the app:
 
-- renders startup art,
+- renders 1 of 9 startup arts at random,
 - checks/creates required runtime files,
 - shows current setting status,
 - opens an entry menu (`Get started` or `Quit`).

@@ -215,24 +215,28 @@ def print_help() -> None:
     console.print(title)
 
     console.print(Text("COMMANDS:", style="app.secondary"))
+    prefix_note = Text("Note: ", style="body.text")
+    prefix_note.append("Commands support --, -, and / prefixes.", style="app.primary")
+    console.print(prefix_note)
+    console.print()
 
     # Command rows helper
     def cmd_row(left: str, right: str) -> None:
         row = Text("", style="body.text")
         row.append(left, style="app.primary")
-        padding = max(1, 35 - len(left))
+        padding = max(1, 31 - len(left))
         row.append(" " * padding, style="body.text")
         row.append(right, style="body.text")
         console.print(row)
 
-    cmd_row("--help, /help", "Show this help menu")
-    cmd_row("--readme, /readme", "Open README in browser")
-    cmd_row("--quit, /quit, q", "Exit the application")
-    cmd_row("--settings, /settings", "View settings configuration")
-    cmd_row("--auto-redirect, /auto-redirect", "Change auto-redirect setting")
-    cmd_row("--auto-wallpaper, /auto-wallpaper", "Change auto-wallpaper setting")
+    cmd_row("--help", "Show this help menu")
+    cmd_row("--readme", "Open README in browser")
+    cmd_row("--quit", "Exit the application")
+    cmd_row("--settings", "View settings configuration")
+    cmd_row("--auto-redirect", "Change auto-redirect setting")
+    cmd_row("--auto-wallpaper", "Change auto-wallpaper setting")
     cmd_row("--auto-wallpaper <filepath>", "Set wallpaper from a global image path")
-    cmd_row("--auto-save, /auto-save", "Change auto-save APOD files setting")
+    cmd_row("--auto-save", "Change auto-save APOD files setting")
 
     console.print()
 

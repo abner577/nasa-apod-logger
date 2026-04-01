@@ -3,6 +3,7 @@
 from rich.text import Text
 
 def build_box_lines(title: str, lines: list[str], padding_x: int = 2) -> list[str]:
+    """Build a simple text box with a centered title and padded content rows."""
     max_line_len = max((len(line) for line in lines), default=0)
     inner_width = max_line_len + (padding_x * 2)
 
@@ -38,6 +39,7 @@ def build_box_lines(title: str, lines: list[str], padding_x: int = 2) -> list[st
 
 
 def stylize_line(text: Text) -> None:
+    """Apply Rich styles to box borders, status markers, and highlighted labels."""
     s = text.plain
     if not s:
         return

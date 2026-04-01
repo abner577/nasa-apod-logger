@@ -123,6 +123,7 @@ def _prompt_yes_no(prompt_text: str) -> str | None:
 
 
 def update_automatically_redirect_setting() -> Any:
+    """Prompt for the browser redirect preference and persist the updated setting."""
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
         msg.append(f"'{user_settings_name}'", style="app.primary")
@@ -172,6 +173,7 @@ def get_automatically_redirect_setting() -> Any:
 
 
 def increment_launch_count(current_launch_count: Any) -> Any:
+    """Increase the stored launch count while preserving the other settings values."""
     current_launch_count += 1
 
     settings_dict = get_all_user_settings()
@@ -210,6 +212,7 @@ def get_automatically_save_apod_files() -> Any:
 
 
 def update_automatically_set_wallpaper() -> Any:
+    """Prompt for the wallpaper preference and write the result back to settings."""
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
         msg.append(f"'{user_settings_name}'", style="app.primary")
@@ -253,6 +256,7 @@ def update_automatically_set_wallpaper() -> Any:
 
 
 def update_automatically_save_apod_files_setting() -> Any:
+    """Prompt for the auto-save preference and persist the updated media setting."""
     if not check_if_user_settings_exist():
         msg = Text("Settings file not found: ", style="err")
         msg.append(f"'{user_settings_name}'", style="app.primary")

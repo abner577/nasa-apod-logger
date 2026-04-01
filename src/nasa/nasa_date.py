@@ -31,6 +31,7 @@ def check_valid_nasa_date(date_object: Any) -> Any:
         console.print(msg)
 
 def ask_user_for_date() -> Any:
+    """Prompt for year, month, and day, then return a validated APOD date string."""
     try:
         console.print()
         console.print(Text("Year (YYYY): ", style="app.secondary"), end="")

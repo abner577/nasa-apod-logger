@@ -78,8 +78,11 @@ def _is_wsl() -> bool:
         return False
 
 
-# This method just converts the wsl file path to the actual file path (not using the mnt prefix)
 def _wsl_file_uri_to_windows(uri: str) -> str:
+    """
+    Convert file:///mnt/<drive>/path to file:///C:/path for Windows browsers.
+    If the uri doesn't match the pattern, return as-is.
+    """
     prefix = "file:///mnt/"
     if not uri.startswith(prefix) or len(uri) <= len(prefix):
         return uri

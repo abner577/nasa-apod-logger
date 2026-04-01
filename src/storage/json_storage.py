@@ -499,6 +499,7 @@ def log_multiple_json_entries(list_formatted_apod_data: Any, show_individual_suc
 
 
 def update_local_file_path_in_json(target_date: str, local_file_path: str) -> bool:
+    """Rewrite the JSONL log so the matching APOD entry stores a local file path."""
     if not check_if_json_output_exists():
         return False
 

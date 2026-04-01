@@ -432,6 +432,7 @@ def log_multiple_csv_entries(list_formatted_apod_data: Any, show_individual_succ
 
 
 def update_local_file_path_in_csv(target_date: str, local_file_path: str) -> bool:
+    """Rewrite the CSV log so the matching APOD row stores a local file path."""
     if not check_if_csv_output_exists():
         return False
 
